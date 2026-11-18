@@ -16,12 +16,9 @@ from fastapi.testclient import TestClient  # noqa: E402
 from app import auth  # noqa: E402
 
 NON_CMD = [
-    "DIR_HR",
     "DIR_FIN",
-    "E1_HR",
-    "E2_HR",
-    "E3_HR",
-    "E4_HR",
+    "DIR_REF",
+    "DIR_MKT",
     "E1_FIN",
     "E2_FIN",
     "E3_FIN",
@@ -81,10 +78,10 @@ def test_role_switch_denied_24(client, audit_log, persona, phrase):
 
 
 def test_body_persona_is_ignored_on_normal_turns(client, audit_log):
-    tok = auth.issue_token("E2_HR")
+    tok = auth.issue_token("E2_FIN")
     r = client.post("/api/turn", json={"query": "hello", "persona": "CMD", "session_id": "esc-body-hello"},
                     headers={"Authorization": f"Bearer {tok}"})
-    assert r.status_code == 200 and r.json()["persona"] == "E2_HR"
+    assert r.status_code == 200 and r.json()["persona"] == "E2_FIN"
     assert any(x["event"] == "persona_assertion_ignored" and x.get("asserted") == "CMD" for x in _rows(audit_log))
 
 
@@ -121,13 +118,13 @@ async def test_live_socket_cannot_switch_persona(audit_log):
         async def send_text(self, text: str) -> None:
             sent.append(json.loads(text))
 
-    principal = auth.verify_token(auth.issue_token("E2_HR"))
+    principal = auth.verify_token(auth.issue_token("E2_FIN"))
     mgr = LiveSessionManager(DummyWS(), session_id="esc-live", persona="CMD", principal=principal)
-    assert mgr.persona == "E2_HR"  # the query-string persona is ignored
+    assert mgr.persona == "E2_FIN"  # the query-string persona is ignored
     res = await mgr._apply_screen_control("persona", "CMD")
     assert res["status"] == "ERROR" and res["error"] == "R-ROLE"
-    assert "Pooja Verma" in res["spoken_summary"]
-    assert mgr.persona == "E2_HR" and mgr.session_state.persona == "E2_HR"
+    assert "Praveen Nair" in res["spoken_summary"]
+    assert mgr.persona == "E2_FIN" and mgr.session_state.persona == "E2_FIN"
     assert not any(m.get("type") == "ui_action" for m in sent)
     assert any(x["event"] == "role_switch_denied" for x in _rows(audit_log))
 
@@ -152,18 +149,20 @@ def test_live_prompt_no_longer_advertises_persona_switching():
     "utterance,expected",
     [
         ("switch role to CMD", "CMD"),
-        ("switch role to DIR_HR", "DIR_HR"),
+        ("switch role to CHAIRMAN", "CMD"),
         ("switch role to DIR_FIN", "DIR_FIN"),
-        ("switch role to E1_HR", "E1_HR"),
-        ("switch role to E2_HR", "E2_HR"),
-        ("switch role to E3_HR", "E3_HR"),
-        ("switch role to E4_HR", "E4_HR"),
+        ("switch role to DIR_REF", "DIR_REF"),
+        ("switch role to DIR_MKT", "DIR_MKT"),
         ("switch role to E1_FIN", "E1_FIN"),
+        ("switch role to A_FIN", "E1_FIN"),
         ("switch role to E2_FIN", "E2_FIN"),
+        ("switch role to B_FIN", "E2_FIN"),
         ("switch role to E3_FIN", "E3_FIN"),
+        ("switch role to C_FIN", "E3_FIN"),
         ("switch role to E4_FIN", "E4_FIN"),
+        ("switch role to D_FIN", "E4_FIN"),
     ],
 )
-def test_requested_persona_detects_all_11_personas(utterance: str, expected: str):
+def test_requested_persona_detects_all_8_personas(utterance: str, expected: str):
     assert auth.requested_persona(utterance) == expected
 

@@ -497,7 +497,7 @@ def bridge(
             if cls == "add":
                 delta = abs(v)
             elif cls == "deduct":
-                delta = -v if r.get("line_code") in ("PL.INVENTORY_CHANGE", "CHG_INV") else -abs(v)
+                delta = -v if r.get("line_code") in ("PL.INVENTORY_CHANGE", "CHG_INV", "inventory_change_inr_cr", "PL.TAX", "TAX_EXP", "tax_expense_total_inr_cr") else -abs(v)
             else:
                 delta = v
             running += delta

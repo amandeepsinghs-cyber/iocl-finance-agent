@@ -91,7 +91,7 @@
     {
       "qid": "ST-1",
       "tool": "query_data",
-      "sql": "SELECT \n    field_id,\n    field_name,\n    asset_name,\n    basin,\n    water_cut_pct,\n    lifting_cost_per_boe_usd,\n    (oil_production_mt + gas_production_mmscm) AS total_production_metric\nFROM `ongc-hr-finance-agent.hrfin_gold.mart_field_economics`\nWHERE LOWER(onshore_offshore) = 'onshore'\n  AND line_type = 'field'\nORDER BY total_production_metric DESC\nLIMIT 10",
+      "sql": "SELECT \n    field_id,\n    field_name,\n    asset_name,\n    basin,\n    water_cut_pct,\n    lifting_cost_per_boe_usd,\n    (oil_production_mt + gas_production_mmscm) AS total_production_metric\nFROM `yukti-finance-iocl.hrfin_gold.mart_field_economics`\nWHERE LOWER(onshore_offshore) = 'onshore'\n  AND line_type = 'field'\nORDER BY total_production_metric DESC\nLIMIT 10",
       "sql_valid": true,
       "latency_ms": 15946.2,
       "spoken": "Across our top 10 producing onshore fields in `hrfin_gold.mart_field_economics`, there is "
@@ -99,7 +99,7 @@
     {
       "qid": "ST-7",
       "tool": "query_data",
-      "sql": "SELECT table_name, column_name FROM `ongc-hr-finance-agent.hrfin_silver.INFORMATION_SCHEMA.COLUMNS` WHERE table_name LIKE '%contract%' OR column_name LIKE '%contract%' OR table_name LIKE '%plant%' OR table_name LIKE '%workforce%'",
+      "sql": "SELECT table_name, column_name FROM `yukti-finance-iocl.hrfin_silver.INFORMATION_SCHEMA.COLUMNS` WHERE table_name LIKE '%contract%' OR column_name LIKE '%contract%' OR table_name LIKE '%plant%' OR table_name LIKE '%workforce%'",
       "sql_valid": true,
       "latency_ms": 31489.1,
       "spoken": "According to the latest workforce records in `hrfin_silver.contract_workforce` (September "
@@ -221,7 +221,7 @@
     {
       "qid": "ST-7",
       "tool": "query_data",
-      "sql": "SELECT table_name FROM `ongc-hr-finance-agent.hrfin_silver`.INFORMATION_SCHEMA.TABLES",
+      "sql": "SELECT table_name FROM `yukti-finance-iocl.hrfin_silver`.INFORMATION_SCHEMA.TABLES",
       "sql_valid": true,
       "latency_ms": 17547.3,
       "spoken": "At our major processing plants, the contract-to-regular workforce ratio stands at approxim"
@@ -335,7 +335,7 @@
     {
       "qid": "ST-1",
       "tool": "query_data",
-      "sql": "\nSELECT\n    t1.field_name,\n    t1.water_cut_pct,\n    t1.lifting_cost_per_boe_usd\n  FROM\n    `ongc-hr-finance-agent.hrfin_gold.mart_field_economics` AS t1\n    INNER JOIN `ongc-hr-finance-agent.hrfin_silver.dim_field` AS t2 ON t1.field_id = t2.field_id\n  WHERE\n    t1.line_type = 'field'\n    AND t1.fiscal_year = 'FY26'\n    AND LOWER(t2.onshore_offshore) = 'onshore'\n  ORDER BY\n    t1.oil_production_mt DESC\n  LIMIT 10\n",
+      "sql": "\nSELECT\n    t1.field_name,\n    t1.water_cut_pct,\n    t1.lifting_cost_per_boe_usd\n  FROM\n    `yukti-finance-iocl.hrfin_gold.mart_field_economics` AS t1\n    INNER JOIN `yukti-finance-iocl.hrfin_silver.dim_field` AS t2 ON t1.field_id = t2.field_id\n  WHERE\n    t1.line_type = 'field'\n    AND t1.fiscal_year = 'FY26'\n    AND LOWER(t2.onshore_offshore) = 'onshore'\n  ORDER BY\n    t1.oil_production_mt DESC\n  LIMIT 10\n",
       "sql_valid": true,
       "latency_ms": 4811.1,
       "spoken": "Among the top 10 onshore fields in FY26, Gandhar has the lowest water cut at 79.28% and al"

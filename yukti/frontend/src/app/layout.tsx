@@ -3,8 +3,8 @@ import '../design/tokens.generated.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Yukti AI — ONGC HR & Finance Executive Intelligence',
-  description: 'Voice-first AI agent for ONGC leadership (CMD, Director HR, Director Finance). Hands-free executive analytics, statutory policy guidance, and document generation.',
+  title: 'Yukti AI — IndianOil Finance & Downstream Intelligence',
+  description: 'Voice-first AI agent for Indian Oil Corporation Limited (IndianOil) leadership (Chairman, Director Finance, Director Refineries, Director Marketing). Hands-free financial analytics, refining economics, treasury policy guidance, and NSE:IOC valuation.',
 };
 
 export default function RootLayout({

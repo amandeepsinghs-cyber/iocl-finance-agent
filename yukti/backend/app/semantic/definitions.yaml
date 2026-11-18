@@ -1,99 +1,70 @@
-# Canonical Yukti v3 semantic definitions (SPEC-07 §4.2, D-51, P2H.3)
-# Single source of truth for station tenure (> 5.0 years continuous stay as of {anchor_date_fmt}).
+# Canonical Yukti IOCL Semantic Definitions
 version: 1
 anchor_date: "{anchor_date}"
 
 definitions:
-  DELHI_GT5_CONT_V1:
-    definition_id: DELHI_GT5_CONT_V1
-    title: "Delhi continuous stay > 5.0 years (as of {anchor_date_fmt})"
-    wc_id: "WC-DEL"
-    station_label: "Delhi"
+  IOCL_NET_REVENUE_V1:
+    definition_id: IOCL_NET_REVENUE_V1
+    title: "IOCL Gross vs Net Revenue from Operations (Ind AS 115 / Note 28)"
     as_of: "{anchor_date}"
-    tenure_basis: "continuous_stay"
-    threshold_years_exclusive: 5.0
-    min_days_exclusive: 1826
-    stay_start_column: "continuous_from_date"
-    grades_executives: ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9"]
-    grades_all_cadres: ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "GRP-B", "GRP-C", "GRP-D"]
-    board_grades_excluded: ["CMD", "DIR"]
-    exemption_handling: "counted_not_removed"
-    rule_sentence: "Continuous stay at the current station, more than 5.0 years, as of {anchor_date_fmt}"
+    rule_sentence: "Net Revenue = Gross Revenue from Operations minus Central Excise Duty remitted as principal refiner"
     citations:
-      - doc_id: "ONGC-HR-POL-JRTP"
+      - doc_id: "IOCL-ACCT"
         kind: "policy"
-        title: "JRTP Rev 4 cl. 3.2 — rotation after 3–5 years (**Illustrative**)"
-        section: "cl. 3.2"
-        illustrative: true
-      - doc_id: "J-03"
-        kind: "case_law"
-        title: "Delhi High Court (2018), ONGC v. B.V. Srihari Rao"
-        section: "2018 SCC OnLine Del (Administrative Exigency & Rotation)"
+        title: "IOCL Annual Report Note 1 & Note 28 — Ind AS 115 Central Excise Presentation"
+        section: "Note 28"
         illustrative: false
     reference_sql: |
       SELECT
-        e.emp_id,
-        e.emp_name AS name,
-        COALESCE(NULLIF(e.current_designation, ''), e.grade_designation) AS functional_designation,
-        e.current_grade_id AS grade,
-        e.grade_level_order,
-        e.discipline_id,
-        ROUND(e.total_tenure_years, 1) AS ongc_tenure_years,
-        ROUND(DATE_DIFF(DATE '{anchor_date}', s.continuous_from_date, DAY) / 365.25, 1) AS delhi_tenure_years,
-        ROUND(e.years_to_retirement, 1) AS years_to_retirement,
-        e.exemption_tag AS exemption,
-        e.is_superannuation_exempt
-      FROM `hrfin_gold.ssot_workforce_employee` e
-      JOIN `hrfin_gold.v_continuous_stay` s
-        ON s.emp_id = e.emp_id AND s.is_current_stay = TRUE
-      WHERE e.employment_status = 'Active'
-        AND e.wc_id = 'WC-DEL'
-        AND e.current_grade_id IN UNNEST(@grades)
-        AND DATE_DIFF(DATE '{anchor_date}', s.continuous_from_date, DAY) > 1826
+        fiscal_year,
+        gross_revenue_inr_cr,
+        excise_duty_inr_cr,
+        net_revenue_inr_cr,
+        ROUND(100.0 * ebitda_inr_cr / NULLIF(net_revenue_inr_cr, 0), 2) AS ebitda_margin_net_pct
+      FROM `hrfin_gold.ssot_corporate_annual_360`
+      ORDER BY fiscal_year DESC
 
-  STATION_GT5_CONT_V1:
-    definition_id: STATION_GT5_CONT_V1
-    title: "Station continuous stay > 5.0 years (as of {anchor_date_fmt})"
-    wc_id: "@wc_id"
-    station_label: "current station"
+  IOCL_CORE_VS_REPORTED_GRM_V1:
+    definition_id: IOCL_CORE_VS_REPORTED_GRM_V1
+    title: "Reported Gross Refining Margin vs Core GRM (ex-Inventory Valuation)"
     as_of: "{anchor_date}"
-    tenure_basis: "continuous_stay"
-    threshold_years_exclusive: 5.0
-    min_days_exclusive: 1826
-    stay_start_column: "continuous_from_date"
-    grades_executives: ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9"]
-    grades_all_cadres: ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9", "GRP-B", "GRP-C", "GRP-D"]
-    board_grades_excluded: ["CMD", "DIR"]
-    exemption_handling: "counted_not_removed"
-    rule_sentence: "Continuous stay at the current station, more than 5.0 years, as of {anchor_date_fmt}"
+    rule_sentence: "Core GRM excludes FIFO/NRV crude and product inventory holding gains or losses from Reported GRM ($/bbl)"
     citations:
-      - doc_id: "ONGC-HR-POL-JRTP"
+      - doc_id: "IOCL-ACCT"
         kind: "policy"
-        title: "JRTP Rev 4 cl. 3.2 — rotation after 3–5 years (**Illustrative**)"
-        section: "cl. 3.2"
-        illustrative: true
-      - doc_id: "J-03"
-        kind: "case_law"
-        title: "Delhi High Court (2018), ONGC v. B.V. Srihari Rao"
-        section: "2018 SCC OnLine Del (Administrative Exigency & Rotation)"
+        title: "IOCL Annual Report Note 11 — Lower of FIFO Cost or NRV Inventory Valuation"
+        section: "Note 11"
         illustrative: false
     reference_sql: |
       SELECT
-        e.emp_id,
-        e.emp_name AS name,
-        COALESCE(NULLIF(e.current_designation, ''), e.grade_designation) AS functional_designation,
-        e.current_grade_id AS grade,
-        e.grade_level_order,
-        e.discipline_id,
-        ROUND(e.total_tenure_years, 1) AS ongc_tenure_years,
-        ROUND(DATE_DIFF(DATE '{anchor_date}', s.continuous_from_date, DAY) / 365.25, 1) AS station_tenure_years,
-        ROUND(e.years_to_retirement, 1) AS years_to_retirement,
-        e.exemption_tag AS exemption,
-        e.is_superannuation_exempt
-      FROM `hrfin_gold.ssot_workforce_employee` e
-      JOIN `hrfin_gold.v_continuous_stay` s
-        ON s.emp_id = e.emp_id AND s.is_current_stay = TRUE
-      WHERE e.employment_status = 'Active'
-        AND e.wc_id = @wc_id
-        AND e.current_grade_id IN UNNEST(@grades)
-        AND DATE_DIFF(DATE '{anchor_date}', s.continuous_from_date, DAY) > 1826
+        fiscal_year,
+        gross_refining_margin_usd_bbl,
+        core_grm_usd_bbl,
+        singapore_benchmark_grm_usd_bbl,
+        grm_premium_over_singapore_usd_bbl
+      FROM `hrfin_gold.ssot_corporate_annual_360`
+      ORDER BY fiscal_year DESC
+
+  IOCL_REFINERY_RECONCILIATION_V1:
+    definition_id: IOCL_REFINERY_RECONCILIATION_V1
+    title: "Downstream 360 Reconciliation: 9 Standalone Refineries + Divisions == Corporate Standalone P&L"
+    as_of: "{anchor_date}"
+    rule_sentence: "SUM across 9 refineries (70.25 MMTPA) equals corporate throughput; adding Marketing, Pipelines & Corporate divisions equals Standalone P&L with 0.00 Cr error"
+    citations:
+      - doc_id: "IOCL-ACCT"
+        kind: "policy"
+        title: "IOCL Annual Report Ind AS 108 & `hrfin_gold.v_refinery_pnl_v3`"
+        section: "Ind AS 108"
+        illustrative: false
+    reference_sql: |
+      SELECT
+        fiscal_year,
+        refinery_id,
+        refinery_name,
+        throughput_mmt,
+        grm_usd_bbl,
+        ebitda_inr_cr,
+        pbt_inr_cr
+      FROM `hrfin_gold.v_refinery_pnl_v3`
+      WHERE is_refinery = TRUE
+      ORDER BY fiscal_year DESC, grm_usd_bbl DESC

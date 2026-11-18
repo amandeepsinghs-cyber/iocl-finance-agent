@@ -41,7 +41,7 @@ def _make_json_safe(obj: Any) -> Any:
     return obj
 
 
-REFUSAL_IDS = {"D1", "D2", "D3", "D4", "D5", "D6", "P18", "P19", "P20", "M3", "M4"}
+REFUSAL_IDS = {"Q29"}
 
 
 def generate_contract_for_certified(entry: dict, params: dict = None, persona: str = "CMD") -> dict:
@@ -131,10 +131,10 @@ def generate_contract_for_certified(entry: dict, params: dict = None, persona: s
         "visual": visual,
         "insights": insights[:3],
         "sources": sources,
-        "suggestions": ["Show breakdown by discipline", "What are the relevant policy rules?"],
+        "suggestions": ["Show FY17–FY26 historical trend", "What are the relevant policy rules?"],
         "access": access,
         "export_options": ["sheets", "xlsx", "pdf"],
-        "status_events": ["Served from Verified Answer Cache (<15ms)", "Audited enterprise ground truth"],
+        "status_events": ["Served from Verified Answer Cache (<15ms)", "Published enterprise ground truth"],
         "latency_ms": 12.5,
         "generated_sql": res.get("executed_sql"),
         "tool_called": "run_certified_query",
@@ -144,7 +144,7 @@ def generate_contract_for_certified(entry: dict, params: dict = None, persona: s
 
 def warmup():
     t0 = time.perf_counter()
-    print("Starting Answer Cache Warm-up for 89 certified queries + follow-up variants (ThreadPoolExecutor=8)...")
+    print("Starting Answer Cache Warm-up for 30 IOCL certified queries + follow-up variants (ThreadPoolExecutor=8)...")
 
     queries = list_certified_queries()
     cache_entries = {}
@@ -167,22 +167,18 @@ def warmup():
             print(f"Error warming up {qid} ({raw_params}): {e}")
             return None
 
-    # Tasks for all 89 roots
+    # Tasks for all 30 IOCL certified queries
     items_to_warm = [dict(q) for q in queries]
 
     # Additional follow-up parameter variants
     variants = [
-        ("C1", {"wc_id": "WC-MUM", "min_stay_months": 60}),
-        ("C1", {"wc_id": "WC-DDN", "min_stay_months": 60}),
-        ("C1", {"wc_id": "WC-AHM", "min_stay_months": 60}),
-        ("C1", {"wc_id": "WC-MEH", "min_stay_months": 60}),
-        ("C1", {"wc_id": "WC-ASM", "min_stay_months": 60}),
-        ("C1", {"wc_id": "WC-DEL", "min_stay_months": 36}),
-        ("C1", {"wc_id": "WC-TRI", "min_stay_months": 60}),
-        ("C6", {"fiscal_year": "FY25"}),
-        ("C12", {"fiscal_year": "FY25"}),
-        ("H1", {"wc_id": "WC-MUM"}),
-        ("H3", {"wc_id": "WC-TRI"}),
+        ("Q01", {"fiscal_year": "FY25"}),
+        ("Q01", {"fiscal_year": "FY24"}),
+        ("Q07", {"fiscal_year": "FY25"}),
+        ("Q09", {"fiscal_year": "FY25"}),
+        ("Q13", {"fiscal_year": "FY25"}),
+        ("Q17", {"fiscal_year": "FY25"}),
+        ("Q20", {"fiscal_year": "FY25"}),
     ]
 
     for qid, params in variants:

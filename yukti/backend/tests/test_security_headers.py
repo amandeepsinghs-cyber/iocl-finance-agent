@@ -48,8 +48,8 @@ def test_evil_origin_gets_no_cors_header(monkeypatch):
 
 def test_allowed_origin_gets_cors_header(monkeypatch):
     main = _fresh_app(monkeypatch)
-    r = _preflight(TestClient(main.app), "http://localhost:3300")
-    assert r.headers.get("access-control-allow-origin") == "http://localhost:3300"
+    r = _preflight(TestClient(main.app), "http://localhost:3400")
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:3400"
     assert r.headers.get("access-control-allow-credentials") == "true"
     methods = r.headers.get("access-control-allow-methods", "")
     assert "POST" in methods and "DELETE" not in methods and "*" not in methods
@@ -104,5 +104,5 @@ def test_docs_off_in_prod(monkeypatch):
 def test_prod_without_origins_env_allows_no_cross_origin(monkeypatch):
     """P0.5 r2 (G4 minor): in prod the localhost dev defaults are not trusted."""
     main = _fresh_app(monkeypatch, YUKTI_ENV="prod")
-    r = _preflight(TestClient(main.app), "http://localhost:3300")
+    r = _preflight(TestClient(main.app), "http://localhost:3400")
     assert "access-control-allow-origin" not in {k.lower() for k in r.headers}

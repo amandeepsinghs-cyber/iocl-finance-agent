@@ -215,12 +215,12 @@ export const EmailDraftRenderer: React.FC<EmailDraftRendererProps> = ({
       className="card flex flex-col rounded-[var(--radius-lg)] border border-[var(--hairline)] bg-[var(--card)] overflow-hidden"
     >
       {/* Header bar */}
-      <div className="bg-ongc-maroon text-white px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-iocl-maroon text-white px-5 py-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <Mail className="w-4 h-4 shrink-0" aria-hidden />
           <div>
             <div className="text-caption uppercase tracking-wider opacity-85">Official Correspondence Draft (Unsent)</div>
-            <div className="text-body font-semibold">{subject || 'Transfer Review Memorandum'}</div>
+            <div className="text-body font-semibold">{subject || 'IOCL Executive Memorandum'}</div>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ export const EmailDraftRenderer: React.FC<EmailDraftRendererProps> = ({
               type="text"
               value={toText}
               onChange={(e) => setToText(e.target.value)}
-              placeholder="Recipient name <email@ongc.co.in>"
+              placeholder="Recipient name <email@indianoil.in>"
               className="w-full px-2.5 py-1 rounded-[var(--radius-sm)] border border-[var(--hairline)] bg-[var(--card)] text-[var(--ink)]"
             />
           ) : (
@@ -342,7 +342,7 @@ export const EmailDraftRenderer: React.FC<EmailDraftRendererProps> = ({
       {/* Footer & Action bar */}
       <div className="px-5 py-3 border-t border-[var(--hairline)] bg-[var(--surface)] flex flex-wrap items-center justify-between gap-3">
         <div className="text-caption text-[var(--ink-3)]" data-testid="email-draft-footer">
-          {draft.footer || 'Data: synthetic employee records calibrated to ONGC AR FY26 (Illustrative)'}
+          {draft.footer || 'Data: IOCL financial and downstream records calibrated to IOCL AR FY26 (Illustrative)'}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button

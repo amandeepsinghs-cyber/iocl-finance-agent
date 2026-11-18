@@ -1,5 +1,5 @@
 """Document Drafting and Revision Engine for Yukti AI.
-Drafts official ONGC Board Notes, Parliament Replies, Transfer Proposals,
+Drafts official IOCL Board Notes, Capex Appraisal Notes, Treasury FX Risk Notes, and Governance Briefs,
 and executive applications using templates in data_bank/landing/documents/templates/.
 Maintains document versions and applies revisions by voice or text.
 Enforces real-person denylist check to guarantee 100% fictional parliamentary integrity.
@@ -40,54 +40,82 @@ def sanitize_fictional_names(text: str) -> str:
 
 DOCUMENT_TEMPLATES = {
     "board_note": {
-        "title": "Board Note: Operational & Financial Review",
+        "title": "Board Note: Downstream & Financial Review",
         "doc_type": "board_note",
-        "template_id": "template_board_note.docx",
-        "default_markdown": """# OIL AND NATURAL GAS CORPORATION LIMITED
-## BOARD OF DIRECTORS | AGENDA NOTE
+        "template_id": "template_board_note.md",
+        "default_markdown": """# INDIAN OIL CORPORATION LIMITED (IOCL)
+## BOARD OF DIRECTORS | FINANCE & DOWNSTREAM AGENDA NOTE
 **STRICTLY CONFIDENTIAL — FOR BOARD CONSIDERATION ONLY**
 
 ### 1. Proposal & Executive Summary
-This memorandum presents an operational and financial assessment grounded in the active session records from the ONGC Single Source of Truth (SSOT).
+This memorandum presents an operational and financial assessment grounded in the active session records from the IOCL Single Source of Truth (SSOT).
 
 ### 2. Operational & Financial Context
-No active cohort or table rows were selected prior to drafting. Run an analytical query first to populate the grounded data table in this memorandum.
+No active financial table rows were selected prior to drafting. Run an analytical query first to populate the grounded SSOT table in this memorandum.
 
-### 3. Strategic Options Evaluated
-1. **Option A: Production Enhancement Contract (PEC):** Inducting Technical Service Partners under a revenue-sharing model (MoPNG PEC Guidelines).
-2. **Option B: Capex Rationalisation & Artificial Lift Overhaul:** Optimising water-handling and well servicing to compress lifting costs.
-3. **Option C: Workforce & Cadre Redeployment:** Aligning rotational transfers with operational priorities under JRTP Rev. 4 guidelines.
+### 3. Strategic Levers Evaluated (`L01–L10`)
+1. **Option A: Refinery Energy & GRM Optimization (`L01–L02`):** Trimming Fuel & Loss (`-30 bps` -> `₹940 Cr/yr`) and scaling heavy/high-TAN opportunity crude (`+$0.35/bbl` -> `₹1,620 Cr/yr`).
+2. **Option B: Pipeline Freight Shift & Working Capital Compression (`L04–L05`):** Migrating `6.5 MMT` inland fuel from rail to pipeline (`₹685 Cr/yr`) and trimming DIO by `3 days` (`~₹4,800 Cr` cash release).
+3. **Option C: Stage-Gate Capex & De-Leveraging (`L07`, `L09`):** Enforcing `≥ 12%` post-tax equity IRR gating (`IOCL-CAPALLOC`) and retiring short-term WCDL/CP facilities.
 
 ### 4. Recommendation & Decision Sought
-The Board is requested to review the grounded SSOT indicators and accord in-principle approval for the recommended intervention.
+The Board Finance Committee is requested to review the grounded SSOT indicators and accord approval under `IOCL-DOA` Clause 6.0.
 
-*Prepared by:* Corporate Strategy & Asset Economics Group  
-*Submitted for Approval:* Chairman & Managing Director (CMD)
+*Prepared by:* Corporate Finance & Treasury Group
+*Submitted for Approval:* Chairman (`CMD`) & Director (Finance)
+"""
+    },
+    "capex_appraisal": {
+        "title": "Capex Appraisal Note (IOCL-CAPALLOC)",
+        "doc_type": "capex_appraisal",
+        "template_id": "template_capex_appraisal.md",
+        "default_markdown": """# INDIAN OIL CORPORATION LIMITED (IOCL)
+## STAGE-GATE CAPITAL EXPENDITURE APPRAISAL NOTE
+
+**POLICY BASIS:** `IOCL-CAPALLOC` Clause 1.0–2.0 (`≥ 12.0%` Post-Tax Equity IRR Hurdle Rate)
+
+### 1. Project & Refinery Capacity Summary
+Capital outlay assessment across brownfield refinery expansions (Panipat P-25, Koyali, Barauni), cross-country pipelines, and Net-Zero 2046 investments grounded in IOCL SSOT.
+
+### 2. Financial Viability & Target Leverage (`D/E ≤ 0.70x`)
+- Stage-gate clearance verifies post-tax IRR `≥ 12%` and ongoing CWIP commissioning discipline.
+"""
+    },
+    "treasury_fx_note": {
+        "title": "Treasury, Crude Hedging & FX Risk Note",
+        "doc_type": "treasury_fx_note",
+        "template_id": "template_treasury_fx_note.md",
+        "default_markdown": """# INDIAN OIL CORPORATION LIMITED (IOCL)
+## TREASURY, CRUDE HEDGING & USD/INR FX RISK NOTE
+
+**POLICY BASIS:** `IOCL-HEDGING` Clauses 2.0–5.0 (`25%–35%` crack hedge band; `50%–75%` short-term FX forward cover)
+
+### 1. Crude Cargo, Crack & FX Exposure Snapshot
+Review of cargo-in-transit pricing mismatch, Singapore gasoil crack hedges, and USD/INR ECB/LC sensitivity grounded in IOCL Treasury limits.
 """
     },
     "parliament_reply": {
-        "title": "Parliament Question Reply: Workforce & Vacancy Review",
+        "title": "Parliament Question Reply: Downstream Refining & Exchequer Review",
         "doc_type": "parliament_reply",
         "template_id": "template_parliament_reply_format.docx",
         "default_markdown": """# GOVERNMENT OF INDIA
 ## MINISTRY OF PETROLEUM AND NATURAL GAS
 ### PARLIAMENT QUESTION BRIEFING DRAFT
 
-**SUBJECT:** Workforce & Operational Review across ONGC Work Centres  
-**QUESTIONED BY:** Shri Anand Swaroop, Hon. M.P.
+**SUBJECT:** Refinery Capacity Utilization, Excise Duty & Capital Expenditure of Indian Oil Corporation Limited (IOCL)
+**QUESTIONED BY:** Hon. Member of Parliament
 
 ---
 
-### (a) Position of Sanctioned and In-Position Strength
+### (a) Statement on Downstream Operations & Financial Performance
 **ANSWER (MINISTER OF STATE IN THE MINISTRY OF PETROLEUM AND NATURAL GAS):**  
-(a) The work-centre-wise sanctioned strength, in-position strength, and vacancy position are compiled from the ONGC Single Source of Truth (SSOT) records in the active session table.
+(a) Standalone refinery throughput (`75.451 MMT` across 9 refineries in FY26), pipeline volumes, and Schedule III financial figures are compiled from the IOCL Single Source of Truth (SSOT) records in the active session table.
 
-### (b) Steps being taken to fill vacancies and incentivize deployments?
+### (b) Expansion, Energy Efficiency & Net-Zero Steps
 **ANSWER:**  
-(b) The Corporation has initiated the following measures:
-1. **Special Recruitment Drives:** Dedicated recruitment drives for notified categories against sanctioned vacancies.
-2. **Rotational Transfer Redeployment:** Executive officers are redeployed across field installations under the Annual General Transfer (AGT) cycle pursuant to JRTP guidelines.
-3. **Graduate Trainee Inductions:** Fresh Graduate Trainees in core technical disciplines undergo foundational training with initial postings in operational assets.
+(b) IndianOil has initiated the following strategic measures:
+1. **Brownfield Refinery Expansions:** Capacity expansions at Panipat (`15 -> 25 MMTPA`), Koyali (`13.7 -> 18 MMTPA`), and Barauni (`6 -> 9 MMTPA`) to bolster domestic fuel security.
+2. **Pipeline Modal Logistics & Net-Zero 2046:** Commissioning cross-country product pipeline spurs and Panipat Green Hydrogen / biofuel initiatives under `IOCL-CAPALLOC`.
 """
     }
 }
@@ -146,7 +174,7 @@ class DocumentDraftingEngine:
         wc_profile = ctx.get("wc_profile") or {}
 
         if ctx_rows or wc_profile:
-            wc_name = wc_profile.get("wc_name") or ctx.get("wc_name") or "ONGC Enterprise Operations"
+            wc_name = wc_profile.get("wc_name") or ctx.get("wc_name") or "Indian Oil Corporation Limited (IOCL)"
             wc_id = wc_profile.get("wc_id") or ctx.get("wc_id") or "CORP-ALL"
             doc_heading = "OFFICE MEMORANDUM & EXECUTIVE BRIEFING NOTE"
             if "board" in q_l or "board" in dt:
@@ -206,13 +234,13 @@ class DocumentDraftingEngine:
             table_section = f"\n### 3. Grounded Analytical Data Table ({len(ctx_rows)} Records)\n{md_table}\n" if md_table else ""
 
             summary_para = ctx.get("summary_text") or (
-                f"This executive briefing note synthesizes enterprise records (demo data) from the ONGC Single Source of Truth (SSOT) "
+                f"This executive briefing note synthesizes published and operational records from the IOCL Single Source of Truth (SSOT) "
                 f"for {wc_name} as of 19th October 2026."
             )
 
-            markdown = f"""# OIL AND NATURAL GAS CORPORATION LIMITED
+            markdown = f"""# INDIAN OIL CORPORATION LIMITED
 ## {doc_heading}
-**File Ref:** `ONGC/CMD/BRIEF/2026/{wc_id}` | **Date:** 20th October 2026  
+**File Ref:** `IOCL/CMD/FIN/2026/{wc_id}` | **Date:** 16th November 2026  
 **Classification:** INTERNAL — FOR EXECUTIVE REVIEW  
 **Subject:** **{subject_line}**
 
@@ -222,12 +250,12 @@ class DocumentDraftingEngine:
 {summary_para}
 {wc_section}{table_section}
 ### 4. Actionable Recommendations & Next Steps
-1. **Workforce & Cadre Alignment:** Align rotational deployments and special recruitment drives with sanctioned post gaps and upcoming superannuation windows under JRTP Rev. 4 guidelines.
-2. **Cost & Productivity Optimization:** Monitor unit manpower and lifting costs against FY27 MoU targets and quarterly budget estimates (BE/RE).
-3. **Compliance & Governance:** Record this briefing note in the executive decision register and circulate approved extracts to concerned Asset/Basin Managers.
+1. **Refinery Energy & GRM Uplift (`L01–L03`):** Accelerate heavy opportunity crude intake and Fuel & Loss integration across Panipat, Paradip, and Koyali refineries.
+2. **Capital Discipline & De-Leveraging:** Enforce `≥ 12%` post-tax equity IRR (`IOCL-CAPALLOC`) and monitor operating margins against FY27 MoU & BE/RE targets.
+3. **Compliance & Governance:** Record this briefing note in the Board Finance Secretariat register and circulate approved extracts under `IOCL-DOA` Clause 6.0.
 
-*Generated & Grounded by:* **Yukti AI (ONGC Executive Intelligence)**  
-*Source Attribution:* `hrfin_gold.ssot_work_centre_360` & `hrfin_gold.ssot_workforce_employee`
+*Generated & Grounded by:* **Yukti AI (IndianOil Finance & Downstream Intelligence)**  
+*Source Attribution:* `hrfin_gold.ssot_corporate_annual_360` & `hrfin_gold.ssot_refinery_economics_360`
 """
 
         # Apply revision instructions if requested
@@ -296,7 +324,7 @@ class DocumentDraftingEngine:
             "Discipline",
             "Present Work Centre",
             "Station Tenure (yrs)",
-            "ONGC Service (yrs)",
+            "IOCL Service (yrs)",
             "Exemption",
         ]
         table_lines = [
@@ -313,7 +341,7 @@ class DocumentDraftingEngine:
                 _format_cell(emp.get("discipline")),
                 _format_cell(emp.get("work_centre")),
                 _format_tenure(emp.get("station_tenure_years")),
-                _format_tenure(emp.get("ongc_tenure_years")),
+                _format_tenure(emp.get("iocl_tenure_years")),
                 _format_cell(emp.get("exemption")),
             ]
             table_lines.append("| " + " | ".join(row_vals) + " |")
@@ -322,7 +350,7 @@ class DocumentDraftingEngine:
         purpose_text = (
             context.get("purpose")
             if context and isinstance(context, dict) and context.get("purpose")
-            else f"This deliberative draft transfer note outlines proposed rotational transfers for {n} executive(s) pursuant to the ONGC Job Rotation and Transfer Policy (JRTP)."
+            else f"This deliberative draft transfer note outlines proposed rotational transfers for {n} executive(s) pursuant to the IOCL Job Rotation and Transfer Policy (JRTP)."
         )
 
         exemption_lines = []

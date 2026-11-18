@@ -6,7 +6,7 @@
 
 WITH cl AS (
     SELECT emp_id, current_grade_id, cumulative_cluster_years, has_breached_cluster_10yr_cap, is_superannuation_exempt
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+    FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
     WHERE cluster_id = 'CL-DEL' AND is_currently_in_cluster
 ),
 ph AS (

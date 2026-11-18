@@ -20,7 +20,7 @@ from typing import Any, Callable, Dict, List
 
 import yaml
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "asia-south1"
 JOB_LABELS = {"datacloud": "ai-agent"}
 

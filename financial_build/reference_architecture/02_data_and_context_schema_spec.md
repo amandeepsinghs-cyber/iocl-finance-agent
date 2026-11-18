@@ -1,6 +1,6 @@
 # Data & Context Schema Specification (BigQuery SSOT + Context Bridge + Vector RAG)
 
-## 1. BigQuery Dataset Topology (`ongc-hr-finance-agent`)
+## 1. BigQuery Dataset Topology (`yukti-finance-iocl`)
 
 | Dataset | Table Name | Grain | Rows | Purpose |
 |---|---|---|---:|---|
@@ -19,7 +19,7 @@
 ## 2. Schema of `hrfin_gold.ssot_financial_line_context`
 
 ```sql
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.ssot_financial_line_context` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.ssot_financial_line_context` (
   context_id STRING NOT NULL,
   fy STRING NOT NULL,                      -- 'FY17' .. 'FY26', or 'FY17_FY26'
   statement_type STRING NOT NULL,          -- 'PNL' | 'BALANCE_SHEET' | 'CASH_FLOW' | 'RATIOS' | 'SUBSIDIARY' | 'FIELD_ECON'
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.ssot_financial_line
 ## 3. Schema of `hrfin_docs.financial_notes_chunks`
 
 ```sql
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_docs.financial_notes_chunks` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_docs.financial_notes_chunks` (
   chunk_id STRING NOT NULL,
   fy STRING NOT NULL,                      -- 'FY17' .. 'FY26' or 'FY17_FY26'
   statement_type STRING NOT NULL,          -- 'PNL' | 'BALANCE_SHEET' | 'CASH_FLOW' | 'RATIOS' | 'CONSOLIDATED' | 'FIELD_ECON' | 'CHRONOLOGY'

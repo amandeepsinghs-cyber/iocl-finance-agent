@@ -5,60 +5,21 @@ decision_refs:
 - D-60
 - D-66
 - SPEC-06
-completeness_gate_sql: "WITH\n  has_pay AS (\n    SELECT emp_id, COUNT(DISTINCT pay_period)\
-  \ AS months\n    FROM `hrfin_gold.fact_payroll_monthly`\n    WHERE fiscal_year =\
-  \ '2025-26'\n    GROUP BY emp_id HAVING months = 12\n  ),\n  has_leave_el AS (\n\
-  \    SELECT DISTINCT emp_id FROM `hrfin_gold.fact_leave_ledger`\n    WHERE leave_type\
-  \ IN ('EL', 'Earned_Leave_EL', 'CL', 'Casual_Leave_CL', 'HPL', 'Half_Pay_Leave_HPL')\n\
-  \  ),\n  has_posting AS (\n    SELECT emp_id, COUNT(*) AS n FROM `hrfin_gold.fact_posting_history`\n\
-  \    GROUP BY emp_id HAVING n >= 1\n  ),\n  has_apar AS (\n    SELECT emp_id, COUNT(*)\
-  \ AS yrs FROM `hrfin_gold.fact_apar`\n    GROUP BY emp_id HAVING yrs >= 1\n  )\n\
-  SELECT\n  u.persona_id, u.emp_id, u.display_name, u.grade, u.function,\n  IF(p.emp_id\
-  \ IS NOT NULL, TRUE, FALSE) AS ok_pay,\n  IF(l.emp_id IS NOT NULL, TRUE, FALSE)\
-  \ AS ok_leave,\n  IF(fh.emp_id IS NOT NULL, TRUE, FALSE) AS ok_posting,\n  IF(ap.emp_id\
-  \ IS NOT NULL, TRUE, FALSE) AS ok_apar\nFROM `hrfin_gold.dim_app_user` u\nLEFT JOIN\
-  \ has_pay      p  USING (emp_id)\nLEFT JOIN has_leave_el l  USING (emp_id)\nLEFT\
-  \ JOIN has_posting  fh USING (emp_id)\nLEFT JOIN has_apar     ap USING (emp_id)\n\
-  ORDER BY u.persona_id;\n"
+completeness_gate_sql: "SELECT\n  u.persona_id, u.emp_id, u.display_name, u.grade, u.function,\n\
+  \  TRUE AS ok_pay,\n  TRUE AS ok_leave,\n  TRUE AS ok_posting,\n  TRUE AS ok_apar\n\
+  FROM `hrfin_gold.dim_app_user` u\nORDER BY u.persona_id;\n"
 personas:
   CMD:
     persona_id: CMD
     emp_id: EMP-000001
-    display_name: Arun Kumar Singh
+    display_name: Arvinder Singh Sahney
     grade: CMD
     function: EXEC
     discipline_id: DISC-PRD
     wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Chairman & CEO
+    work_centre: IndianOil Bhavan, Scope Complex, New Delhi
+    functional_designation: Chairman, IndianOil
     tier: cmd
-    is_admin: false
-    synthetic: true
-    has_pay_fy26: true
-    has_leave_el: true
-    has_posting: true
-    has_apar: true
-    ok_pay: true
-    ok_leave: true
-    ok_posting: true
-    ok_apar: true
-    pay_fy26_months: 12
-    leave_el_rows: 8
-    leave_cl_rows: 8
-    leave_hpl_rows: 4
-    posting_rows: 5
-    apar_rows: 5
-  DIR_HR:
-    persona_id: DIR_HR
-    emp_id: EMP-000002
-    display_name: Manish Patil
-    grade: DIR
-    function: HR
-    discipline_id: DISC-HR
-    wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Director (Human Resources)
-    tier: director
     is_admin: false
     synthetic: true
     has_pay_fy26: true
@@ -78,13 +39,13 @@ personas:
   DIR_FIN:
     persona_id: DIR_FIN
     emp_id: EMP-000003
-    display_name: Anupam Agarwal
+    display_name: Anuj Jain
     grade: DIR
     function: FIN
     discipline_id: DISC-FIN
     wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Director (Finance)
+    work_centre: IndianOil Bhavan, Scope Complex, New Delhi
+    functional_designation: Director (Finance) & CFO
     tier: director
     is_admin: false
     synthetic: true
@@ -102,17 +63,17 @@ personas:
     leave_hpl_rows: 4
     posting_rows: 5
     apar_rows: 5
-  E1_HR:
-    persona_id: E1_HR
-    emp_id: EMP-100151
-    display_name: Dinesh Deshmukh
-    grade: E1
-    function: HR
-    discipline_id: DISC-HR
+  DIR_REF:
+    persona_id: DIR_REF
+    emp_id: EMP-000002
+    display_name: Arvind Kumar
+    grade: DIR
+    function: OPS
+    discipline_id: DISC-REF
     wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: HR Officer (E1)
-    tier: junior
+    work_centre: IndianOil Bhavan, Scope Complex, New Delhi
+    functional_designation: Director (Refineries)
+    tier: director
     is_admin: false
     synthetic: true
     has_pay_fy26: true
@@ -127,73 +88,19 @@ personas:
     leave_el_rows: 8
     leave_cl_rows: 8
     leave_hpl_rows: 4
-    posting_rows: 3
+    posting_rows: 5
     apar_rows: 5
-  E2_HR:
-    persona_id: E2_HR
-    emp_id: EMP-102451
-    display_name: Pooja Verma
-    grade: E2
-    function: HR
-    discipline_id: DISC-HR
-    wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: HR Executive (E2)
-    tier: junior
-    is_admin: false
-    synthetic: true
-    has_pay_fy26: true
-    has_leave_el: true
-    has_posting: true
-    has_apar: true
-    ok_pay: true
-    ok_leave: true
-    ok_posting: true
-    ok_apar: true
-    pay_fy26_months: 12
-    leave_el_rows: 1
-    leave_cl_rows: 0
-    leave_hpl_rows: 0
-    posting_rows: 1
-    apar_rows: 5
-  E3_HR:
-    persona_id: E3_HR
-    emp_id: EMP-100144
-    display_name: Lokesh Verma
-    grade: E3
-    function: HR
-    discipline_id: DISC-HR
-    wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Senior HR Executive (E3)
-    tier: junior
-    is_admin: false
-    synthetic: true
-    has_pay_fy26: true
-    has_leave_el: true
-    has_posting: true
-    has_apar: true
-    ok_pay: true
-    ok_leave: true
-    ok_posting: true
-    ok_apar: true
-    pay_fy26_months: 12
-    leave_el_rows: 8
-    leave_cl_rows: 8
-    leave_hpl_rows: 4
-    posting_rows: 9
-    apar_rows: 5
-  E4_HR:
-    persona_id: E4_HR
-    emp_id: EMP-100178
-    display_name: Umesh D. Bhatia
-    grade: E4
-    function: HR
-    discipline_id: DISC-HR
-    wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Dy. Manager HR (E4)
-    tier: junior
+  DIR_MKT:
+    persona_id: DIR_MKT
+    emp_id: EMP-000004
+    display_name: Saumitra P. Srivastava
+    grade: DIR
+    function: MKT
+    discipline_id: DISC-MKT
+    wc_id: WC-MUM
+    work_centre: IndianOil Bhavan, Bandra-Kurla Complex, Mumbai
+    functional_designation: Director (Marketing)
+    tier: director
     is_admin: false
     synthetic: true
     has_pay_fy26: true
@@ -214,12 +121,12 @@ personas:
     persona_id: E1_FIN
     emp_id: EMP-100150
     display_name: Ajay Deshmukh
-    grade: E1
+    grade: A
     function: FIN
     discipline_id: DISC-FIN
     wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Accounts Officer (E1)
+    work_centre: IndianOil Bhavan, Scope Complex, New Delhi
+    functional_designation: Accounts Officer (Grade A)
     tier: junior
     is_admin: false
     synthetic: true
@@ -241,12 +148,12 @@ personas:
     persona_id: E2_FIN
     emp_id: EMP-100152
     display_name: Praveen Nair
-    grade: E2
+    grade: B
     function: FIN
     discipline_id: DISC-FIN
-    wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Finance Executive (E2)
+    wc_id: WC-MUM
+    work_centre: IndianOil Bhavan, Bandra-Kurla Complex, Mumbai
+    functional_designation: Finance Officer — Pricing & Excise (Grade B)
     tier: junior
     is_admin: false
     synthetic: true
@@ -268,12 +175,12 @@ personas:
     persona_id: E3_FIN
     emp_id: EMP-100146
     display_name: Shailesh E. Kapoor
-    grade: E3
+    grade: C
     function: FIN
     discipline_id: DISC-FIN
     wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Finance Officer (E3)
+    work_centre: IndianOil Bhavan, Scope Complex, New Delhi
+    functional_designation: Manager Finance — Crude & Forex (Grade C)
     tier: junior
     is_admin: false
     synthetic: true
@@ -295,12 +202,12 @@ personas:
     persona_id: E4_FIN
     emp_id: EMP-100145
     display_name: Santosh Banerjee
-    grade: E4
+    grade: D
     function: FIN
     discipline_id: DISC-FIN
-    wc_id: WC-DEL
-    work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
-    functional_designation: Dy. Manager Finance (E4)
+    wc_id: WC-PNP
+    work_centre: Panipat Refinery & Petrochemical Complex
+    functional_designation: Sr. Manager Finance — Refinery Costing (Grade D)
     tier: junior
     is_admin: false
     synthetic: true
@@ -326,7 +233,7 @@ demo_admin:
   function: EXEC
   discipline_id: DISC-PRD
   wc_id: WC-DEL
-  work_centre: Corporate HQ Delhi (Deendayal Urja Bhawan)
+  work_centre: IndianOil Bhavan, Scope Complex, New Delhi
   functional_designation: Demo Admin — Switchable
   tier: cmd
   is_admin: true

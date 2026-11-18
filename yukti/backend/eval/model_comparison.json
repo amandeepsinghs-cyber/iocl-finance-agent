@@ -102,7 +102,7 @@
     {
       "qid": "ST-1",
       "tool": "query_data",
-      "sql": "SELECT column_name, data_type \nFROM `ongc-hr-finance-agent.hrfin_gold.INFORMATION_SCHEMA.COLUMNS`\nWHERE table_name IN ('mart_field_economics', 'v_field_pnl')\nORDER BY table_name, ordinal_position",
+      "sql": "SELECT column_name, data_type \nFROM `yukti-finance-iocl.hrfin_gold.INFORMATION_SCHEMA.COLUMNS`\nWHERE table_name IN ('mart_field_economics', 'v_field_pnl')\nORDER BY table_name, ordinal_position",
       "sql_valid": true,
       "numeric_correct": true,
       "latency_ms": 31869.1,
@@ -239,7 +239,7 @@
     {
       "qid": "ST-1",
       "tool": "query_data",
-      "sql": "SELECT \n  f.field_name,\n  f.water_cut_pct,\n  f.lifting_cost_per_boe_usd,\n  f.oil_production_mt\nFROM `ongc-hr-finance-agent.hrfin_gold.mart_field_economics` f\nWHERE LOWER(f.onshore_offshore) = 'onshore' \n  AND f.line_type = 'field'\n  AND f.water_cut_pct IS NOT NULL \n  AND f.lifting_cost_per_boe_usd IS NOT NULL\nORDER BY f.oil_production_mt DESC\nLIMIT 10",
+      "sql": "SELECT \n  f.field_name,\n  f.water_cut_pct,\n  f.lifting_cost_per_boe_usd,\n  f.oil_production_mt\nFROM `yukti-finance-iocl.hrfin_gold.mart_field_economics` f\nWHERE LOWER(f.onshore_offshore) = 'onshore' \n  AND f.line_type = 'field'\n  AND f.water_cut_pct IS NOT NULL \n  AND f.lifting_cost_per_boe_usd IS NOT NULL\nORDER BY f.oil_production_mt DESC\nLIMIT 10",
       "sql_valid": true,
       "numeric_correct": true,
       "latency_ms": 9308.0,

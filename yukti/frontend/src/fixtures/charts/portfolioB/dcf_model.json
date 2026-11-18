@@ -173,7 +173,7 @@
     "row_idx": 4,
     "col_idx": 4
    },
-   "source": "Illustrative UI test fixture, not ONGC data"
+   "source": "Illustrative UI test fixture, not IOCL AR data"
   },
   "tornado": {
    "output": {
@@ -181,7 +181,7 @@
     "unit": "INR",
     "base": 205.45
    },
-   "source": "Illustrative UI test fixture, not ONGC data",
+   "source": "Illustrative UI test fixture, not IOCL AR data",
    "bars": [
     {
      "driver": "brent",

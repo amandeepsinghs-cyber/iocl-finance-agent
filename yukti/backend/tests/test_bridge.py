@@ -19,7 +19,7 @@ BACKEND_ROOT = Path(__file__).resolve().parent.parent
 YUKTI_ROOT = BACKEND_ROOT.parent
 CONTRACTS_DIR = YUKTI_ROOT / "contracts"
 BRIDGE_FIXTURES_DIR = CONTRACTS_DIR / "fixtures" / "bridge"
-LEGACY_PNL_JSON = YUKTI_ROOT.parent / "financial_build" / "data" / "ongc_10yr_schedule_iii_lines.json"
+LEGACY_PNL_JSON = YUKTI_ROOT.parent / "financial_build" / "data" / "iocl_10yr_schedule_iii_lines.json"
 
 sys.path.insert(0, str(BACKEND_ROOT))
 
@@ -189,7 +189,7 @@ def test_diag_c_probe_a3_fy25_pnl_replot_as_waterfall() -> None:
         columns=cols,
         rows=fy25_rows,
         chart_kind=None,
-        title="ONGC Statement of Profit & Loss · FY25",
+        title="IOCL Statement of Profit & Loss · FY25",
         subtitle="FY25",
         mode="replace",
     )
@@ -209,14 +209,14 @@ def test_diag_c_probe_a3_fy25_pnl_replot_as_waterfall() -> None:
             "spoken_summary": "FY25 P&L is on screen.",
             "display_text": "FY25 P&L is on screen.",
             "visual": vis,
-            "insights": ["FY25 PAT ₹36,236.20 Cr"],
+            "insights": ["FY25 PAT ₹12,961.57 Cr"],
             "sources": [{"kind": "data", "object": "hrfin_gold"}],
             "suggestions": [],
             "access": {"status": "allowed"},
             "export_options": ["pdf"],
             "status_events": [],
         },
-        user_query="Show me ONGC's FY25 P&L statement",
+        user_query="Show me IOCL's FY25 P&L statement",
         all_rows=fy25_rows,
     )
 
@@ -239,7 +239,7 @@ def test_diag_c_probe_a3_fy25_pnl_replot_as_waterfall() -> None:
     expected_pat = next(r["amount_cr"] for r in fy25_rows if r["line_code"] == "pat_inr_cr")
     assert 10 <= len(bars) <= 15, f"Expected 10-15 bridge bars (never 23 raw lines), got {len(bars)}: {bars}"
     assert all(b.get("type") in ("total", "delta") for b in bars)
-    assert bars[0]["type"] == "total" and abs(bars[0]["amount_cr"] - 137846.0) <= 1.0
+    assert bars[0]["type"] == "total" and abs(bars[0]["amount_cr"] - 845513.0) <= 1.0
     assert bars[-1]["type"] == "total" and abs(bars[-1]["amount_cr"] - expected_pat) <= 0.5
 
     # Also verify statement visual re-plot on shared FY25 fixture (PAT = ₹36,236.20 cr)
@@ -255,7 +255,7 @@ def test_diag_c_probe_a3_fy25_pnl_replot_as_waterfall() -> None:
             "visual": {
                 "type": "statement",
                 "mode": "replace",
-                "title": "ONGC FY25 P&L Statement",
+                "title": "IOCL FY25 P&L Statement",
                 "statement": {**pnl_fx, "periods": ["FY25"]},
             },
             "insights": ["FY25 PAT ₹36,236.20 Cr"],
@@ -265,7 +265,7 @@ def test_diag_c_probe_a3_fy25_pnl_replot_as_waterfall() -> None:
             "export_options": ["pdf"],
             "status_events": [],
         },
-        user_query="Show me ONGC's FY25 P&L statement",
+        user_query="Show me IOCL's FY25 P&L statement",
     )
     replot_fx = asyncio.run(
         runner._execute_turn_inner(
@@ -612,7 +612,7 @@ def test_m3_presenter_bridge_error_keeps_table_and_emits_honest_note() -> None:
             columns=cols,
             rows=corrupt_rows,
             chart_kind=requested_kind,
-            title="ONGC Statement of Profit & Loss · FY25",
+            title="IOCL Statement of Profit & Loss · FY25",
             subtitle="FY25",
             mode="replace",
         )
@@ -646,7 +646,7 @@ def test_s4_cash_flow_statement_replot_as_waterfall_preserves_typed_cf_bridge() 
         columns=list(cf_rows[0].keys()),
         rows=cf_rows,
         chart_kind=None,
-        title="ONGC Cash Flow Statement · FY26",
+        title="IOCL Cash Flow Statement · FY26",
         subtitle="FY26",
         mode="replace",
     )

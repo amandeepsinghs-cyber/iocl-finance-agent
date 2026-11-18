@@ -17,7 +17,7 @@ base AS (
     SELECT v.grade_id, v.discipline_id, v.emp_id,
            DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 AS retiring_3yr,
            IFNULL(x.has_valid_exemption, FALSE) AS has_valid_exemption
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
     LEFT JOIN cur_exempt x ON x.emp_id = v.emp_id
     WHERE v.is_current_stay = TRUE
       AND v.wc_id = 'WC-DEL'

@@ -52,7 +52,7 @@ Registry entries hold `id`, `class`, `requires_role`, `triggers`, `examples` and
 
 ## 4. Platform
 
-- Google Cloud project `ongc-hr-finance-agent`, region `asia-south1`.
+- Google Cloud project `yukti-finance-iocl`, region `asia-south1`.
 - One Cloud Run service, `yukti-ai`. A single container runs the Next.js `server.js` (a same-origin proxy for `/api/*`, `/health` and `/ws/live`) and FastAPI on port 8095.
 - The Firestore job store falls back to in-memory if Firestore is unavailable.
 - Releases: Cloud Build → Artifact Registry → `gcloud run deploy --no-traffic --tag` → startup check → `update-traffic`. One-step rollback is listed in `APP_LINK.md`.

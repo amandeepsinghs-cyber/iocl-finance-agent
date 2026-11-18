@@ -46,10 +46,10 @@ export function AuraShowcase({ isDark = false }: { isDark?: boolean }) {
           <div className="yk-aura-bloom" aria-hidden />
           <div className="relative text-center space-y-3">
             <div className="inline-flex items-center gap-2 text-label text-[var(--ink-2)]">
-              <Sparkles className="w-4 h-4" /> Yukti · HR &amp; Finance
+              <Sparkles className="w-4 h-4" /> Yukti · Finance &amp; Downstream
             </div>
             <h2 className="text-display font-display text-[var(--ink)]">Hello, I am Yukti</h2>
-            <p className="text-body text-[var(--ink-2)]">Your HR and Finance agent. How can I help, Chairman?</p>
+            <p className="text-body text-[var(--ink-2)]">Your IndianOil Finance and Downstream agent. How can I help, Chairman?</p>
           </div>
         </div>
 

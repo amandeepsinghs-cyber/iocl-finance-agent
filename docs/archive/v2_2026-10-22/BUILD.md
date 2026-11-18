@@ -155,7 +155,7 @@ The U0 step re-runs the eval on `baseline-v0.2` because the P1 fixes changed beh
 - Work branches: `upgrade/U1-design-system`, `upgrade/U2-feed`, and so on.
 - Rollback: `git checkout baseline-v0.2` (or the last `upgrade-*` tag), then rebuild the frontend and restart both servers.
 - Feature flags for demo safety: `YUKTI_PLANNER=1` for the brain (default off until B2 passes its gate) and `NEXT_PUBLIC_FEED_V2=1` for the new UI feed (default off until U2 passes G5).
-- **Cloud Run rollback:** `gcloud run services update-traffic yukti-ai --project ongc-hr-finance-agent --region asia-south1 --to-revisions=<previous-revision>=100`.
+- **Cloud Run rollback:** `gcloud run services update-traffic yukti-ai --project yukti-finance-iocl --region asia-south1 --to-revisions=<previous-revision>=100`.
 - **BigQuery rollback (B-phases):** new views and tables are created as `*_v2` alongside the existing ones (never replaced in place). Rollback means re-pointing config to the previous object. DDL for every new object is versioned in `yukti/backend/sql/`.
 
 ---

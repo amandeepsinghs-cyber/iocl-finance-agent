@@ -12,7 +12,7 @@ export interface FilterableColumn {
   options: string[];
 }
 
-// P2H.2: ranks for all 11 personas (junior 1 · director 2 · CMD 3); unknown → 0
+// Personas (junior 1 · director 2 · CMD 3); unknown → 0
 export const ROLE_RANK: Record<string, number> = Object.fromEntries(PERSONA_DIRECTORY.map((p) => [p.id, personaRank(p.id)]));
 
 export function isActionAllowed(action: RowAction, persona?: string): boolean {
@@ -75,8 +75,8 @@ export function getColumnWidth(col: string): string {
       return '9rem';
     case 'functional_designation':
       return '13rem';
-    case 'ongc_tenure_years':
-    case 'delhi_tenure_years':
+    case 'iocl_tenure_years':
+    case 'service_years':
     case 'years_to_retirement':
       return '9.5rem';
     case 'exemption':

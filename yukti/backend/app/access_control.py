@@ -1,6 +1,6 @@
-"""Persona Access Control Hook & Refusal Governance for Yukti AI.
-Implements the persona permission matrix from UX Spec §2, §8, and
-the refusal answers from official ONGC governance policies for D1–D6, P18–P20, M3, M4.
+"""Persona Access Control Hook & Refusal Governance for Yukti IOCL.
+Implements the 8-persona IOCL Finance & Downstream permission matrix from SPEC-06,
+and refusal answers grounded in IndianOil governance rules.
 """
 
 from dataclasses import dataclass
@@ -11,33 +11,32 @@ from app.config import GCP_PROJECT
 
 CANONICAL_PERSONAS: tuple[str, ...] = (
     "CMD",
-    "DIR_HR",
     "DIR_FIN",
-    "E1_HR",
-    "E2_HR",
-    "E3_HR",
-    "E4_HR",
+    "DIR_REF",
+    "DIR_MKT",
     "E1_FIN",
     "E2_FIN",
     "E3_FIN",
     "E4_FIN",
 )
 
-# Personas allowed in answer contract schema (D-41: 11 personas)
+# Personas allowed in answer contract schema (D-41: 8 IOCL Finance personas)
 ALL_PERSONAS_ORDERED: tuple[str, ...] = CANONICAL_PERSONAS
 VALID_PERSONAS: Set[str] = set(CANONICAL_PERSONAS)
 
-JUNIOR_HR_PERSONAS: frozenset[str] = frozenset({"E1_HR", "E2_HR", "E3_HR", "E4_HR"})
+JUNIOR_HR_PERSONAS: frozenset[str] = frozenset()
 JUNIOR_FIN_PERSONAS: frozenset[str] = frozenset({"E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"})
-JUNIOR_PERSONAS: frozenset[str] = JUNIOR_HR_PERSONAS | JUNIOR_FIN_PERSONAS
-DIRECTOR_PERSONAS: frozenset[str] = frozenset({"DIR_HR", "DIR_FIN"})
-SENIOR_PERSONAS: frozenset[str] = frozenset({"CMD", "DIR_HR", "DIR_FIN"})
+JUNIOR_PERSONAS: frozenset[str] = JUNIOR_FIN_PERSONAS
+DIRECTOR_PERSONAS: frozenset[str] = frozenset({"DIR_FIN", "DIR_REF", "DIR_MKT"})
+SENIOR_PERSONAS: frozenset[str] = frozenset({"CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"})
 
 # Persona alias normalization map
 PERSONA_ALIASES = {
-    # CMD
+    # CMD / Chairman
     "cmd": "CMD",
     "chairman": "CMD",
+    "chairman, indianoil": "CMD",
+    "chairman indianoil": "CMD",
     "chairman & ceo": "CMD",
     "chairman and ceo": "CMD",
     "chairman & md": "CMD",
@@ -46,228 +45,208 @@ PERSONA_ALIASES = {
     "chairman and managing director": "CMD",
     "ceo": "CMD",
     "cmd_exec": "CMD",
-    "arun": "CMD",
-    "arun kumar singh": "CMD",
-    # DIR_HR
-    "dir hr": "DIR_HR",
-    "dir-hr": "DIR_HR",
-    "director (hr)": "DIR_HR",
-    "director hr": "DIR_HR",
-    "director - hr": "DIR_HR",
-    "hr director": "DIR_HR",
-    "director (human resources)": "DIR_HR",
-    "dir_hr": "DIR_HR",
-    "manish": "DIR_HR",
-    "manish patil": "DIR_HR",
+    "arvinder": "CMD",
+    "arvinder singh sahney": "CMD",
+    "arvinder sahney": "CMD",
     # DIR_FIN
     "dir fin": "DIR_FIN",
     "dir-fin": "DIR_FIN",
     "director (finance)": "DIR_FIN",
+    "director (finance) & cfo": "DIR_FIN",
     "director finance": "DIR_FIN",
     "director - finance": "DIR_FIN",
     "finance director": "DIR_FIN",
     "director (fin)": "DIR_FIN",
     "cfo": "DIR_FIN",
     "dir_fin": "DIR_FIN",
-    "anupam": "DIR_FIN",
-    "anupam agarwal": "DIR_FIN",
-    # E1_HR
-    "e1_hr": "E1_HR",
-    "e1-hr": "E1_HR",
-    "e1 hr": "E1_HR",
-    "e1 · hr": "E1_HR",
-    "hr_e1": "E1_HR",
-    "hr-e1": "E1_HR",
-    "hr e1": "E1_HR",
-    "e1 hr officer": "E1_HR",
-    "e1 hr executive": "E1_HR",
-    "hr officer (e1)": "E1_HR",
-    "dinesh deshmukh": "E1_HR",
-    # E2_HR
-    "e2_hr": "E2_HR",
-    "e2-hr": "E2_HR",
-    "e2 hr": "E2_HR",
-    "e2 · hr": "E2_HR",
-    "hr_e2": "E2_HR",
-    "hr-e2": "E2_HR",
-    "hr e2": "E2_HR",
-    "e2 hr officer": "E2_HR",
-    "e2 hr executive": "E2_HR",
-    "hr executive (e2)": "E2_HR",
-    "pooja verma": "E2_HR",
-    "e1–e4 officer (hr)": "E2_HR",
-    # E3_HR
-    "e3_hr": "E3_HR",
-    "e3-hr": "E3_HR",
-    "e3 hr": "E3_HR",
-    "e3 · hr": "E3_HR",
-    "hr_e3": "E3_HR",
-    "hr-e3": "E3_HR",
-    "hr e3": "E3_HR",
-    "e3 hr officer": "E3_HR",
-    "e3 hr executive": "E3_HR",
-    "senior hr executive (e3)": "E3_HR",
-    "sr. hr executive (e3)": "E3_HR",
-    "lokesh verma": "E3_HR",
-    # E4_HR
-    "e4_hr": "E4_HR",
-    "e4-hr": "E4_HR",
-    "e4 hr": "E4_HR",
-    "e4 · hr": "E4_HR",
-    "hr_e4": "E4_HR",
-    "hr-e4": "E4_HR",
-    "hr e4": "E4_HR",
-    "e4 hr officer": "E4_HR",
-    "e4 hr executive": "E4_HR",
-    "dy. manager hr (e4)": "E4_HR",
-    "deputy manager hr (e4)": "E4_HR",
-    "umesh d. bhatia": "E4_HR",
-    "umesh bhatia": "E4_HR",
-    # E1_FIN
+    "anuj": "DIR_FIN",
+    "anuj jain": "DIR_FIN",
+    # DIR_REF
+    "dir ref": "DIR_REF",
+    "dir-ref": "DIR_REF",
+    "dir_ref": "DIR_REF",
+    "director (refineries)": "DIR_REF",
+    "director refineries": "DIR_REF",
+    "director - refineries": "DIR_REF",
+    "refineries director": "DIR_REF",
+    "director (ref)": "DIR_REF",
+    "arvind": "DIR_REF",
+    "arvind kumar": "DIR_REF",
+    # DIR_MKT
+    "dir mkt": "DIR_MKT",
+    "dir-mkt": "DIR_MKT",
+    "dir_mkt": "DIR_MKT",
+    "director (marketing)": "DIR_MKT",
+    "director marketing": "DIR_MKT",
+    "director - marketing": "DIR_MKT",
+    "marketing director": "DIR_MKT",
+    "director (mkt)": "DIR_MKT",
+    "saumitra": "DIR_MKT",
+    "saumitra srivastava": "DIR_MKT",
+    "saumitra p. srivastava": "DIR_MKT",
+    # E1_FIN (Grade A Finance)
     "e1_fin": "E1_FIN",
     "e1-fin": "E1_FIN",
     "e1 fin": "E1_FIN",
     "e1 · fin": "E1_FIN",
+    "a_fin": "E1_FIN",
+    "a-fin": "E1_FIN",
+    "a fin": "E1_FIN",
     "fin_e1": "E1_FIN",
     "fin-e1": "E1_FIN",
     "fin e1": "E1_FIN",
+    "grade a": "E1_FIN",
+    "grade a finance": "E1_FIN",
+    "grade a · finance": "E1_FIN",
     "e1 finance": "E1_FIN",
     "e1 finance officer": "E1_FIN",
     "e1 accounts officer": "E1_FIN",
-    "accounts officer (e1)": "E1_FIN",
+    "accounts officer (grade a)": "E1_FIN",
     "ajay deshmukh": "E1_FIN",
-    # E2_FIN
+    # E2_FIN (Grade B Finance)
     "e2_fin": "E2_FIN",
     "e2-fin": "E2_FIN",
     "e2 fin": "E2_FIN",
     "e2 · fin": "E2_FIN",
+    "b_fin": "E2_FIN",
+    "b-fin": "E2_FIN",
+    "b fin": "E2_FIN",
     "fin_e2": "E2_FIN",
     "fin-e2": "E2_FIN",
     "fin e2": "E2_FIN",
+    "grade b": "E2_FIN",
+    "grade b finance": "E2_FIN",
+    "grade b · pricing & excise": "E2_FIN",
     "e2 finance": "E2_FIN",
     "e2 finance officer": "E2_FIN",
     "e2 finance executive": "E2_FIN",
-    "finance executive (e2)": "E2_FIN",
+    "finance officer — pricing & excise (grade b)": "E2_FIN",
     "praveen nair": "E2_FIN",
-    # E3_FIN
+    # E3_FIN (Grade C Finance)
     "e3_fin": "E3_FIN",
     "e3-fin": "E3_FIN",
     "e3 fin": "E3_FIN",
     "e3 · fin": "E3_FIN",
+    "c_fin": "E3_FIN",
+    "c-fin": "E3_FIN",
+    "c fin": "E3_FIN",
     "fin_e3": "E3_FIN",
     "fin-e3": "E3_FIN",
     "fin e3": "E3_FIN",
+    "grade c": "E3_FIN",
+    "grade c finance": "E3_FIN",
+    "grade c · treasury & fx": "E3_FIN",
     "e3 finance": "E3_FIN",
     "e3 finance officer": "E3_FIN",
     "e3 finance executive": "E3_FIN",
     "finance officer": "E3_FIN",
-    "finance officer (e3)": "E3_FIN",
+    "manager finance — crude & forex (grade c)": "E3_FIN",
     "shailesh e. kapoor": "E3_FIN",
     "shailesh kapoor": "E3_FIN",
-    "rajesh kulkarni": "E3_FIN",
-    "e1–e4 officer (finance)": "E3_FIN",
-    # E4_FIN
+    # E4_FIN (Grade D Finance)
     "e4_fin": "E4_FIN",
     "e4-fin": "E4_FIN",
     "e4 fin": "E4_FIN",
     "e4 · fin": "E4_FIN",
+    "d_fin": "E4_FIN",
+    "d-fin": "E4_FIN",
+    "d fin": "E4_FIN",
     "fin_e4": "E4_FIN",
     "fin-e4": "E4_FIN",
     "fin e4": "E4_FIN",
+    "grade d": "E4_FIN",
+    "grade d finance": "E4_FIN",
+    "grade d · refinery costing": "E4_FIN",
     "e4 finance": "E4_FIN",
     "e4 finance officer": "E4_FIN",
     "e4 finance executive": "E4_FIN",
-    "dy. manager finance (e4)": "E4_FIN",
-    "deputy manager finance (e4)": "E4_FIN",
+    "e4 finance manager": "E4_FIN",
+    "sr. manager finance — refinery costing (grade d)": "E4_FIN",
     "santosh banerjee": "E4_FIN",
 }
 
 # The 11 refusal questions and their statutory definitions
 REFUSAL_DEFINITIONS = {
     "D1": {
-        "reason": "Individual compensation, basic pay, and allowances are strictly confidential personal data under ONGC CDA Rules and DPE guidelines.",
-        "rule_ref": "ONGC CDA Rules 1994, Rule 5.0 (Confidentiality of Personal Information) & DPE Executive Compensation Guidelines.",
-        "alternative": "Public executive pay scale bands (E0 to E9) and statutory DA/allowance brackets.",
-        # D-10: CMD and Directors see individual pay; only E1–E4 are refused (D-11).
+        "reason": "Individual officer compensation and payroll records are confidential personal data restricted to authorized leadership.",
+        "rule_ref": "IOCL Governance & DPE Executive Compensation Guidelines.",
+        "alternative": "Company-wide Employee Benefits Expense trends (Schedule III Note 32) across FY17–FY26.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
-    grade_id,
-    designation,
-    pay_scale_min_inr,
-    pay_scale_max_inr,
-    typical_residency_years
-FROM `{GCP_PROJECT}.hrfin_silver.dim_grade`
-WHERE LOWER(cadre) = 'executive'
-ORDER BY level_order;"""
+    fiscal_year,
+    employee_benefit_net_pnl_inr_cr,
+    net_revenue_inr_cr,
+    ROUND(100.0 * employee_benefit_net_pnl_inr_cr / NULLIF(net_revenue_inr_cr, 0), 2) AS emp_cost_pct_of_net_rev
+FROM `{GCP_PROJECT}.hrfin_gold.ssot_corporate_annual_360`
+ORDER BY fiscal_year DESC
+LIMIT 5;"""
     },
     "D2": {
-        "reason": "Unapproved draft transfer proposals and placement notes are non-final deliberative records exempt from disclosure prior to official notification by Director (HR).",
-        "rule_ref": "ONGC Job Rotation and Transfer Policy (JRTP) Clause 11.0 (Confidentiality & Promulgation of Transfer Orders) & RTI Act Section 8(1)(i).",
-        "alternative": "Station tenure guidelines (JRTP Clause 3.0) and aggregate count of Mumbai executives overdue for rotational transfer.",
+        "reason": "Unpublished draft Board Finance agenda packs and deliberative refinery/marketing sub-ledgers are restricted prior to official notification.",
+        "rule_ref": "IOCL Delegation of Financial Powers (IOCL-DOA) Clause 8.0 & SEBI PIT Regulations.",
+        "alternative": "Published IOCL Annual Report Schedule III P&L and verified FY26 refinery-wise economics.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
-    grade_id,
-    discipline_id,
-    COUNT(DISTINCT emp_id) AS mumbai_executives_due_rotation
-FROM `{GCP_PROJECT}.hrfin_gold.v_continuous_stay`
-WHERE is_current_stay = TRUE
-  AND cluster_id = 'CL-MUM'
-  AND grade_id LIKE 'E%'
-  AND continuous_stay_months >= 36
-GROUP BY grade_id, discipline_id
-ORDER BY grade_id, discipline_id;"""
+    fiscal_year,
+    refinery_id,
+    refinery_name,
+    throughput_mmt,
+    grm_usd_bbl,
+    ebitda_inr_cr
+FROM `{GCP_PROJECT}.hrfin_gold.ssot_refinery_economics_360`
+WHERE fiscal_year = 'FY26' AND is_refinery = TRUE
+ORDER BY grm_usd_bbl DESC;"""
     },
     "D3": {
-        "reason": "Departmental Promotion Committee (DPC) deliberations, assessment rosters, and promotion panel recommendations are classified confidential records.",
-        "rule_ref": "Modified Recruitment & Promotion Regulations 1980 / Service Rules 1995, Clause 8.0 (Confidentiality of DPC Proceedings & Sealed Cover).",
-        "alternative": "Published promotion policy residency requirements and benchmark APAR eligibility criteria by grade.",
+        "reason": "Counterparty-named bank credit utilization matrices, ISDA exposure schedules, and individual appraisal records are confidential.",
+        "rule_ref": "IOCL Commodity & Forex Risk Management Policy (IOCL-HEDGING) Clause 7.0.",
+        "alternative": "Published Commodity & Forex Hedging Policy limits (25%–35% crack band; 50%–75% short-term FX cover).",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
-    grade_id,
-    designation,
-    typical_residency_years,
-    promotion_mode,
-    dpc_evaluation_type
-FROM `{GCP_PROJECT}.hrfin_silver.dim_grade`
-WHERE LOWER(cadre) = 'executive'
-ORDER BY level_order;"""
+    doc_id,
+    clause_ref,
+    heading,
+    SUBSTR(text, 1, 300) AS quote_snippet
+FROM `{GCP_PROJECT}.hrfin_docs.silver_chunks`
+WHERE doc_id = 'IOCL-HEDGING' AND clause_ref IN ('Clause 3.0', 'Clause 5.0', 'Clause 7.0')
+ORDER BY clause_ref;"""
     },
     "D4": {
-        "reason": "Field-level profitability statements and draft forward capital budget allocations are commercially sensitive operational data restricted to senior management.",
-        "rule_ref": "Book of Delegated Powers (BDP 2015) Clause 8.0 & Corporate Commercial Information Protection Guidelines.",
-        "alternative": "Company-wide gross revenues, standalone capital expenditure, and net profit from published annual accounts.",
+        "reason": "Unpublished quarterly refinery margin sub-ledgers and forward draft Capex bids are commercially sensitive internal data.",
+        "rule_ref": "IOCL-DOA Clause 8.0 & IOCL-CAPALLOC Capital Governance Guidelines.",
+        "alternative": "Published company-wide Gross Revenue, Net Revenue ex-Excise, Capex, and PAT across FY17–FY26.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
     fiscal_year,
     gross_revenue_inr_cr,
+    excise_duty_inr_cr,
+    net_revenue_inr_cr,
     total_capex_spent_inr_cr,
     pat_inr_cr
-FROM `{GCP_PROJECT}.hrfin_gold.mart_corporate_performance`
+FROM `{GCP_PROJECT}.hrfin_gold.ssot_corporate_annual_360`
 WHERE fiscal_year IS NOT NULL
-GROUP BY fiscal_year, gross_revenue_inr_cr, total_capex_spent_inr_cr, pat_inr_cr
 ORDER BY fiscal_year DESC
 LIMIT 5;"""
     },
     "D5": {
-        "reason": "Bulk nominal employee rosters containing personal tenure and posting histories are restricted from disclosure to general staff to protect personal privacy.",
-        "rule_ref": "ONGC IT Data Governance Policy & CDA Rules 1994, Rule 5.0.",
-        "alternative": "Aggregated counts of Delhi executives possessing station tenure >= 5 years, grouped by grade band.",
+        "reason": "Named trader/counterparty credit exposure tables and personnel records are restricted to protect commercial and employee confidentiality.",
+        "rule_ref": "IOCL-HEDGING Clause 7.0 & IOCL Information Security Policy.",
+        "alternative": "Aggregated corporate Borrowings, Net Debt, and D/E ratios from published Schedule III Notes 19 & 22.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
-    grade_id,
-    COUNT(DISTINCT emp_id) AS executives_ge_5yr_count
-FROM `{GCP_PROJECT}.hrfin_gold.v_continuous_stay`
-WHERE is_current_stay = TRUE
-  AND wc_id = 'WC-DEL'
-  AND grade_id LIKE 'E%'
-  AND DATE_DIFF(DATE '2026-10-19', s.continuous_from_date, DAY) > 1826
-GROUP BY grade_id
-ORDER BY grade_id;"""
+    fiscal_year,
+    long_term_debt_inr_cr,
+    short_term_debt_inr_cr,
+    total_debt_inr_cr,
+    debt_to_equity_ratio
+FROM `{GCP_PROJECT}.hrfin_gold.ssot_corporate_annual_360`
+ORDER BY fiscal_year DESC
+LIMIT 5;"""
     },
     "D6": {
-        "reason": "Vigilance inquiry records, preliminary investigation reports, and complaint dossiers are strictly classified and protected against unauthorized disclosure.",
-        "rule_ref": "Central Vigilance Commission (CVC) Operating Manual & ONGC Vigilance Guidelines, Clause 7.0.",
-        "alternative": "Standard procedure for lodging vigilance complaints and Whistle Blower Policy protections.",
+        "reason": "Internal audit / vigilance investigation dossiers are classified and protected against unauthorized disclosure.",
+        "rule_ref": "Central Vigilance Commission (CVC) Operating Manual & IOCL Governance Guidelines.",
+        "alternative": "Published IOCL Finance & DoA governance clauses (`IOCL-DOA`, `IOCL-MOU`).",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
     doc_id,
@@ -275,14 +254,14 @@ ORDER BY grade_id;"""
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
 FROM `{GCP_PROJECT}.hrfin_docs.silver_chunks`
-WHERE doc_id IN ('P2-01', 'Whistle Blower Policy') OR questions_served LIKE '%D6%'
+WHERE doc_id IN ('IOCL-DOA', 'IOCL-MOU')
 ORDER BY doc_id, clause_ref
 LIMIT 5;"""
     },
     "P18": {
-        "reason": "Annual rotational transfer orders in draft proposal stage are privileged administrative deliberations pending formal approval by Director (HR) and CMD.",
-        "rule_ref": "Job Rotation and Transfer Policy (JRTP) Clause 11.0 (Confidentiality & Promulgation of Transfer Orders).",
-        "alternative": "Published JRTP rotation calendar, station tenure norms (Clause 3.0), and hard station service rules.",
+        "reason": "Unpublished Q1 Board draft refinery margin sub-ledgers and deliberative pricing notes are privileged pre-release financial records.",
+        "rule_ref": "IOCL-DOA Clause 8.0 (Confidentiality of Unpublished Board Packs & Sub-Ledgers).",
+        "alternative": "Published FY26 Annual Report Refinery Economics (`ssot_refinery_economics_360`) and `IOCL-DOA` Clause 8.0.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
     doc_id,
@@ -290,13 +269,13 @@ LIMIT 5;"""
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
 FROM `{GCP_PROJECT}.hrfin_docs.silver_chunks`
-WHERE doc_id = 'JRTP' AND clause_ref IN ('Clause 3.0', 'Clause 9.0', 'Clause 11.0')
+WHERE doc_id = 'IOCL-DOA' AND clause_ref IN ('Clause 2.1', 'Clause 6.0', 'Clause 8.0')
 ORDER BY clause_ref;"""
     },
     "P19": {
-        "reason": "The internal discretionary financial delegation matrix and reserved authorization limits for Whole-Time Directors are classified administrative records.",
-        "rule_ref": "Book of Delegated Powers (BDP 2015) Clause 8.0 (Confidentiality & Exceptions).",
-        "alternative": "Operational financial delegation limits assigned to Key Executives / Level-1 Asset Managers for day-to-day procurement.",
+        "reason": "Confidential counterparty commercial discount tables and unpublished tender bid evaluations are restricted to Senior Management.",
+        "rule_ref": "IOCL-DOA Clause 8.0 & IOCL-HEDGING Clause 7.0.",
+        "alternative": "Published crude cargo procurement approval thresholds under `IOCL-DOA` Clauses 2.1 & 3.1.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
     doc_id,
@@ -304,53 +283,51 @@ ORDER BY clause_ref;"""
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
 FROM `{GCP_PROJECT}.hrfin_docs.silver_chunks`
-WHERE doc_id = 'BDP summary' AND clause_ref IN ('Clause 2.0', 'Clause 3.0')
+WHERE doc_id = 'IOCL-DOA' AND clause_ref IN ('Clause 2.1', 'Clause 3.1')
 ORDER BY clause_ref;"""
     },
     "P20": {
-        "reason": "Board agenda memoranda, internal valuation sheets, and commercial deliberations on asset divestment are strictly confidential Board documents.",
-        "rule_ref": "Companies Act 2013 Section 118 / ONGC Board Secretariat Governance Norms.",
-        "alternative": "Government policy guidelines for Discovered Small Fields (DSF) and the Production Enhancement Contract (PEC) framework for mature fields.",
-        "restricted_personas": {"DIR_HR"} | set(JUNIOR_PERSONAS),
+        "reason": "Board agenda memoranda, M&A/JV valuation sheets, and unpublished Board Finance Committee packs are strictly confidential Board documents.",
+        "rule_ref": "Companies Act 2013 Section 118 / IOCL-DOA Clause 6.0 & 8.0.",
+        "alternative": "Published Annual Report capital allocation and subsidiary financial summaries.",
+        "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
     doc_id,
     clause_ref,
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
 FROM `{GCP_PROJECT}.hrfin_docs.silver_chunks`
-WHERE doc_id IN ('G-07', 'BDP summary') OR questions_served LIKE '%P20%'
+WHERE doc_id IN ('IOCL-CAPALLOC', 'IOCL-DOA')
 ORDER BY doc_id, clause_ref
 LIMIT 5;"""
     },
     "M3": {
-        "reason": "Individual compensation and annual performance appraisal ratings (APAR) for specific employees are strictly confidential personal records.",
-        "rule_ref": "ONGC CDA Rules 1994, Rule 5.0 (Confidentiality of Personal Records) & Right to Privacy guidelines.",
-        "alternative": "Official procedure for an officer to access their own appraisal and pay slip via Employee Self Service (ESS) portal.",
-        # D-10: CMD and Directors see individual pay and APAR; only E1–E4 are refused (D-11).
+        "reason": "Individual appraisal ratings and employee compensation records are strictly confidential.",
+        "rule_ref": "IOCL Confidentiality & Privacy Guidelines.",
+        "alternative": "Published Schedule III Note 32 corporate employee benefits expense and MoU Scorecard targets.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
-    grade_id,
-    designation,
-    pay_scale_min_inr,
-    pay_scale_max_inr,
-    typical_residency_years
-FROM `{GCP_PROJECT}.hrfin_silver.dim_grade`
-WHERE LOWER(cadre) = 'executive'
-ORDER BY level_order;"""
+    fiscal_year,
+    parameter_name,
+    category,
+    actual_achievement,
+    achieved_rating
+FROM `{GCP_PROJECT}.hrfin_gold.fact_mou_scorecard`
+ORDER BY weightage DESC;"""
     },
     "M4": {
-        "reason": "Field-level profitability reports and individual field margin economics are restricted commercially sensitive operational data.",
-        "rule_ref": "Book of Delegated Powers (BDP 2015) Clause 8.0 & Corporate Commercial Policy.",
-        "alternative": "Standalone corporate revenue, gross operating profit (EBITDA), and total production figures from published annual accounts.",
+        "reason": "Counterparty credit exposures by trader and unpublished refinery margin sub-ledgers are restricted commercially sensitive treasury/finance data.",
+        "rule_ref": "IOCL-DOA Clause 8.0 & IOCL-HEDGING Clause 7.0.",
+        "alternative": "Published standalone Gross Revenue, EBITDA, PAT, and corporate GRM from published annual accounts.",
         "restricted_personas": set(JUNIOR_PERSONAS),
         "alternative_sql": f"""SELECT
     fiscal_year,
     gross_revenue_inr_cr,
     ebitda_inr_cr,
-    pat_inr_cr
-FROM `{GCP_PROJECT}.hrfin_gold.mart_corporate_performance`
+    pat_inr_cr,
+    gross_refining_margin_usd_bbl
+FROM `{GCP_PROJECT}.hrfin_gold.ssot_corporate_annual_360`
 WHERE fiscal_year IS NOT NULL
-GROUP BY fiscal_year, gross_revenue_inr_cr, ebitda_inr_cr, pat_inr_cr
 ORDER BY fiscal_year DESC
 LIMIT 5;"""
     }
@@ -367,7 +344,7 @@ REFUSAL_DEFINITIONS["R-POSH"] = {
 }
 REFUSAL_DEFINITIONS["R-MED"] = {
     "reason": "Individual medical and health records are confidential personal data.",
-    "rule_ref": "ONGC Medical Attendance & Treatment Rules (confidentiality) · D-11",
+    "rule_ref": "IOCL Confidentiality & Privacy Policy (D-11)",
     "alternative": "Aggregate medical-claim volumes and turnaround times by work centre.",
     "restricted_personas": set(JUNIOR_PERSONAS),
     "alternative_sql": None,
@@ -391,16 +368,18 @@ class UnknownPersona(ValueError):
 
 
 _JUNIOR_ALIAS_RE = re.compile(
-    r"^(?:(hr|human\s*resources|fin|finance|accounts)[\s_\-·]*)?"
-    r"e([1-4])"
-    r"(?:[\s_\-·]*(hr|human\s*resources|fin|finance|accounts))?"
-    r"(?:[\s_\-]+(?:officer|executive|exec|manager|dy\.?\s*manager|sr\.?\s*executive|senior\s*executive))?$",
+    r"^(?:(fin|finance|accounts)[\s_\-·]*)?"
+    r"(?:e([1-4])|grade[\s_\-]*([a-d])|([a-d]))"
+    r"(?:[\s_\-·]*(fin|finance|accounts))?"
+    r"(?:[\s_\-]+(?:officer|executive|exec|manager|dy\.?\s*manager|sr\.?\s*manager|sr\.?\s*executive|senior\s*executive))?$",
     re.IGNORECASE,
 )
 
+_GRADE_LETTER_TO_LEVEL = {"a": "1", "b": "2", "c": "3", "d": "4"}
+
 
 def normalize_persona(persona: Optional[str]) -> str:
-    """Normalizes a known persona id or alias into the 11 contract personas.
+    """Normalizes a known persona id or alias into the 8 canonical IOCL personas.
 
     P0.4 / P2H.1: unknown or empty values raise UnknownPersona instead of being coerced.
     """
@@ -414,11 +393,10 @@ def normalize_persona(persona: Optional[str]) -> str:
         return cleaned.upper()
     m = _JUNIOR_ALIAS_RE.match(cleaned)
     if m:
-        fn_prefix, grade_num, fn_suffix = m.group(1), m.group(2), m.group(3)
+        fn_prefix, e_num, g_letter_1, g_letter_2, fn_suffix = m.groups()
         fn_raw = (fn_prefix or fn_suffix or "").lower()
-        if fn_raw.startswith("hr") or "human" in fn_raw:
-            return f"E{grade_num}_HR"
-        if fn_raw.startswith("fin") or fn_raw.startswith("acc"):
+        grade_num = e_num or _GRADE_LETTER_TO_LEVEL.get((g_letter_1 or g_letter_2 or "").lower())
+        if grade_num and (fn_raw.startswith("fin") or fn_raw.startswith("acc")):
             return f"E{grade_num}_FIN"
     raise UnknownPersona(f"unknown persona {persona!r}")
 
@@ -532,7 +510,7 @@ def check_access(persona: str, entry_id: Optional[str] = None, query: Optional[s
 
     # 0. D-66: APAR and medical records for EMP-000001..3 are refused for EVERY persona (including self & CMD)
     root_id = entry_id.split("__")[0] if entry_id else None
-    if root_id in ("my_apar", "E3") and normalized_persona in ("CMD", "DIR_HR", "DIR_FIN"):
+    if root_id in ("my_apar", "E3") and normalized_persona in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
         from app.brain.rbac import OFFICE_HOLDER_REFUSAL_COPY
 
         return AccessDecision(
@@ -575,16 +553,6 @@ def check_access(persona: str, entry_id: Optional[str] = None, query: Optional[s
     }
     if root_id and root_id in REFUSAL_DEFINITIONS:
         ref_def = REFUSAL_DEFINITIONS[root_id]
-        if normalized_persona == "DIR_FIN" and root_id in ("R-POSH", "R-MED"):
-            return AccessDecision(
-                status="partial",
-                reason="Under D-43, Director (Finance) receives aggregate counts only (k >= 5) for POSH and medical records.",
-                rule_ref="D-43 · " + ref_def["rule_ref"],
-                alternative=ref_def["alternative"],
-                alternative_sql=ref_def["alternative_sql"],
-                refusal_id=root_id,
-                code="R-SENS",
-            )
         if normalized_persona in ref_def["restricted_personas"]:
             return AccessDecision(
                 status="refused",
@@ -595,7 +563,7 @@ def check_access(persona: str, entry_id: Optional[str] = None, query: Optional[s
                 refusal_id=root_id,
                 code=_REFUSAL_ID_TO_CODE.get(root_id, "R-NAMED"),
             )
-        elif normalized_persona == "CMD":
+        elif normalized_persona in SENIOR_PERSONAS:
             return AccessDecision(status="allowed")
 
     # 2. Check strict self-scope, aggregate-pay relaxation, or policy/reporting-process questions
@@ -674,6 +642,30 @@ def check_access(persona: str, entry_id: Optional[str] = None, query: Optional[s
                         refusal_id=rid,
                         code=code,
                     )
+            # Q29: confidential counterparty credit exposure & unpublished draft Board packs
+            if any(
+                k in q_low
+                for k in (
+                    "counterparty credit",
+                    "by trader",
+                    "unpublished",
+                    "draft board",
+                    "board draft",
+                    "draft refinery margin",
+                    "pre-release",
+                )
+            ):
+                rid = "M4" if "counterparty" in q_low or "trader" in q_low else "P18"
+                d = REFUSAL_DEFINITIONS[rid]
+                return AccessDecision(
+                    status="refused",
+                    reason=d["reason"],
+                    rule_ref=d["rule_ref"],
+                    alternative=d["alternative"],
+                    alternative_sql=d["alternative_sql"],
+                    refusal_id=rid,
+                    code="R-BOARD" if rid == "P18" else "R-FUNC",
+                )
             # Check for draft transfer list
             if "draft transfer list" in q_low or "draft fy27 transfer order" in q_low:
                 d = REFUSAL_DEFINITIONS["D2"]
@@ -746,7 +738,7 @@ def check_access(persona: str, entry_id: Optional[str] = None, query: Optional[s
                     refusal_id="P19",
                     code="R-FUNC",
                 )
-        if normalized_persona == "DIR_HR" or normalized_persona in JUNIOR_PERSONAS:
+        if normalized_persona in JUNIOR_PERSONAS:
             if "divesting marginal fields" in q_low or "divestment" in q_low and "marginal fields" in q_low:
                 d = REFUSAL_DEFINITIONS["P20"]
                 return AccessDecision(

@@ -1,18 +1,18 @@
 agents:
   - id: fin_diagnostics_agent
     class: app.agents.fin_diagnostics.tool
-    requires_role: ["CMD", "DIR_HR", "DIR_FIN", "E1_HR", "E2_HR", "E3_HR", "E4_HR", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
-    description: Finance diagnostics agent for PBT bridge and root causes.
+    requires_role: ["CMD", "DIR_FIN", "DIR_REF", "DIR_MKT", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
+    description: Finance diagnostics agent for PBT bridge, refinery GRM variance, and CFO levers.
     triggers:
       - "(?i)\\b(diagnose|why did .* drop|bridge)\\b"
     examples:
-      - "why did PBT drop in FY24"
+      - "why did PAT drop in FY25"
       - "give me a variance bridge"
-      - "diagnose the revenue drop"
+      - "diagnose the gross margin drop"
       - "show me a waterfall chart of costs"
       - "what caused the profit to decrease"
-      - "pbt drop kyu hua"
-      - "fy24 me variance kya hai"
+      - "pat drop kyu hua"
+      - "fy25 me variance kya hai"
       - "bridge chart dikhao"
 
   - id: dcf_agent
@@ -35,40 +35,24 @@ agents:
       - id: publish
         label: "Publishing"
     class: app.agents.dcf_agent.DCFAgent
-    requires_role: ["CMD", "DIR_FIN"]
-    description: Runs a discounted cash flow valuation.
+    requires_role: ["CMD", "DIR_FIN", "DIR_REF", "DIR_MKT", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
+    description: Runs a discounted cash flow valuation for IndianOil (NSE:IOC).
     triggers:
       - "(?i)\\b(dcf|discounted cash flow|intrinsic val\\w*|under ?valued|over ?valued)\\b"
     examples:
-      - "Can you run a discounted cash flow and tell if ONGC is undervalued?"
+      - "Can you run a discounted cash flow and tell if IOCL is undervalued?"
       - "dcf run karo"
       - "valuation kya hai"
-      - "is ongc overvalued"
+      - "is iocl overvalued"
       - "show me intrinsic value"
       - "calculate dcf for fy26"
       - "run intrinsic valuation"
       - "what is the wacc"
 
-  - id: hr_transfer_agent
-    class: app.agents.hr_transfer.tool
-    requires_role: ["CMD", "DIR_HR", "DIR_FIN", "E1_HR", "E2_HR", "E3_HR", "E4_HR", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
-    description: Proposes HR transfers and drafts review emails.
-    triggers:
-      - "(?i)\\b(transfer|relocat\\w*|postings|email|draft)\\b"
-    examples:
-      - "transfer employee 123"
-      - "draft an email to Director HR"
-      - "send this email"
-      - "relocate these executives to Mumbai"
-      - "prepare transfer orders"
-      - "email draft karo"
-      - "transfer order bhejo"
-      - "inhe delhi relocate karo"
-
   - id: doc_export_agent
     class: app.agents.doc_export.tool
-    requires_role: ["CMD", "DIR_HR", "DIR_FIN", "E1_HR", "E2_HR", "E3_HR", "E4_HR", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
-    description: Exports documents to Excel, PDF, etc.
+    requires_role: ["CMD", "DIR_FIN", "DIR_REF", "DIR_MKT", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
+    description: Exports Finance & Downstream tables and memos to Excel, PDF, Word, Google Docs/Sheets.
     run_mode: auto
     steps:
       - id: start
@@ -91,16 +75,16 @@ agents:
 
   - id: analyst
     class: app.agents.analyst.AnalystAgent
-    requires_role: ["CMD", "DIR_HR", "DIR_FIN", "E1_HR", "E2_HR", "E3_HR", "E4_HR", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
-    description: Core analytical planner for HR and finance queries.
+    requires_role: ["CMD", "DIR_FIN", "DIR_REF", "DIR_MKT", "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN"]
+    description: Core analytical planner for IndianOil Finance, Refinery Economics, Pipelines, Marketing, and MoU queries.
     triggers:
-      - "(?i)\\b(balance sheet|profit|loss|salary|payroll|leave)\\b"
+      - "(?i)\\b(balance sheet|profit|loss|revenue|excise|grm|refinery|pipeline|marketing|wacc)\\b"
     examples:
-      - "show balance sheet for 2024"
-      - "what is my salary"
-      - "how many employees are there"
-      - "what is the revenue"
+      - "show balance sheet for FY26"
+      - "compare gross vs net revenue FY17-FY26"
+      - "compare GRM across IndianOil refineries"
+      - "what is the marketing volume for MS and HSD"
       - "give me the cash flow"
-      - "salary kitni hai"
+      - "grm kitna hai"
       - "balance sheet dikhao"
       - "profit kitna hua"

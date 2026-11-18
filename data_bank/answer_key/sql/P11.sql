@@ -7,7 +7,7 @@
 -- Semantic audit 2026-10-20: Exemption = retirement within 3 years of 2026-10-19 (Clause 7.1 practice; 2-year strict rule also shown).
 WITH delhi AS (
     SELECT v.emp_id, v.cumulative_cluster_years, v.has_breached_cluster_10yr_cap, v.retirement_date, g.cadre
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure` v
     JOIN dim_grade g ON g.grade_id = v.current_grade_id
     WHERE v.cluster_id = 'CL-DEL' AND v.is_currently_in_cluster
 )

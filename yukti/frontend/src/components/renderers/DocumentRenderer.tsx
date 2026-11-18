@@ -95,7 +95,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ document, is
         );
       } else if (trimmed.startsWith('### ')) {
         elements.push(
-          <h3 key={idx} className="text-sm md:text-base font-semibold text-ongc-maroon tracking-wide uppercase mb-3">
+          <h3 key={idx} className="text-sm md:text-base font-semibold text-iocl-maroon tracking-wide uppercase mb-3">
             {renderInlineMarkdown(trimmed.slice(4))}
           </h3>
         );
@@ -128,33 +128,33 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ document, is
       data-testid="document-renderer"
       className="card flex flex-col h-[clamp(24rem,calc(100vh-22rem),52rem)] overflow-hidden"
     >
-      {/* Official ONGC Letterhead Banner */}
-      <div className="bg-ongc-maroon text-white px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shrink-0">
+      {/* Official IndianOil Letterhead Banner */}
+      <div className="bg-iocl-maroon text-white px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-3">
           <div
-            title="Oil and Natural Gas Corporation Limited (Official Logo)"
+            title="Indian Oil Corporation Limited (Official Logo)"
             className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-xs shrink-0"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/brand/ongc_logo.png"
-              alt="ONGC Logo"
+              src="/brand/iocl_logo.png"
+              alt="IndianOil Logo"
               className="w-full h-full object-contain"
             />
           </div>
           <div>
             <div className="text-xs uppercase tracking-wider text-white/80 font-medium">
-              Oil and Natural Gas Corporation Limited
+              Indian Oil Corporation Limited
             </div>
             <div className="text-base font-bold text-white">
-              {document.title || 'Official Parliamentary Reply'}
+              {document.title || 'Official Board & Finance Memorandum'}
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-white/20 text-white border border-white/30 backdrop-blur-sm">
-            {document.doc_type || 'Parliament Reply'}
+            {document.doc_type || 'Board Note'}
           </span>
           <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40">
             Draft v{document.version || 1}

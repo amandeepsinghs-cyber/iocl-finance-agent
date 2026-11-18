@@ -64,7 +64,7 @@ _IS_PROD = YUKTI_ENV == "prod"
 app = FastAPI(
     title="Yukti AI Backend",
     version="1.0.0",
-    description="Voice-First HR & Finance AI Agent for ONGC CMD & Leadership",
+    description="Voice-First Finance & Downstream Intelligence AI Agent for IndianOil Chairman & Leadership",
     # P0.5 (SPEC-06 §4.7): no interactive docs / schema on Cloud Run
     docs_url=None if _IS_PROD else "/docs",
     redoc_url=None if _IS_PROD else "/redoc",
@@ -320,7 +320,7 @@ def _apply_admin_switch(contract: Dict[str, Any], principal: Principal, response
     ui_act = contract.get("ui_action") or {}
     if (ui_act.get("command") or ui_act.get("action")) not in ("set_persona", "persona"):
         return
-    target = str(ui_act.get("value") or "").upper()
+    target = yauth.resolve_auth_persona(str(ui_act.get("value") or ""))
     if principal.is_admin and target in yauth.PERSONA_DIRECTORY:
         token = yauth.issue_token(target, is_admin=True)
         yauth.set_session_cookie(response, token)
@@ -590,8 +590,8 @@ def create_export(
         norm_p = (principal.persona or "").strip().upper()
         if not req.rows and not req.content and not req.email_draft:
             _refuse_export_403("Export requires a verified turn_id or policy-compliant payload.")
-        if norm_p not in ("CMD", "DIR_HR"):
-            # Non-CMD/DIR_HR may only export client rows that enforce_export_rbac can verify and collapse
+        if norm_p not in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
+            # Junior Grades A–D may only export client rows that enforce_export_rbac can verify and collapse
             if not req.rows or req.content or req.email_draft:
                 _refuse_export_403(
                     f"Client-supplied content requires a verified turn_id for access level {norm_p}."
@@ -609,7 +609,7 @@ def create_export(
                 },
             },
         }
-        if req.email_draft and norm_p in ("CMD", "DIR_HR"):
+        if req.email_draft and norm_p in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
             base_contract["email_draft"] = req.email_draft
 
     # 3. Enforce RBAC & column intersection on contract
@@ -664,10 +664,10 @@ def create_export(
         title_override=title_override,
     )
 
-    # M1: Only use req.content when CMD/DIR_HR explicitly exports client markdown without turn_id
+    # M1: Only use req.content when Leadership/Director explicitly exports client markdown without turn_id
     safe_md = (
         (req.content or "")
-        if (is_client_supplied and (principal.persona or "").upper() in ("CMD", "DIR_HR"))
+        if (is_client_supplied and (principal.persona or "").upper() in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"))
         else str(masked_contract.get("display_text") or "")
     )
 

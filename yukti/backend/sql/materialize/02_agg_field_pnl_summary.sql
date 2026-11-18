@@ -1,9 +1,9 @@
 -- Proposed Materialized Summary Table 02
--- Table: ongc-hr-finance-agent.hrfin_gold.agg_field_pnl_summary
+-- Table: yukti-finance-iocl.hrfin_gold.agg_field_pnl_summary
 -- Purpose: Pre-aggregate field-level economics to accelerate P&L and What-If scenario queries from ~1.8s to ~120ms.
 -- Target Cluster: (field_id, onshore_offshore)
 
-CREATE OR REPLACE TABLE `ongc-hr-finance-agent.hrfin_gold.agg_field_pnl_summary`
+CREATE OR REPLACE TABLE `yukti-finance-iocl.hrfin_gold.agg_field_pnl_summary`
 CLUSTER BY field_id, onshore_offshore
 OPTIONS(
     description="Pre-aggregated physical field P&L components for rapid executive review and what-if pricing models."
@@ -38,5 +38,5 @@ SELECT
     is_divestment_candidate,
     pec_monetisation_potential_flag,
     root_cause_loss_code
-FROM `ongc-hr-finance-agent.hrfin_gold.v_field_pnl`
+FROM `yukti-finance-iocl.hrfin_gold.v_field_pnl`
 WHERE field_id IS NOT NULL;

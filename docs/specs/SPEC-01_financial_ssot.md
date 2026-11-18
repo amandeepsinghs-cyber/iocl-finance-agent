@@ -107,7 +107,7 @@ flowchart LR
 - XBRL: `lxml`, namespace `in-bse-fin`. Keep facts with `contextRef="FourD"` (full year) for annual rows and `OneD` for Q4. Value ÷ 1e7 → ₹ cr; `decimals="-7"` means the value is rounded to ₹1 cr, so `precision_inr_cr = 1`. Example: FY21 standalone `RevenueFromOperations` FourD = 681,410,900,000 INR = ₹68,141.09 cr, which equals the AR FY26 10-yr value 681,411 ₹ mn.
 - Yahoo: direct JSON (no scraping) from `query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/ONGC.NS` (annual + quarterly types) and `/v8/finance/chart/ONGC.NS` and `/^NSEI` (range=max, interval=1d and 1wk, events=div). Raw JSON is saved unmodified to `knowledge/public_sources/market_data/yahoo/<endpoint>_<UTC>.json` and loaded to `hrfin_bronze.yahoo_raw`. All Yahoo statement rows: `scope='consolidated'`, `source_system='yahoo'`.
 
-## 5. Data schemas (BigQuery, project `ongc-hr-finance-agent`)
+## 5. Data schemas (BigQuery, project `yukti-finance-iocl`)
 
 ### 5.1 `hrfin_gold.fact_financial_statement_line` (the SSOT)
 Partitioned by `period_end` (yearly), clustered by `scope, statement, line_code`. Grain: one row per (`fiscal_year`, `period_type`, `scope`, `statement`, `line_code`, `source_system`, `report_vintage`).

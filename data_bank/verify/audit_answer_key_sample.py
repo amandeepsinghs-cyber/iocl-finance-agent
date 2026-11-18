@@ -4,7 +4,7 @@ audit_answer_key_sample.py — Independent Audit of Phase 5 Answer Key (Steps 5.
 Audits:
  1. Stratified sample of >=60 entries (all W1-W4 + C13 roots & followups, core C1, P11, C2, C4, C6, C11, C12, F1, F3, H1, H3, H5, X1, X3, X7,
     all refusals D1-D6, P18-P20, M3, M4, plus representative follow-ups).
- 2. Re-executes independent SQL against BigQuery ongc-hr-finance-agent (hrfin_gold / hrfin_silver) without reusing answer_key SQL.
+ 2. Re-executes independent SQL against BigQuery yukti-finance-iocl (hrfin_gold / hrfin_silver) without reusing answer_key SQL.
  3. Verifies that answer markdown text matches query outputs and cites governing policy clauses.
  4. Reconciles C1 / P11 tenure figures with JRTP Clause 4 & 7 and document drafts.
  5. Validates W1 crude price sensitivity recomputation from field_pnl_annual.
@@ -25,7 +25,7 @@ from google.cloud import bigquery
 import pandas as pd
 
 DATA_BANK_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "asia-south1"
 
 ANSWER_KEY_DIR = DATA_BANK_DIR / "answer_key"
@@ -103,7 +103,7 @@ def run_answer_key_audit() -> Dict[str, Any]:
             SELECT COUNT(DISTINCT emp_id) as total_5y,
                    COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) as exempt_3yr,
                    COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) as non_exempt
-            FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+            FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
             WHERE is_current_stay = TRUE AND wc_id = 'WC-DEL' AND grade_id LIKE 'E%' AND continuous_stay_months >= 60
         """,
         # P11: Delhi cluster 10y
@@ -111,46 +111,46 @@ def run_answer_key_audit() -> Dict[str, Any]:
             SELECT COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap THEN emp_id END) as breached_10y,
                    COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) as exempt_3yr,
                    COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) as non_exempt
-            FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+            FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
             WHERE cluster_id = 'CL-DEL' AND is_currently_in_cluster = TRUE
         """,
         # C2: NE Deployment
         "C2": """
             SELECT current_wc_id as wc_id, COUNT(DISTINCT emp_id) as in_pos
-            FROM `ongc-hr-finance-agent.hrfin_silver.employee_master`
+            FROM `yukti-finance-iocl.hrfin_silver.employee_master`
             WHERE current_wc_id IN ('WC-ASM', 'WC-JOR', 'WC-TRI', 'WC-SIL') AND current_grade_id LIKE 'E%' AND (employment_status = 'Active' OR separation_date IS NULL)
             GROUP BY current_wc_id
         """,
         # C4: GM E7+ retirement horizon
         "C4": """
             SELECT current_grade_id, COUNT(DISTINCT emp_id) as in_pos
-            FROM `ongc-hr-finance-agent.hrfin_silver.employee_master`
+            FROM `yukti-finance-iocl.hrfin_silver.employee_master`
             WHERE current_grade_id IN ('E7', 'E8', 'E9') AND (employment_status = 'Active' OR separation_date IS NULL)
             GROUP BY current_grade_id
         """,
         # C6: Field P&L FY26
         "C6": """
             SELECT field_id, field_name, recomputed_gross_revenue_inr_cr, total_opex_inr_cr, recomputed_ebitda_inr_cr, recomputed_pbt_inr_cr
-            FROM `ongc-hr-finance-agent.hrfin_gold.v_field_pnl`
+            FROM `yukti-finance-iocl.hrfin_gold.v_field_pnl`
             WHERE fiscal_year IN ('FY26', '2026') AND field_id IS NOT NULL
         """,
         # C11: Decoupling Cambay
         "C11": """
             SELECT wc_id, SUM(headcount) as hc
-            FROM `ongc-hr-finance-agent.hrfin_silver.headcount_snapshot`
+            FROM `yukti-finance-iocl.hrfin_silver.headcount_snapshot`
             WHERE wc_id = 'WC-CAM' AND fiscal_year = 'FY26'
             GROUP BY wc_id
         """,
         # C12: Manpower cost per BOE
         "C12": """
             SELECT asset_name, manpower_cost_per_boe_usd, allocated_manpower_cost_inr_cr
-            FROM `ongc-hr-finance-agent.hrfin_gold.v_lifting_cost`
+            FROM `yukti-finance-iocl.hrfin_gold.v_lifting_cost`
             WHERE fiscal_year = 'FY26' AND asset_wc_id IN ('WC-MUM', 'WC-NEH', 'WC-AHM', 'WC-ASM')
         """,
         # C13: 200 Executive Relocation simulation
         "C13": """
             SELECT COUNT(DISTINCT emp_id) as eligible_overstay_del_ddn
-            FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+            FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
             WHERE wc_id IN ('WC-DEL', 'WC-DDN') AND is_current_stay = TRUE AND grade_id LIKE 'E%' AND continuous_stay_months >= 60
         """,
         # W1: Brent $60 simulation
@@ -160,7 +160,7 @@ def run_answer_key_audit() -> Dict[str, Any]:
                    total_opex_inr_cr,
                    ROUND((oil_revenue_inr_cr * (57.50 / 68.40) + gas_revenue_inr_cr) - ((statutory_royalty_inr_cr + statutory_cess_inr_cr) * (57.50 / 68.40)) - total_opex_inr_cr, 2) as sim_ebitda,
                    ROUND((oil_revenue_inr_cr * (57.50 / 68.40) + gas_revenue_inr_cr) - ((statutory_royalty_inr_cr + statutory_cess_inr_cr) * (57.50 / 68.40)) - total_opex_inr_cr - dda_depreciation_inr_cr, 2) as sim_pbt
-            FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual`
+            FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual`
             WHERE fiscal_year IN ('FY26', '2026') AND line_type = 'field'
         """,
         # W4: Cess / Realisation sensitivity
@@ -170,7 +170,7 @@ def run_answer_key_audit() -> Dict[str, Any]:
                    ROUND(AVG(ongc_crude_net_realisation_usd_bbl), 2) AS net_realisation_usd_bbl,
                    ROUND(AVG(windfall_tax_saed_inr_bbl), 2) AS saed_windfall_tax_inr_bbl,
                    ROUND(AVG(inr_usd_fx_rate), 2) AS avg_fx_rate
-            FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+            FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
             WHERE fiscal_year IN ('FY23', 'FY24', 'FY25', 'FY26')
             GROUP BY fiscal_year
             ORDER BY fiscal_year
@@ -178,40 +178,40 @@ def run_answer_key_audit() -> Dict[str, Any]:
         # F1: Lifting cost
         "F1": """
             SELECT asset_name, AVG(lifting_cost_per_boe_usd) as lifting_cost
-            FROM `ongc-hr-finance-agent.hrfin_gold.v_lifting_cost`
+            FROM `yukti-finance-iocl.hrfin_gold.v_lifting_cost`
             WHERE fiscal_year = 'FY26'
             GROUP BY asset_name
         """,
         # F3: 5y revenue & EBITDA
         "F3": """
             SELECT field_id, fiscal_year, gross_revenue_inr_cr, ebitda_inr_cr
-            FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual`
+            FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual`
             WHERE line_type = 'field'
         """,
         # H1: Rotation candidates
         "H1": """
             SELECT wc_name, COUNT(DISTINCT emp_id) as overstay_officers
-            FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+            FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
             WHERE is_current_stay = TRUE AND continuous_stay_months >= 36 AND grade_id LIKE 'E%'
             GROUP BY wc_name
         """,
         # H3: Voluntary separation
         "H3": """
             SELECT fiscal_year, separation_type, COUNT(*) as cnt
-            FROM `ongc-hr-finance-agent.hrfin_silver.separations`
+            FROM `yukti-finance-iocl.hrfin_silver.separations`
             WHERE separation_type IN ('resignation', 'vrs')
             GROUP BY fiscal_year, separation_type
         """,
         # H5: DPC delay
         "H5": """
             SELECT dpc_status, COUNT(*) as cnt
-            FROM `ongc-hr-finance-agent.hrfin_gold.mart_promotions_dpc`
+            FROM `yukti-finance-iocl.hrfin_gold.mart_promotions_dpc`
             GROUP BY dpc_status
         """,
         # X1: Contract vs regular
         "X1": """
             SELECT wc_id, SUM(contractor_headcount) as contract_hc
-            FROM `ongc-hr-finance-agent.hrfin_silver.contract_workforce`
+            FROM `yukti-finance-iocl.hrfin_silver.contract_workforce`
             WHERE fiscal_year = 'FY26'
             GROUP BY wc_id
         """,
@@ -303,7 +303,7 @@ def run_answer_key_audit() -> Dict[str, Any]:
         SELECT COUNT(DISTINCT emp_id) as total_delhi_5y,
                COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) as exempt_3yr,
                COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) as non_exempt
-        FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+        FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
         WHERE is_current_stay = TRUE AND wc_id = 'WC-DEL' AND grade_id LIKE 'E%' AND continuous_stay_months >= 60
     """
     c1_row = list(client.query(q_c1_exact).result())[0]
@@ -313,14 +313,14 @@ def run_answer_key_audit() -> Dict[str, Any]:
         SELECT COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap THEN emp_id END) as current_breached_10y,
                COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) as exempt_3yr,
                COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) as non_exempt
-        FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+        FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
         WHERE cluster_id = 'CL-DEL' AND is_currently_in_cluster = TRUE
     """
     p11_curr_row = list(client.query(q_p11_current).result())[0]
 
     q_p11_lifetime = """
         SELECT COUNT(DISTINCT emp_id)
-        FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+        FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
         WHERE cluster_id = 'CL-DEL' AND has_breached_cluster_10yr_cap = TRUE
     """
     p11_life_row = list(client.query(q_p11_lifetime).result())[0][0]
@@ -357,7 +357,7 @@ def run_answer_key_audit() -> Dict[str, Any]:
                 statutory_cess_inr_cr,
                 total_opex_inr_cr,
                 dda_depreciation_inr_cr
-            FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual`
+            FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual`
             WHERE fiscal_year IN ('FY26', '2026') AND line_type = 'field'
         ),
         simulated AS (

@@ -28,8 +28,9 @@ logger = logging.getLogger("yukti.market.oil")
 BENCHMARKS: Dict[str, Dict[str, str]] = {
     "brent": {"symbol": "BZ=F", "label": "Brent crude", "short": "Brent", "unit": "$/bbl"},
     "wti": {"symbol": "CL=F", "label": "WTI crude", "short": "WTI", "unit": "$/bbl"},
-    # 27-Oct: the rupee explains much of ONGC's revenue resilience (prices are dollar-linked, books are in rupees)
     "inr": {"symbol": "INR=X", "label": "Rupee per US dollar", "short": "₹/$", "unit": "₹ per $"},
+    "grm": {"symbol": "SG_GRM", "label": "Singapore Complex GRM benchmark", "short": "SG GRM", "unit": "$/bbl"},
+    "iocl": {"symbol": "IOC.NS", "label": "IndianOil share price (NSE:IOC)", "short": "IOC.NS", "unit": "₹"},
 }
 CACHE_TTL_S = int(os.getenv("YUKTI_OIL_CACHE_S", "600"))
 OVERLAP_DAYS = 5
@@ -49,6 +50,10 @@ def normalize_benchmark(value: Optional[str]) -> str:
         return "wti"
     if v in ("inr", "inr=x", "rupee", "rupees", "usd", "usdinr", "usd/inr", "inr/usd", "dollar", "fx", "forex", "currency", "exchange rate", "₹/$"):
         return "inr"
+    if v in ("grm", "sg_grm", "sg grm", "singapore grm", "singapore_grm", "singapore complex grm", "crack", "crack spread", "refining margin"):
+        return "grm"
+    if v in ("iocl", "ioc", "ioc.ns", "nse:ioc", "indianoil", "indian oil", "share", "share price", "stock", "stock price"):
+        return "iocl"
     return "brent"
 
 
@@ -109,6 +114,14 @@ def _refresh(benchmark: str) -> Tuple[Dict[str, float], Dict[str, Any], int, int
     spec = BENCHMARKS[benchmark]
     h = _load_history(benchmark)
     saved = len(h)
+    if benchmark == "grm":
+        if not h:
+            raise ValueError("missing grm_daily.json saved benchmark history")
+        days = sorted(h.items())
+        cur_px = days[-1][1]
+        prev_px = days[-2][1] if len(days) >= 2 else cur_px
+        meta = {"currency": "USD", "regularMarketPrice": cur_px, "previousClose": prev_px}
+        return h, meta, saved, 0
     start = None
     if h:
         last = datetime.strptime(max(h), "%Y-%m-%d").replace(tzinfo=timezone.utc)
@@ -147,13 +160,19 @@ def _payload(benchmark: str, h: Dict[str, float], meta: Dict[str, Any], saved: i
     if change_pct is None and prev and price:
         change_pct = (price - prev) / prev * 100
     as_of = meta.get("regularMarketTime")
+    default_ccy = "INR" if benchmark in ("inr", "iocl") else "USD"
+    src_desc = (
+        "Calibrated Singapore Complex GRM benchmark (daily series anchored to FY17–FY26 Reuters/PPAC averages)"
+        if benchmark == "grm"
+        else f"Yahoo Finance ({spec['symbol']}{', front-month futures' if benchmark in ('brent', 'wti') else ''}; daily closes, saved history + live updates)"
+    )
     return {
         "benchmark": benchmark,
         "symbol": spec["symbol"],
         "label": spec["label"],
         "short": spec["short"],
         "unit": spec["unit"],
-        "currency": meta.get("currency") or "USD",
+        "currency": meta.get("currency") or default_ccy,
         "live": {
             "price": round(float(price), 2) if price else None,
             "change_pct": round(float(change_pct), 2) if change_pct is not None else None,
@@ -164,7 +183,7 @@ def _payload(benchmark: str, h: Dict[str, float], meta: Dict[str, Any], saved: i
         "daily": daily,
         "history": {"days": len(days), "first": days[0][0] if days else None, "last": days[-1][0] if days else None,
                     "saved_days": saved, "new_days": new_days},
-        "source": f"Yahoo Finance ({spec['symbol']}{', front-month futures' if benchmark != 'inr' else ''}; daily closes, saved history + live updates)",
+        "source": src_desc,
         "fetched_at": now.isoformat(),
         "stale": stale,
     }
@@ -196,3 +215,29 @@ def get_oil_prices(benchmark: str) -> Dict[str, Any]:
             return data
         _mem[benchmark] = (time.time(), data)
         return data
+
+
+_FUEL_HISTORY_CACHE: Optional[Dict[str, Any]] = None
+_FUEL_BUILDUP_CACHE: Optional[List[Dict[str, Any]]] = None
+
+
+def get_retail_fuel_prices() -> Dict[str, Any]:
+    """Load IOCL 10-year Metro Retail Selling Price history (MS, HSD, Indane LPG, ATF)."""
+    global _FUEL_HISTORY_CACHE
+    if _FUEL_HISTORY_CACHE is None:
+        path = _HIST_DIR / "retail_fuel_prices_history.json"
+        if not path.exists():
+            raise RuntimeError("Retail fuel price history is not available locally.")
+        _FUEL_HISTORY_CACHE = json.loads(path.read_text(encoding="utf-8"))
+    return _FUEL_HISTORY_CACHE
+
+
+def get_delhi_fuel_buildup() -> List[Dict[str, Any]]:
+    """Load IOCL Delhi Retail Price & Tax Build-Up (Base, Freight, Excise, Commission, VAT)."""
+    global _FUEL_BUILDUP_CACHE
+    if _FUEL_BUILDUP_CACHE is None:
+        path = _HIST_DIR / "fuel_price_buildup_delhi.json"
+        if not path.exists():
+            raise RuntimeError("Delhi fuel price build-up data is not available locally.")
+        _FUEL_BUILDUP_CACHE = json.loads(path.read_text(encoding="utf-8"))
+    return _FUEL_BUILDUP_CACHE

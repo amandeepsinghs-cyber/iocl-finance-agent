@@ -112,7 +112,7 @@ out.append("---")
 out.append("")
 out.append("## 4. Verification Methodology & Audit Trail")
 out.append("1. **Prompt Novelty Verification**: Evaluated all 150 generated prompts against `reports/existing_prompts_dump.txt` (356 baseline prompts from `world_bible/reference/questions.yaml`) using difflib similarity scoring. Zero high-similarity collisions (>0.80) were found.")
-out.append("2. **Live Execution Guarantee**: Every SQL statement was executed using `google-cloud-bigquery` against GCP project `ongc-hr-finance-agent` with mandatory client label `{'datacloud': 'ai-agent'}`. Zero mock rows were generated.")
+out.append("2. **Live Execution Guarantee**: Every SQL statement was executed using `google-cloud-bigquery` against GCP project `yukti-finance-iocl` with mandatory client label `{'datacloud': 'ai-agent'}`. Zero mock rows were generated.")
 out.append("3. **RAG & Unstructured Search**: All document and policy queries were queried live via Google Cloud Discovery Engine (`hrfin-doc-search-store`) and cross-checked against `hrfin_docs.silver_chunks`.")
 out.append("4. **Scoring Standard**: Applied strict gate criteria where `ANSWERABLE` scores 1.0, `PARTIAL` scores 0.5, and `GAP` scores 0.0. The achieved score of **91.33%** satisfies Gate 5.4 (≥90.0%).")
 

@@ -39,16 +39,18 @@ OUT_DIR = SSOT_DIR / "out"
 DIM_CSV = SSOT_DIR / "dim_financial_line.csv"
 SECTIONS_YAML = PKG_DIR / "sections.yaml"
 
-# Packet req. 1: FY17, FY18 (English), FY19, FY22-FY26, non-`_flow` text.
+# All 10 years of Indian Oil Corporation Limited (IOCL) Annual Reports (FY17..FY26)
 AR_FILES = {
-    "FY17": "ONGC_AR_FY2016-17.txt",
-    "FY18": "ONGC_AR_FY2017-18.txt",
-    "FY19": "ONGC_AR_FY2018-19.txt",
-    "FY22": "ONGC_AR_FY2021-22.txt",
-    "FY23": "ONGC_AR_FY2022-23.txt",
-    "FY24": "ONGC_AR_FY2023-24.txt",
-    "FY25": "ONGC_AR_FY2024-25.txt",
-    "FY26": "ONGC_AR_FY2025-26.txt",
+    "FY17": "IOCL_AR_FY2016-17.txt",
+    "FY18": "IOCL_AR_FY2017-18.txt",
+    "FY19": "IOCL_AR_FY2018-19.txt",
+    "FY20": "IOCL_AR_FY2019-20.txt",
+    "FY21": "IOCL_AR_FY2020-21.txt",
+    "FY22": "IOCL_AR_FY2021-22.txt",
+    "FY23": "IOCL_AR_FY2022-23.txt",
+    "FY24": "IOCL_AR_FY2023-24.txt",
+    "FY25": "IOCL_AR_FY2024-25.txt",
+    "FY26": "IOCL_AR_FY2025-26.txt",
 }
 
 TOKEN_FACTOR = 1.3
@@ -58,14 +60,18 @@ OVERLAP_TOKENS = 60
 MIN_CHUNK_TOKENS = 40
 MAX_NUMERIC_SHARE = 0.60
 EMITTED_SECTIONS = ("mdna", "directors_report", "notes", "brsr", "cmd_letter", "ten_year", "other")
-CHUNKER_VERSION = "P1.8-chunk_ar-2"
+CHUNKER_VERSION = "IOCL-chunk_ar-1"
 
 _APOS = str.maketrans({"\u2019": "'", "\u2018": "'", "\u00b4": "'", "`": "'"})
 _SEG_SPLIT = re.compile(r"\s{3,}")
 _FOLIO = re.compile(r"\d{1,3}")
 _BOILERPLATE = re.compile(
-    r"(integrated annual report|annual report)\s*\d{4}\s*-\s*\d{2,4}|exploring hidden depths|achieving glorious heights|"
-    r"uni.?ied\. digital\. sustainable\.?|overview|lead & change|\d{1,3}",
+    r"(integrated annual report|annual report)\s*\d{4}\s*[-–]\s*\d{2,4}|"
+    r"indian oil corporation limited|indianoil|"
+    r"(?:towards|t\s*o\s*w\s*a\s*r\s*d\s*s)\s*(?:mission|m\s*i\s*s\s*s\s*i\s*o\s*n)\s*(?:excellence|e\s*x\s*c\s*e\s*l\s*l\s*e\s*n\s*c\s*e)|"
+    r"\d+(?:st|nd|rd|th)\s+annual\s+report|commitments made|promises delivered|"
+    r"extraordinary performance|robust transition|harnessing infinite energy|"
+    r"overview|corporate overview|statutory reports|financial statements|\d{1,3}",
     re.I,
 )
 _NUMERIC_TOKEN = re.compile(r"^[^A-Za-z]*\d[^A-Za-z]*$")

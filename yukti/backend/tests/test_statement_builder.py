@@ -289,7 +289,7 @@ def test_presenter_flag_gating_for_statement_visual(monkeypatch):
     assert len(vis_v3["kpis"]) == 3
     errs = list(STATEMENT_SPEC_VALIDATOR.iter_errors(vis_v3["statement"]))
     assert not errs, f"Presenter statement_spec validation errors: {[e.message for e in errs]}"
-    assert vis_v3["statement"]["periods"] == ["FY26", "FY25"]
+    assert vis_v3["statement"]["periods"] == ["FY26"]
     assert vis_v3["statement"]["totals_check"]["passed"] is True
 
     # 3. Explicit waterfall request with flag enabled -> `chart` (waterfall) wins while preserving `statement`
@@ -308,7 +308,7 @@ def test_presenter_flag_gating_for_statement_visual(monkeypatch):
     assert "statement" in vis_wf
 
     # 4. Cash Flow presenter branch wires `bs_cash_by_period` and checks Closing Cash = BS Cash tie-out (M3)
-    cf_raw = json.loads((BASE_DIR / "financial_build/data/ongc_10yr_cash_flow_lines.json").read_text())
+    cf_raw = json.loads((BASE_DIR / "financial_build/data/iocl_10yr_cash_flow_lines.json").read_text())
     cf_fy26_rows = [
         {
             "line_order": r["line_order"],

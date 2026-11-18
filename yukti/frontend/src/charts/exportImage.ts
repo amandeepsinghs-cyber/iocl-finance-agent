@@ -15,7 +15,7 @@ export const NAMING_REGEX = /^yukti_[a-z0-9_-]+_\d{8}-\d{4}(_aggregate)?\.(xlsx|
 export interface ImageMeta {
   title: string;
   subtitle?: string; // unit · as-of
-  source?: string; // "Source: ONGC Annual Report FY2023-24, p. 212"
+  source?: string; // "Source: IndianOil Annual Report FY2025-26, p. 212"
   background: string;
   ink: string;
   ink2: string;
@@ -28,7 +28,7 @@ export interface ImageMeta {
 
 // Mirrors backend export_audit._HINDI_TRANSLIT (longest phrases first) so client and server names agree.
 const HI_TRANSLIT: [RegExp, string][] = [
-  [/ओएनजीसी/g, 'ongc'],
+  [/इंडियनऑयल/g, 'indianoil'],
   [/राजस्व/g, 'rajasva'],
   [/शुद्ध\s*लाभ/g, 'shuddh_labh'],
   [/लाभ/g, 'labh'],

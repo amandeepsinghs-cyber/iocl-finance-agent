@@ -18,6 +18,7 @@ import csv
 import datetime
 import hashlib
 import io
+import os
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -27,9 +28,9 @@ import pyarrow.parquet as pq
 import yaml
 from google.cloud import bigquery, storage
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or "yukti-finance-iocl"
 DATASET_ID = "hrfin_bronze"
-LANDING_BUCKET = "ongc-hr-finance-agent-landing"
+LANDING_BUCKET = os.getenv("YUKTI_LANDING_BUCKET", "yukti-finance-iocl-landing")
 BATCH_DATE = "20261020"
 
 BASE_DIR = Path(__file__).resolve().parent.parent

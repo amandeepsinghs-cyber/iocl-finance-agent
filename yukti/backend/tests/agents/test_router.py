@@ -20,7 +20,7 @@ def test_router_accuracy():
         # DCF (10)
         ("run dcf", "dcf_agent"),
         ("what is the intrinsic value", "dcf_agent"),
-        ("is ONGC undervalued", "dcf_agent"),
+        ("is IOCL undervalued", "dcf_agent"),
         ("discounted cash flow model", "dcf_agent"),
         ("dcf run karo", "dcf_agent"),
         ("can you run a discounted cash flow", "dcf_agent"),
@@ -29,17 +29,9 @@ def test_router_accuracy():
         ("is it overvalued", "dcf_agent"),
         ("कंपनी का मूल्यांकन क्या है", "dcf_agent"),
         
-        # Transfer (10)
-        ("transfer employee 123", "hr_transfer_agent"),
-        ("relocate john doe", "hr_transfer_agent"),
-        ("postings for next year", "hr_transfer_agent"),
-        ("initiate a transfer", "hr_transfer_agent"),
-        ("relocation options", "hr_transfer_agent"),
-        ("hr transfer karo", "hr_transfer_agent"),
-        ("mera transfer kahan hoga", "hr_transfer_agent"),
-        ("i want to transfer", "hr_transfer_agent"),
-        ("relocate me", "hr_transfer_agent"),
-        ("मुझे ट्रांसफर करना है", "hr_transfer_agent"),
+        # Analyst (Finance / Downstream)
+        ("show balance sheet for FY26", "analyst"),
+        ("compare GRM across IndianOil refineries", "analyst"),
         
         # Export (10)
         ("export this to excel", "doc_export_agent"),

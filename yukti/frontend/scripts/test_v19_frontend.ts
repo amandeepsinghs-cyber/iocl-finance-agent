@@ -54,11 +54,11 @@ ok('gradeRank orders E1<E2<E10 and executives before GRP-B<GRP-C<GRP-D, unknown 
 });
 ok('years columns are numeric and formatted to 1 dp without a unit suffix', () => {
   assert.ok(isYearsColumn('delhi_tenure_years'));
-  assert.ok(isYearsColumn('ongc_tenure_years'));
+  assert.ok(isYearsColumn('iocl_tenure_years'));
   assert.ok(isYearsColumn('years_to_retirement'));
   assert.equal(formatRosterCell('years_to_retirement', 30, false).text, '30.0');
   assert.equal(formatRosterCell('delhi_tenure_years', 7.2649, false).text, '7.3');
-  assert.equal(formatRosterCell('ongc_tenure_years', '21.04', false).text, '21.0');
+  assert.equal(formatRosterCell('iocl_tenure_years', '21.04', false).text, '21.0');
   assert.equal(formatRosterCell('continuous_stay_years', 6.01, false).text, '6.0 yrs'); // legacy unchanged
   assert.equal(formatRosterCell('exemption', null, false).text, '—');
 });
@@ -69,7 +69,7 @@ ok('columnLabel prefers backend labels ("Tenure in Delhi (yrs)")', () => {
   assert.equal(columnLabel('exemption', labels, (k) => k.toUpperCase()), 'EXEMPTION');
 });
 
-const cols = ['name', 'functional_designation', 'grade', 'ongc_tenure_years', 'delhi_tenure_years', 'years_to_retirement', 'exemption'];
+const cols = ['name', 'functional_designation', 'grade', 'iocl_tenure_years', 'delhi_tenure_years', 'years_to_retirement', 'exemption'];
 const roster = normalizeRows(cols, [
   ['A', 'Chief Manager (HR)', 'E5', 22.1, 6.2, 9.4, null],
   ['B', 'Manager (Drilling)', 'E10', 12.0, 9.9, 18.0, 'pre_retirement'],
@@ -80,7 +80,7 @@ const roster = normalizeRows(cols, [
 const numeric = detectNumericColumns(cols, roster);
 
 ok('years_to_retirement and tenure columns detected numeric', () => {
-  for (const c of ['ongc_tenure_years', 'delhi_tenure_years', 'years_to_retirement']) assert.ok(numeric.has(c), c);
+  for (const c of ['iocl_tenure_years', 'delhi_tenure_years', 'years_to_retirement']) assert.ok(numeric.has(c), c);
 });
 ok('default sort delhi_tenure_years desc', () => {
   const out = filterAndSortRows(roster, cols, '', {}, 'delhi_tenure_years', 'desc', numeric);

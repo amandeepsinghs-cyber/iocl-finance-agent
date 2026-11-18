@@ -195,7 +195,7 @@ flowchart LR
 ## 6. GCP project recommendation
 
 > [!IMPORTANT]
-> **Recommendation:** create a **new dedicated project**, e.g. `ongc-hr-finance-agent`, under the `amandeepsinghs.altostrat.com` org.
+> **Recommendation:** create a **new dedicated project**, e.g. `yukti-finance-iocl`, under the `amandeepsinghs.altostrat.com` org.
 
 | Factor | New project | Reuse `og-agentic-ecosystem` |
 |---|---|---|

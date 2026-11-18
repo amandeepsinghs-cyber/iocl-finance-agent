@@ -33,7 +33,7 @@ from google.auth import default
 from google.cloud import bigquery, discoveryengine_v1 as discoveryengine, storage
 from pypdf import PdfReader
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 DATASET_ID = "hrfin_docs"
 LOCATION_BQ = "asia-south1"
 DOCAI_PROCESSOR_ID = "projects/89038075859/locations/asia-south1/processors/306037dbdbd42c8e"
@@ -61,7 +61,7 @@ def gcp_clients():
 
 def test_ocr_quality_rulebooks(gcp_clients):
     _, storage_client, _ = gcp_clients
-    bucket = storage_client.bucket("ongc-hr-finance-agent-docs")
+    bucket = storage_client.bucket("yukti-finance-iocl-docs")
     blobs = list(bucket.list_blobs(prefix="_docai_output/batch_1/"))
     op_folders = sorted(list({b.name.split("/")[2] for b in blobs if b.name.endswith(".json")}))
     latest_op = op_folders[-1] if op_folders else ""

@@ -38,7 +38,7 @@ const TABS: TabItem[] = [
   },
   {
     id: 'aggregate',
-    label: 'Aggregate (E2_HR)',
+    label: 'Aggregate (E2_FIN)',
     data: v2RosterAggregateE2,
     persona: v2RosterAggregateE2.persona,
   },

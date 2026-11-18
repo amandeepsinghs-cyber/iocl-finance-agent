@@ -1,8 +1,7 @@
-"""Export verified SSOT rows to legacy financial_build/data/ongc_10yr_*.json files.
+"""Export verified SSOT rows to legacy financial_build/data/iocl_10yr_*.json files.
 
-Ensures any remaining reader of financial_build/data/ongc_10yr_*.json receives verified
-Annual Report SSOT numbers with honest provenance and zero 'Yahoo Finance (ONGC.NS)' or
-'Audited' claims.
+Ensures any remaining reader of financial_build/data/iocl_10yr_*.json receives verified
+Annual Report SSOT numbers with honest provenance.
 """
 from __future__ import annotations
 
@@ -156,9 +155,9 @@ def export_all() -> None:
     as_rep = _build_lookup(df, "as_reported")
     latest = _build_lookup(df, "latest")
 
-    # 1. Update ongc_10yr_corporate_wide.json using latest trend (for multi-FY series consistency)
+    # 1. Update iocl_10yr_corporate_wide.json using latest trend (for multi-FY series consistency)
     # with fallback to as_reported where latest is absent.
-    cw_path = DATA_DIR / "ongc_10yr_corporate_wide.json"
+    cw_path = DATA_DIR / "iocl_10yr_corporate_wide.json"
     cw_rows = json.loads(cw_path.read_text(encoding="utf-8"))
     for row in cw_rows:
         fy = row["fiscal_year"]
@@ -192,7 +191,7 @@ def export_all() -> None:
         # Clean any Yahoo/Audited references in notes
         for nk in ("primary_driver_note", "balance_sheet_driver_note"):
             if nk in row and isinstance(row[nk], str):
-                row[nk] = row[nk].replace("Yahoo Finance (ONGC.NS)", "Annual Report SSOT").replace("ONGC.NS", "ONGC").replace("Audited", "Reported")
+                row[nk] = row[nk].replace("Yahoo Finance (IOC.NS)", "Annual Report SSOT").replace("Audited", "Reported")
     cw_path.write_text(json.dumps(cw_rows, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     # Helper to update statement line JSONs using as_reported values
@@ -208,9 +207,9 @@ def export_all() -> None:
             lc = r["line_code"]
             r.pop("yahoo_finance_line", None)
             if "line_name" in r:
-                r["line_name"] = r["line_name"].replace(" (ONGC.NS)", "").replace("Yahoo Finance", "Annual Report")
+                r["line_name"] = r["line_name"].replace(" (IOC.NS)", "").replace("Yahoo Finance", "Annual Report")
             if "driver_note" in r and isinstance(r["driver_note"], str):
-                r["driver_note"] = r["driver_note"].replace("Yahoo Finance (ONGC.NS)", "Annual Report").replace("ONGC.NS", "ONGC").replace("Audited", "Reported")
+                r["driver_note"] = r["driver_note"].replace("Yahoo Finance (IOC.NS)", "Annual Report").replace("Audited", "Reported")
             val = None
             if lc in LEGACY_TO_SSOT:
                 scope, ssot_code = LEGACY_TO_SSOT[lc]
@@ -222,26 +221,26 @@ def export_all() -> None:
                 r[val_key] = round(float(val), 2)
                 by_fy_code[(fy, lc)] = r[val_key]
 
-        # Ensure prod_transport_selling_exp_inr_cr in Schedule III P&L is strictly ex-levies and ex-employee-benefit
-        # so the Schedule III P&L waterfall bridge closes with zero plug across FY17..FY26
-        if filename == "ongc_10yr_schedule_iii_lines.json":
+        # Reconcile IOCL P&L subtotal identity when exporting Schedule III lines
+        if filename == "iocl_10yr_schedule_iii_lines.json":
             other_exp_codes = [
                 "statutory_levies_total_inr_cr",
+                "cost_of_materials_consumed_inr_cr",
+                "purchases_stock_in_trade_inr_cr",
+                "inventory_change_inr_cr",
                 "employee_benefit_net_pnl_inr_cr",
-                "other_expenses_inr_cr",
-                "exploration_costs_written_off_inr_cr",
                 "dda_inr_cr",
                 "finance_costs_inr_cr",
             ]
             for r in rows:
-                if r["line_code"] == "prod_transport_selling_exp_inr_cr":
+                if r["line_code"] == "other_expenses_inr_cr":
                     fy = r["fiscal_year"]
                     tot_exp = by_fy_code.get((fy, "total_expenses_inr_cr"))
                     if tot_exp is not None:
                         other_sum = sum(by_fy_code.get((fy, c), 0.0) for c in other_exp_codes)
                         val_ex = round(tot_exp - other_sum, 2)
                         r["amount_inr_cr"] = val_ex
-                        by_fy_code[(fy, "prod_transport_selling_exp_inr_cr")] = val_ex
+                        by_fy_code[(fy, "other_expenses_inr_cr")] = val_ex
 
         # Second pass: compute prior_fy, yoy_delta, yoy_change_pct, pct_of_*
         for r in rows:
@@ -265,10 +264,10 @@ def export_all() -> None:
 
         p.write_text(json.dumps(rows, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    _update_stmt_file("ongc_10yr_schedule_iii_lines.json", "gross_revenue_inr_cr", "pct_of_revenue")
-    _update_stmt_file("ongc_10yr_balance_sheet_lines.json", "total_assets_inr_cr", "pct_of_total_assets")
-    _update_stmt_file("ongc_10yr_cash_flow_lines.json", "operating_cash_flow_inr_cr", "pct_of_ocf")
-    _update_stmt_file("ongc_10yr_ratios_lines.json", "", None)
+    _update_stmt_file("iocl_10yr_schedule_iii_lines.json", "gross_revenue_inr_cr", "pct_of_revenue")
+    _update_stmt_file("iocl_10yr_balance_sheet_lines.json", "total_assets_inr_cr", "pct_of_total_assets")
+    _update_stmt_file("iocl_10yr_cash_flow_lines.json", "operating_cash_flow_inr_cr", "pct_of_ocf")
+    _update_stmt_file("iocl_10yr_ratios_lines.json", "", None)
 
     # Update snapshot_manifest.json
     manifest_path = DATA_DIR / "snapshot_manifest.json"

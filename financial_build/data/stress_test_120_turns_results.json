@@ -31,7 +31,7 @@
             "Note 28 (Statutory Levies): Total levies were \u20b925,999 cr (-16.0% YoY; SAED windfall tax \u20b90 cr).",
             "Notes 32\u201337 (Below-EBITDA Drivers): Exploration dry-well & survey write-offs were \u20b97,790 cr, DD&A was \u20b925,197.01 cr, yielding PBT of \u20b943,247.02 cr and Tax Expense of \u20b910,353.02 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -69,7 +69,7 @@
             "Standalone profit after tax \u2014 PAT (\u20b9 cr): \u20b932,894 cr (FY26).",
             "Consolidated pat cr: 49,793."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -88,7 +88,7 @@
             "Standalone profit after tax \u2014 PAT (\u20b9 cr): \u20b932,894 cr (FY26).",
             "Consolidated pat cr: 49,793."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -116,7 +116,7 @@
             "Note 28 (Statutory Levies): Total levies were \u20b945,284.20 cr (+62.1% YoY; SAED windfall tax \u20b910,964 cr).",
             "Notes 32\u201337 (Below-EBITDA Drivers): Exploration dry-well & survey write-offs were \u20b910,031.20 cr, DD&A was \u20b919,652 cr, yielding PBT of \u20b950,821 cr and Tax Expense of \u20b911,992 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY23'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY23'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -153,7 +153,7 @@
             "Royalty cr: 16,480.",
             "Statutory levies \u2014 Royalty + Cess + SAED (\u20b9 cr) is up \u20b917,352 cr (+62.1%) vs FY22."
           ],
-          "sql": "SELECT ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY23'"
+          "sql": "SELECT ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY23'"
         },
         {
           "turn": 4,
@@ -173,7 +173,7 @@
             "Director (Finance) Action: Reallocate \u20b94,200 cr infill capex to New Well Gas ($7.80/MMBtu, +20% premium over APM) and transition 12 high-water-cut mature clusters to PEC contracts (-\u20b9620 cr/yr opex).",
             "FY24 accounts for 14.6% of the total (\u20b940,526 cr of \u20b9277,485 cr)."
           ],
-          "sql": "SELECT\n  fiscal_year,\n  ROUND(gross_revenue_inr_cr, 0) AS revenue_from_ops_cr,\n  ROUND(other_income_inr_cr, 0) AS other_income_cr,\n  ROUND(statutory_levies_total_inr_cr, 0) AS statutory_levies_cr,\n  ROUND(royalty_inr_cr, 0) AS royalty_cr,\n  ROUND(oidb_cess_inr_cr, 0) AS oidb_cess_cr,\n  ROUND(saed_windfall_tax_inr_cr, 0) AS saed_windfall_tax_cr,\n  ROUND(net_revenue_inr_cr, 0) AS net_revenue_cr,\n  ROUND(operating_expenses_total_inr_cr, 0) AS operating_expenses_cr,\n  ROUND(ebitda_inr_cr, 0) AS ebitda_cr,\n  ROUND(exploration_costs_written_off_inr_cr, 0) AS exploration_writeoff_cr,\n  ROUND(dda_inr_cr, 0) AS dda_cr,\n  ROUND(finance_costs_inr_cr, 0) AS finance_costs_cr,\n  ROUND(exceptional_items_inr_cr, 0) AS exceptional_items_cr,\n  ROUND(pbt_inr_cr, 0) AS pbt_cr,\n  ROUND(tax_expense_total_inr_cr, 0) AS tax_expense_cr,\n  ROUND(pat_inr_cr, 0) AS standalone_pat_cr,\n  ROUND(consolidated_pat_inr_cr, 0) AS consolidated_pat_cr\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
+          "sql": "SELECT\n  fiscal_year,\n  ROUND(gross_revenue_inr_cr, 0) AS revenue_from_ops_cr,\n  ROUND(other_income_inr_cr, 0) AS other_income_cr,\n  ROUND(statutory_levies_total_inr_cr, 0) AS statutory_levies_cr,\n  ROUND(royalty_inr_cr, 0) AS royalty_cr,\n  ROUND(oidb_cess_inr_cr, 0) AS oidb_cess_cr,\n  ROUND(saed_windfall_tax_inr_cr, 0) AS saed_windfall_tax_cr,\n  ROUND(net_revenue_inr_cr, 0) AS net_revenue_cr,\n  ROUND(operating_expenses_total_inr_cr, 0) AS operating_expenses_cr,\n  ROUND(ebitda_inr_cr, 0) AS ebitda_cr,\n  ROUND(exploration_costs_written_off_inr_cr, 0) AS exploration_writeoff_cr,\n  ROUND(dda_inr_cr, 0) AS dda_cr,\n  ROUND(finance_costs_inr_cr, 0) AS finance_costs_cr,\n  ROUND(exceptional_items_inr_cr, 0) AS exceptional_items_cr,\n  ROUND(pbt_inr_cr, 0) AS pbt_cr,\n  ROUND(tax_expense_total_inr_cr, 0) AS tax_expense_cr,\n  ROUND(pat_inr_cr, 0) AS standalone_pat_cr,\n  ROUND(consolidated_pat_inr_cr, 0) AS consolidated_pat_cr\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
         }
       ]
     },
@@ -201,7 +201,7 @@
             "Note 28 (Statutory Levies): Total levies were \u20b922,175 cr (-11.6% YoY; SAED windfall tax \u20b90 cr).",
             "Notes 32\u201337 (Below-EBITDA Drivers): Exploration dry-well & survey write-offs were \u20b98,711 cr, DD&A was \u20b918,617 cr, yielding PBT of \u20b920,388 cr and Tax Expense of \u20b96,924 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY20'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY20'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -220,7 +220,7 @@
             "FY22 accounts for 62.0% of the total (\u20b940,306 cr of \u20b965,016 cr).",
             "Highest is FY22 (\u20b940,306 cr); lowest is FY21 (\u20b911,246 cr) across 3 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY20' AND 'FY22' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY20' AND 'FY22' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -240,7 +240,7 @@
             "Note 28 (Statutory Levies): Total levies were \u20b927,932.20 cr (+70.1% YoY; SAED windfall tax \u20b90 cr).",
             "Notes 32\u201337 (Below-EBITDA Drivers): Exploration dry-well & survey write-offs were \u20b95,451.90 cr, DD&A was \u20b918,601.50 cr, yielding PBT of \u20b941,040 cr and Tax Expense of \u20b9734 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY22'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY22'\nORDER BY line_order ASC"
         },
         {
           "turn": 4,
@@ -259,7 +259,7 @@
             "FY24 accounts for 14.6% of the total (\u20b940,526 cr of \u20b9277,485 cr).",
             "Highest is FY24 (\u20b940,526 cr); lowest is FY21 (\u20b911,246 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -287,7 +287,7 @@
             "Crude oil revenue cr: 89,680.",
             "Revenue from operations (\u20b9 cr) is down \u20b95,338 cr (-3.9%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr, ROUND(SUM(crude_oil_revenue_inr_cr), 2) AS crude_oil_revenue_cr, ROUND(SUM(natural_gas_revenue_inr_cr), 2) AS natural_gas_revenue_cr, ROUND(SUM(vap_revenue_inr_cr), 2) AS vap_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr, ROUND(SUM(crude_oil_revenue_inr_cr), 2) AS crude_oil_revenue_cr, ROUND(SUM(natural_gas_revenue_inr_cr), 2) AS natural_gas_revenue_cr, ROUND(SUM(vap_revenue_inr_cr), 2) AS vap_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -306,7 +306,7 @@
             "FY23 accounts for 14.0% of the total (\u20b9155,517 cr of \u20b91,111,540 cr).",
             "Highest is FY23 (\u20b9155,517 cr); lowest is FY21 (\u20b968,141 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr, ROUND(SUM(crude_oil_revenue_inr_cr), 2) AS crude_oil_revenue_cr, ROUND(SUM(natural_gas_revenue_inr_cr), 2) AS natural_gas_revenue_cr, ROUND(SUM(vap_revenue_inr_cr), 2) AS vap_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr, ROUND(SUM(crude_oil_revenue_inr_cr), 2) AS crude_oil_revenue_cr, ROUND(SUM(natural_gas_revenue_inr_cr), 2) AS natural_gas_revenue_cr, ROUND(SUM(vap_revenue_inr_cr), 2) AS vap_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -325,7 +325,7 @@
             "Crude oil realisation ($/bbl): $73.40 (FY26).",
             "Crude oil realisation ($/bbl) is down $5.23 (-6.7%) vs FY25."
           ],
-          "sql": "SELECT ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 4,
@@ -344,7 +344,7 @@
             "Crude oil realisation ($/bbl): $73.40 (FY26).",
             "Crude oil realisation ($/bbl) is down $5.23 (-6.7%) vs FY25."
           ],
-          "sql": "SELECT ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         }
       ]
     },
@@ -372,7 +372,7 @@
             "Royalty cr: 12,965.",
             "Statutory levies \u2014 Royalty + Cess + SAED (\u20b9 cr) is down \u20b94,969 cr (-16.0%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -391,7 +391,7 @@
             "FY23 accounts for 16.9% of the total (\u20b945,284.20 cr of \u20b9267,889.60 cr).",
             "Highest is FY23 (\u20b945,284.20 cr); lowest is FY21 (\u20b916,423.70 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -411,7 +411,7 @@
             "Highest is FY23 (\u20b910,964 cr); lowest is FY26 (\u20b90 cr) across 4 groups.",
             "The top 3 (FY23, FY24, FY25) hold 100.0% of the total."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr, ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY23' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr, ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY23' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -430,7 +430,7 @@
             "FY25 accounts for 100.0% of the total (\u20b93,769.80 cr of \u20b93,769.80 cr).",
             "FY25 leads FY26 by \u20b93,769.80 cr (\u20b93,769.80 cr vs \u20b90 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr, ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(saed_windfall_tax_inr_cr), 2) AS saed_windfall_tax_cr, ROUND(SUM(statutory_levies_total_inr_cr), 2) AS statutory_levies_cr, ROUND(SUM(royalty_inr_cr), 2) AS royalty_cr, ROUND(SUM(oidb_cess_inr_cr), 2) AS oidb_cess_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -458,7 +458,7 @@
             "Exploratory wells written off cr: 5,840.",
             "Exploration costs written off \u2014 Survey + Dry Wells (\u20b9 cr) is down \u20b92,035.80 cr (-20.7%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -477,7 +477,7 @@
             "FY23 accounts for 13.5% of the total (\u20b910,031.20 cr of \u20b974,492.90 cr).",
             "Highest is FY23 (\u20b910,031.20 cr); lowest is FY17 (\u20b95,152 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -496,7 +496,7 @@
             "FY25 accounts for 56.8% of the total (\u20b97,680 cr of \u20b913,520 cr).",
             "FY25 leads FY26 by \u20b91,840 cr (\u20b97,680 cr vs \u20b95,840 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -515,7 +515,7 @@
             "FY25 accounts for 56.8% of the total (\u20b97,680 cr of \u20b913,520 cr).",
             "FY25 leads FY26 by \u20b91,840 cr (\u20b97,680 cr vs \u20b95,840 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(exploratory_wells_written_off_inr_cr), 2) AS exploratory_wells_written_off_cr, ROUND(SUM(exploration_costs_written_off_inr_cr), 2) AS exploration_costs_written_off_cr, ROUND(SUM(survey_costs_written_off_inr_cr), 2) AS survey_costs_written_off_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -543,7 +543,7 @@
             "Notes 5\u201310 (Asset Composition): Oil & Gas Producing Properties Net Block is \u20b9162,480 cr, Capital Work-in-Progress (CWIP) is \u20b936,920 cr, and Subsidiary/JV Investments (HPCL, OVL, MRPL, OPaL) are \u20b9121,840 cr.",
             "Notes 15\u201322 (Liquidity & Obligations): Cash & Bank Balances stand at \u20b921,960 cr against Long-Term Borrowings of \u20b96,420 cr and Site Restoration ARO Provision of \u20b938,450 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_total_assets, 1) AS pct_of_assets,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_balance_sheet_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_total_assets, 1) AS pct_of_assets,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_balance_sheet_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -562,7 +562,7 @@
             "FY26 accounts for 51.5% of the total (\u20b9121,840 cr of \u20b9236,520 cr).",
             "FY26 leads FY25 by \u20b97,160 cr (\u20b9121,840 cr vs \u20b9114,680 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -582,7 +582,7 @@
             "FY26 accounts for 13.2% of the total (\u20b9474,340 cr of \u20b93,580,456 cr).",
             "Highest is FY26 (\u20b9474,340 cr); lowest is FY17 (\u20b9247,240 cr) across 10 groups."
           ],
-          "sql": "SELECT\n  fiscal_year,\n  ROUND(total_assets_inr_cr, 0) AS total_assets_cr,\n  ROUND(non_current_assets_inr_cr, 0) AS non_current_assets_cr,\n  ROUND(oil_and_gas_assets_inr_cr, 0) AS oil_and_gas_assets_cr,\n  ROUND(cwip_inr_cr, 0) AS cwip_cr,\n  ROUND(investments_subsidiaries_jv_inr_cr, 0) AS investments_subsidiaries_cr,\n  ROUND(current_assets_inr_cr, 0) AS current_assets_cr,\n  ROUND(cash_and_bank_inr_cr, 0) AS cash_and_bank_cr,\n  ROUND(net_worth_inr_cr, 0) AS net_worth_cr,\n  ROUND(total_debt_inr_cr, 0) AS total_debt_cr,\n  ROUND(abandonment_provision_inr_cr, 0) AS abandonment_provision_cr,\n  ROUND(total_liabilities_inr_cr, 0) AS total_liabilities_cr\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
+          "sql": "SELECT\n  fiscal_year,\n  ROUND(total_assets_inr_cr, 0) AS total_assets_cr,\n  ROUND(non_current_assets_inr_cr, 0) AS non_current_assets_cr,\n  ROUND(oil_and_gas_assets_inr_cr, 0) AS oil_and_gas_assets_cr,\n  ROUND(cwip_inr_cr, 0) AS cwip_cr,\n  ROUND(investments_subsidiaries_jv_inr_cr, 0) AS investments_subsidiaries_cr,\n  ROUND(current_assets_inr_cr, 0) AS current_assets_cr,\n  ROUND(cash_and_bank_inr_cr, 0) AS cash_and_bank_cr,\n  ROUND(net_worth_inr_cr, 0) AS net_worth_cr,\n  ROUND(total_debt_inr_cr, 0) AS total_debt_cr,\n  ROUND(abandonment_provision_inr_cr, 0) AS abandonment_provision_cr,\n  ROUND(total_liabilities_inr_cr, 0) AS total_liabilities_cr\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
         },
         {
           "turn": 4,
@@ -601,7 +601,7 @@
             "Subsidiary revenue cr: 516,412.",
             "Subsidiary PAT (\u20b9 cr) is up \u20b914,180 cr (+521.5%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `ongc-hr-finance-agent.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `yukti-finance-iocl.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26'"
         }
       ]
     },
@@ -629,7 +629,7 @@
             "Notes 5\u201310 (Asset Composition): Oil & Gas Producing Properties Net Block is \u20b9106,840 cr, Capital Work-in-Progress (CWIP) is \u20b922,450 cr, and Subsidiary/JV Investments (HPCL, OVL, MRPL, OPaL) are \u20b975,865 cr.",
             "Notes 15\u201322 (Liquidity & Obligations): Cash & Bank Balances stand at \u20b95,062 cr against Long-Term Borrowings of \u20b90 cr and Site Restoration ARO Provision of \u20b921,450 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_total_assets, 1) AS pct_of_assets,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_balance_sheet_lines`\nWHERE fiscal_year = 'FY18'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_total_assets, 1) AS pct_of_assets,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_balance_sheet_lines`\nWHERE fiscal_year = 'FY18'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -648,7 +648,7 @@
             "FY18 accounts for 100.0% of the total (\u20b925,592 cr of \u20b925,592 cr).",
             "FY18 leads FY17 by \u20b925,592 cr (\u20b925,592 cr vs \u20b90 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_debt_inr_cr), 2) AS total_debt_cr, ROUND(SUM(long_term_debt_inr_cr), 2) AS long_term_debt_cr, ROUND(SUM(short_term_debt_inr_cr), 2) AS short_term_debt_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr, ROUND(SUM(net_debt_inr_cr), 2) AS net_debt_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY18' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_debt_inr_cr), 2) AS total_debt_cr, ROUND(SUM(long_term_debt_inr_cr), 2) AS long_term_debt_cr, ROUND(SUM(short_term_debt_inr_cr), 2) AS short_term_debt_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr, ROUND(SUM(net_debt_inr_cr), 2) AS net_debt_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY18' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -668,7 +668,7 @@
             "Highest is FY18 (\u20b925,592 cr); lowest is FY17 (\u20b90 cr) across 10 groups.",
             "The top 3 (FY18, FY19, FY21) hold 52.8% of the total."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_debt_inr_cr), 2) AS total_debt_cr, ROUND(SUM(long_term_debt_inr_cr), 2) AS long_term_debt_cr, ROUND(SUM(short_term_debt_inr_cr), 2) AS short_term_debt_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr, ROUND(SUM(net_debt_inr_cr), 2) AS net_debt_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_debt_inr_cr), 2) AS total_debt_cr, ROUND(SUM(long_term_debt_inr_cr), 2) AS long_term_debt_cr, ROUND(SUM(short_term_debt_inr_cr), 2) AS short_term_debt_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr, ROUND(SUM(net_debt_inr_cr), 2) AS net_debt_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -688,7 +688,7 @@
             "Total debt cr: 7,850.",
             "1 is negative: FY26 (\u2212\u20b914,110 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(net_debt_inr_cr), 2) AS net_debt_cr, ROUND(SUM(total_debt_inr_cr), 2) AS total_debt_cr, ROUND(SUM(long_term_debt_inr_cr), 2) AS long_term_debt_cr, ROUND(SUM(short_term_debt_inr_cr), 2) AS short_term_debt_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(net_debt_inr_cr), 2) AS net_debt_cr, ROUND(SUM(total_debt_inr_cr), 2) AS total_debt_cr, ROUND(SUM(long_term_debt_inr_cr), 2) AS long_term_debt_cr, ROUND(SUM(short_term_debt_inr_cr), 2) AS short_term_debt_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -716,7 +716,7 @@
             "Oil and gas assets cr: 162,480.",
             "Capital work-in-progress \u2014 CWIP (\u20b9 cr) is down \u20b91,530 cr (-4.0%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -735,7 +735,7 @@
             "FY23 accounts for 13.5% of the total (\u20b943,890 cr of \u20b9325,900 cr).",
             "Highest is FY23 (\u20b943,890 cr); lowest is FY17 (\u20b921,840 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -754,7 +754,7 @@
             "FY25 accounts for 51.0% of the total (\u20b938,450 cr of \u20b975,370 cr).",
             "FY25 leads FY26 by \u20b91,530 cr (\u20b938,450 cr vs \u20b936,920 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY25' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -773,7 +773,7 @@
             "FY26 accounts for 13.0% of the total (\u20b9162,480 cr of \u20b91,253,870 cr).",
             "Highest is FY26 (\u20b9162,480 cr); lowest is FY17 (\u20b998,420 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(oil_and_gas_assets_inr_cr), 2) AS oil_and_gas_assets_cr, ROUND(SUM(cwip_inr_cr), 2) AS cwip_cr, ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2) AS investments_subsidiaries_jv_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -801,7 +801,7 @@
             "Total assets cr: 474,340.",
             "Standalone net worth / equity (\u20b9 cr) is up \u20b916,225 cr (+5.3%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(net_worth_inr_cr), 2) AS net_worth_cr, ROUND(SUM(total_assets_inr_cr), 2) AS total_assets_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr, ROUND(SUM(current_assets_inr_cr), 2) AS current_assets_cr, ROUND(SUM(total_liabilities_inr_cr), 2) AS total_liabilities_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(net_worth_inr_cr), 2) AS net_worth_cr, ROUND(SUM(total_assets_inr_cr), 2) AS total_assets_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr, ROUND(SUM(current_assets_inr_cr), 2) AS current_assets_cr, ROUND(SUM(total_liabilities_inr_cr), 2) AS total_liabilities_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -820,7 +820,7 @@
             "FY26 accounts for 13.4% of the total (\u20b9320,635 cr of \u20b92,387,297 cr).",
             "Highest is FY26 (\u20b9320,635 cr); lowest is FY17 (\u20b9185,540 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(net_worth_inr_cr), 2) AS net_worth_cr, ROUND(SUM(total_assets_inr_cr), 2) AS total_assets_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr, ROUND(SUM(current_assets_inr_cr), 2) AS current_assets_cr, ROUND(SUM(total_liabilities_inr_cr), 2) AS total_liabilities_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(net_worth_inr_cr), 2) AS net_worth_cr, ROUND(SUM(total_assets_inr_cr), 2) AS total_assets_cr, ROUND(SUM(non_current_assets_inr_cr), 2) AS non_current_assets_cr, ROUND(SUM(current_assets_inr_cr), 2) AS current_assets_cr, ROUND(SUM(total_liabilities_inr_cr), 2) AS total_liabilities_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -839,7 +839,7 @@
             "Total Ind-AS 116 lease liabilities (\u20b9 cr): \u20b99,300 cr (FY20).",
             "Abandonment provision cr: 25,410."
           ],
-          "sql": "SELECT ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY20'"
+          "sql": "SELECT ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY20'"
         },
         {
           "turn": 4,
@@ -859,7 +859,7 @@
             "Highest is FY26 (\u20b918,170 cr); lowest is FY20 (\u20b99,300 cr) across 7 groups.",
             "The top 3 (FY26, FY25, FY24) hold 54.4% of the total."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY20' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY20' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -887,7 +887,7 @@
             "Site restoration fund cr: 28,950.",
             "Site restoration / decommissioning provision ARO (\u20b9 cr) is up \u20b91,630 cr (+4.4%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -906,7 +906,7 @@
             "FY26 accounts for 13.3% of the total (\u20b938,450 cr of \u20b9289,920 cr).",
             "Highest is FY26 (\u20b938,450 cr); lowest is FY17 (\u20b919,840 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -925,7 +925,7 @@
             "FY26 accounts for 13.3% of the total (\u20b938,450 cr of \u20b9289,920 cr).",
             "Highest is FY26 (\u20b938,450 cr); lowest is FY17 (\u20b919,840 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(abandonment_provision_inr_cr), 2) AS abandonment_provision_cr, ROUND(SUM(site_restoration_fund_inr_cr), 2) AS site_restoration_fund_cr, ROUND(SUM(total_lease_liabilities_inr_cr), 2) AS lease_liabilities_cr, ROUND(SUM(deferred_tax_liability_net_inr_cr), 2) AS deferred_tax_liability_net_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -945,7 +945,7 @@
             "Notes 5\u201310 (Asset Composition): Oil & Gas Producing Properties Net Block is \u20b9152,840 cr, Capital Work-in-Progress (CWIP) is \u20b938,450 cr, and Subsidiary/JV Investments (HPCL, OVL, MRPL, OPaL) are \u20b9114,680 cr.",
             "Notes 15\u201322 (Liquidity & Obligations): Cash & Bank Balances stand at \u20b918,920 cr against Long-Term Borrowings of \u20b96,840 cr and Site Restoration ARO Provision of \u20b936,820 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_total_assets, 1) AS pct_of_assets,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_balance_sheet_lines`\nWHERE fiscal_year = 'FY25'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_total_assets, 1) AS pct_of_assets,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_balance_sheet_lines`\nWHERE fiscal_year = 'FY25'\nORDER BY line_order ASC"
         }
       ]
     },
@@ -973,7 +973,7 @@
             "Disputed receivables cr: 1,594.34.",
             "Trade receivables (\u20b9 cr) is up \u20b9687.89 cr (+5.5%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(receivables_outstanding_inr_cr), 2) AS trade_receivables_cr, ROUND(SUM(disputed_receivables_inr_cr), 2) AS disputed_receivables_cr, ROUND(SUM(inventories_inr_cr), 2) AS inventories_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(receivables_outstanding_inr_cr), 2) AS trade_receivables_cr, ROUND(SUM(disputed_receivables_inr_cr), 2) AS disputed_receivables_cr, ROUND(SUM(inventories_inr_cr), 2) AS inventories_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -993,7 +993,7 @@
             "Trade receivables cr: 13,167.89.",
             "Disputed trade receivables (\u20b9 cr) is up \u20b9104.34 cr (+7.0%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(disputed_receivables_inr_cr), 2) AS disputed_receivables_cr, ROUND(SUM(receivables_outstanding_inr_cr), 2) AS trade_receivables_cr, ROUND(SUM(inventories_inr_cr), 2) AS inventories_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(disputed_receivables_inr_cr), 2) AS disputed_receivables_cr, ROUND(SUM(receivables_outstanding_inr_cr), 2) AS trade_receivables_cr, ROUND(SUM(inventories_inr_cr), 2) AS inventories_cr, ROUND(SUM(cash_and_bank_inr_cr), 2) AS cash_and_bank_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 3,
@@ -1012,7 +1012,7 @@
             "Highest is FY21 (42.40); lowest is FY20 (18.90) across 10 groups.",
             "FY21 leads FY22 by 3.90 (42.40 vs 38.50)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(receivable_days), 1) AS receivable_days FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING receivable_days IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(receivable_days), 1) AS receivable_days FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING receivable_days IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1031,7 +1031,7 @@
             "Highest is FY21 (42.40); lowest is FY20 (18.90) across 10 groups.",
             "FY21 leads FY22 by 3.90 (42.40 vs 38.50)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(receivable_days), 1) AS receivable_days FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING receivable_days IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(receivable_days), 1) AS receivable_days FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING receivable_days IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -1059,7 +1059,7 @@
             "Capital Allocation (FY26): Net Cash Used in Investing Activities was \u2212\u20b935,188 cr and Net Cash Used in Financing Activities was \u2212\u20b921,612 cr (including Dividends Paid of \u2212\u20b914,069 cr).",
             "ONGC Ind-AS 7 Statement of Cash Flows is up \u20b925,519 cr (+37.5%) vs FY25."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -1099,7 +1099,7 @@
             "Capital Allocation (FY26): Net Cash Used in Investing Activities was \u2212\u20b935,188 cr and Net Cash Used in Financing Activities was \u2212\u20b921,612 cr (including Dividends Paid of \u2212\u20b914,069 cr).",
             "ONGC Ind-AS 7 Statement of Cash Flows is up \u20b925,519 cr (+37.5%) vs FY25."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
         },
         {
           "turn": 4,
@@ -1119,7 +1119,7 @@
             "FY24 accounts for 13.7% of the total (\u20b969,820 cr of \u20b9508,110 cr).",
             "Highest is FY24 (\u20b969,820 cr); lowest is FY21 (\u20b928,940 cr) across 10 groups."
           ],
-          "sql": "SELECT\n  fiscal_year,\n  ROUND(operating_cash_flow_inr_cr, 0) AS operating_cash_flow_cr,\n  ROUND(investing_cash_flow_inr_cr, 0) AS investing_cash_flow_cr,\n  ROUND(financing_cash_flow_inr_cr, 0) AS financing_cash_flow_cr,\n  ROUND(total_capex_spent_inr_cr, 0) AS total_capex_cr,\n  ROUND(free_cash_flow_inr_cr, 0) AS free_cash_flow_cr,\n  ROUND(net_cash_change_inr_cr, 0) AS net_cash_change_cr,\n  ROUND(closing_cash_inr_cr, 0) AS closing_cash_cr\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
+          "sql": "SELECT\n  fiscal_year,\n  ROUND(operating_cash_flow_inr_cr, 0) AS operating_cash_flow_cr,\n  ROUND(investing_cash_flow_inr_cr, 0) AS investing_cash_flow_cr,\n  ROUND(financing_cash_flow_inr_cr, 0) AS financing_cash_flow_cr,\n  ROUND(total_capex_spent_inr_cr, 0) AS total_capex_cr,\n  ROUND(free_cash_flow_inr_cr, 0) AS free_cash_flow_cr,\n  ROUND(net_cash_change_inr_cr, 0) AS net_cash_change_cr,\n  ROUND(closing_cash_inr_cr, 0) AS closing_cash_cr\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
         }
       ]
     },
@@ -1147,7 +1147,7 @@
             "Investing cash flow cr: -35,188.",
             "Operating cash flow \u2014 OCF (\u20b9 cr) is down \u20b93,340 cr (-5.3%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -1166,7 +1166,7 @@
             "FY24 accounts for 13.7% of the total (\u20b969,820 cr of \u20b9508,110 cr).",
             "Highest is FY24 (\u20b969,820 cr); lowest is FY21 (\u20b928,940 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -1185,7 +1185,7 @@
             "FY23 accounts for 19.6% of the total (\u20b938,282 cr of \u20b9195,309.50 cr).",
             "Highest is FY23 (\u20b938,282 cr); lowest is FY21 (\u20b92,498.50 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1204,7 +1204,7 @@
             "Free cash flow \u2014 FCF (\u20b9 cr): \u20b92,498.50 cr (FY21).",
             "Operating cash flow cr: 28,940."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY21' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY21' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -1232,7 +1232,7 @@
             "Capital Allocation (FY18): Net Cash Used in Investing Activities was \u2212\u20b960,782 cr and Net Cash Used in Financing Activities was \u20b917,414 cr (including Dividends Paid of \u2212\u20b97,880 cr).",
             "ONGC Ind-AS 7 Statement of Cash Flows is down \u20b920,053 cr (-44.9%) vs FY17."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY18'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY18'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -1252,7 +1252,7 @@
             "Capital Allocation (FY25): Net Cash Used in Investing Activities was \u2212\u20b951,917 cr and Net Cash Used in Financing Activities was \u2212\u20b919,183 cr (including Dividends Paid of \u2212\u20b913,311 cr).",
             "ONGC Ind-AS 7 Statement of Cash Flows is down \u20b952,403 cr (-43.5%) vs FY24."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY25'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY25'\nORDER BY line_order ASC"
         },
         {
           "turn": 3,
@@ -1272,7 +1272,7 @@
             "Highest is FY21 (\u2212\u20b923,301.50 cr); lowest is FY18 (\u2212\u20b960,782 cr) across 8 groups.",
             "FY18 is an outlier at \u2212\u20b960,782 cr (median \u2212\u20b926,768 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY18' AND 'FY25' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY18' AND 'FY25' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1291,7 +1291,7 @@
             "Subsidiary revenue cr: 516,412.",
             "Subsidiary PAT (\u20b9 cr) is up \u20b914,180 cr (+521.5%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `ongc-hr-finance-agent.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `yukti-finance-iocl.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26'"
         }
       ]
     },
@@ -1319,7 +1319,7 @@
             "Capital Allocation (FY22): Net Cash Used in Investing Activities was \u2212\u20b924,401 cr and Net Cash Used in Financing Activities was \u2212\u20b926,406 cr (including Dividends Paid of \u2212\u20b917,560 cr).",
             "ONGC Ind-AS 7 Statement of Cash Flows is up \u20b952,782.50 cr (+371.1%) vs FY21."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY22'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY22'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -1339,7 +1339,7 @@
             "Operating cash flow cr: 54,620.",
             "Net cash used in financing activities (\u20b9 cr) is down \u20b918,882.50 cr (+251.0%) vs FY21."
           ],
-          "sql": "SELECT ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY22'"
+          "sql": "SELECT ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY22'"
         },
         {
           "turn": 3,
@@ -1358,7 +1358,7 @@
             "Highest is FY26 (13.25); lowest is FY21 (3.60) across 10 groups.",
             "FY26 leads FY24 by 1 (13.25 vs 12.25)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING dividend_per_share_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING dividend_per_share_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1378,7 +1378,7 @@
             "Capital Allocation (FY19): Net Cash Used in Investing Activities was \u2212\u20b925,660 cr and Net Cash Used in Financing Activities was \u2212\u20b921,772 cr (including Dividends Paid of \u2212\u20b912,806 cr).",
             "ONGC Ind-AS 7 Statement of Cash Flows is up \u20b926,677 cr (+108.5%) vs FY18."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY19'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  section,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_ocf, 1) AS pct_of_ocf,\n  yahoo_finance_line,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_cash_flow_lines`\nWHERE fiscal_year = 'FY19'\nORDER BY line_order ASC"
         }
       ]
     },
@@ -1406,7 +1406,7 @@
             "Capex spent (\u20b9 cr) is down \u20b926,179.08 cr (-42.2%) vs FY25.",
             "Highest is Eastern Offshore (\u20b912,987.21 cr); lowest is CEWELL (\u20b937.22 cr) across 31 groups."
           ],
-          "sql": "SELECT asset_wc_id AS asset, ROUND(SUM(actual_spend_inr_cr), 2) AS capex_actual_cr FROM `ongc-hr-finance-agent.hrfin_silver.capex_budget` WHERE fiscal_year = 'FY26' GROUP BY asset_wc_id ORDER BY capex_actual_cr DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, ROUND(SUM(actual_spend_inr_cr), 2) AS capex_actual_cr FROM `yukti-finance-iocl.hrfin_silver.capex_budget` WHERE fiscal_year = 'FY26' GROUP BY asset_wc_id ORDER BY capex_actual_cr DESC LIMIT 1000"
         },
         {
           "turn": 2,
@@ -1426,7 +1426,7 @@
             "Capex spent (\u20b9 cr) is down \u20b926,179.08 cr (-42.2%) vs FY25.",
             "Highest is Eastern Offshore (\u20b912,987.21 cr); lowest is CEWELL (\u20b937.22 cr) across 31 groups."
           ],
-          "sql": "SELECT asset_wc_id AS asset, capex_head AS capex_head, ROUND(SUM(actual_spend_inr_cr), 2) AS capex_actual_cr FROM `ongc-hr-finance-agent.hrfin_silver.capex_budget` WHERE fiscal_year = 'FY26' GROUP BY asset_wc_id, capex_head ORDER BY capex_actual_cr DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, capex_head AS capex_head, ROUND(SUM(actual_spend_inr_cr), 2) AS capex_actual_cr FROM `yukti-finance-iocl.hrfin_silver.capex_budget` WHERE fiscal_year = 'FY26' GROUP BY asset_wc_id, capex_head ORDER BY capex_actual_cr DESC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -1446,7 +1446,7 @@
             "Highest is Eastern Offshore (\u20b948,955 cr); lowest is CEWELL (\u20b9139 cr) across 31 groups.",
             "Eastern Offshore is an outlier at \u20b948,955 cr (median \u20b91,553 cr)."
           ],
-          "sql": "WITH capex AS (\n  SELECT asset_wc_id, SUM(actual_spend_inr_cr) AS capex_cr\n  FROM `ongc-hr-finance-agent.hrfin_silver.capex_budget`\n  WHERE fiscal_year BETWEEN 'FY22' AND 'FY26'\n  GROUP BY asset_wc_id),\nres AS (\n  SELECT asset_wc_id, SUM(reserves_2p_total_mmtoe) AS reserves_2p_mmtoe\n  FROM `ongc-hr-finance-agent.hrfin_silver.reserves_annual`\n  WHERE fiscal_year = 'FY26'\n  GROUP BY asset_wc_id),\nj AS (SELECT c.asset_wc_id, c.capex_cr, r.reserves_2p_mmtoe FROM capex c LEFT JOIN res r USING (asset_wc_id)),\na AS (SELECT SUM(capex_cr) / NULLIF(SUM(reserves_2p_mmtoe), 0) AS avg_cr_per_mmtoe FROM j WHERE reserves_2p_mmtoe > 0)\nSELECT j.asset_wc_id AS asset,\n  ROUND(j.capex_cr, 0) AS capex_cr,\n  ROUND(j.capex_cr * 100.0 / SUM(j.capex_cr) OVER (), 1) AS pct_of_capex,\n  ROUND(j.reserves_2p_mmtoe, 1) AS reserves_2p_mmtoe,\n  ROUND(j.capex_cr / NULLIF(j.reserves_2p_mmtoe, 0), 1) AS capex_cr_per_mmtoe,\n  ROUND(a.avg_cr_per_mmtoe, 1) AS avg_capex_cr_per_mmtoe,\n  (j.reserves_2p_mmtoe > 0 AND j.capex_cr / j.reserves_2p_mmtoe < 0.5 * a.avg_cr_per_mmtoe) AS under_invested\nFROM j CROSS JOIN a\nORDER BY j.capex_cr DESC"
+          "sql": "WITH capex AS (\n  SELECT asset_wc_id, SUM(actual_spend_inr_cr) AS capex_cr\n  FROM `yukti-finance-iocl.hrfin_silver.capex_budget`\n  WHERE fiscal_year BETWEEN 'FY22' AND 'FY26'\n  GROUP BY asset_wc_id),\nres AS (\n  SELECT asset_wc_id, SUM(reserves_2p_total_mmtoe) AS reserves_2p_mmtoe\n  FROM `yukti-finance-iocl.hrfin_silver.reserves_annual`\n  WHERE fiscal_year = 'FY26'\n  GROUP BY asset_wc_id),\nj AS (SELECT c.asset_wc_id, c.capex_cr, r.reserves_2p_mmtoe FROM capex c LEFT JOIN res r USING (asset_wc_id)),\na AS (SELECT SUM(capex_cr) / NULLIF(SUM(reserves_2p_mmtoe), 0) AS avg_cr_per_mmtoe FROM j WHERE reserves_2p_mmtoe > 0)\nSELECT j.asset_wc_id AS asset,\n  ROUND(j.capex_cr, 0) AS capex_cr,\n  ROUND(j.capex_cr * 100.0 / SUM(j.capex_cr) OVER (), 1) AS pct_of_capex,\n  ROUND(j.reserves_2p_mmtoe, 1) AS reserves_2p_mmtoe,\n  ROUND(j.capex_cr / NULLIF(j.reserves_2p_mmtoe, 0), 1) AS capex_cr_per_mmtoe,\n  ROUND(a.avg_cr_per_mmtoe, 1) AS avg_capex_cr_per_mmtoe,\n  (j.reserves_2p_mmtoe > 0 AND j.capex_cr / j.reserves_2p_mmtoe < 0.5 * a.avg_cr_per_mmtoe) AS under_invested\nFROM j CROSS JOIN a\nORDER BY j.capex_cr DESC"
         },
         {
           "turn": 4,
@@ -1466,7 +1466,7 @@
             "Highest is FY18 (\u20b972,902 cr); lowest is FY21 (\u20b926,441.50 cr) across 10 groups.",
             "FY18 is an outlier at \u20b972,902 cr (median \u20b929,873 cr)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_capex_spent_inr_cr), 2) AS total_capex_cr, ROUND(SUM(operating_cash_flow_inr_cr), 2) AS operating_cash_flow_cr, ROUND(SUM(investing_cash_flow_inr_cr), 2) AS investing_cash_flow_cr, ROUND(SUM(financing_cash_flow_inr_cr), 2) AS financing_cash_flow_cr, ROUND(SUM(free_cash_flow_inr_cr), 2) AS free_cash_flow_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -1494,7 +1494,7 @@
             "Solvency & Per-Share (FY26): Debt-to-Equity ratio is 0.02x with 8.55x Interest Coverage; Basic EPS is \u20b926.15/share and Dividend Per Share is \u20b913.25/share.",
             "1 is negative: row (-0.20)."
           ],
-          "sql": "SELECT\n  line_order,\n  ratio_name AS line_item,\n  category,\n  unit,\n  ROUND(value, 2) AS value,\n  ROUND(prior_fy_value, 2) AS prior_fy_value,\n  ROUND(yoy_delta, 2) AS yoy_delta,\n  formula,\n  line_code\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_ratios_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  ratio_name AS line_item,\n  category,\n  unit,\n  ROUND(value, 2) AS value,\n  ROUND(prior_fy_value, 2) AS prior_fy_value,\n  ROUND(yoy_delta, 2) AS yoy_delta,\n  formula,\n  line_code\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_ratios_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -1514,7 +1514,7 @@
             "Highest is FY23 (89.2%); lowest is FY21 (18.9%) across 10 groups.",
             "FY23 leads FY22 by 14.1 pts (89.2% vs 75.1%)."
           ],
-          "sql": "SELECT\n  fiscal_year,\n  ROUND(ebitda_margin_pct, 1) AS ebitda_margin_pct,\n  ROUND(pat_margin_pct, 1) AS pat_margin_pct,\n  ROUND(standalone_roce_pct, 1) AS roce_pct,\n  ROUND(roe_pct, 1) AS roe_pct,\n  ROUND(debt_to_equity_ratio, 2) AS debt_to_equity_ratio,\n  ROUND(current_ratio, 2) AS current_ratio,\n  ROUND(eps_basic_inr, 2) AS eps_basic_inr,\n  ROUND(dividend_per_share_inr, 2) AS dividend_per_share_inr\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
+          "sql": "SELECT\n  fiscal_year,\n  ROUND(ebitda_margin_pct, 1) AS ebitda_margin_pct,\n  ROUND(pat_margin_pct, 1) AS pat_margin_pct,\n  ROUND(standalone_roce_pct, 1) AS roce_pct,\n  ROUND(roe_pct, 1) AS roe_pct,\n  ROUND(debt_to_equity_ratio, 2) AS debt_to_equity_ratio,\n  ROUND(current_ratio, 2) AS current_ratio,\n  ROUND(eps_basic_inr, 2) AS eps_basic_inr,\n  ROUND(dividend_per_share_inr, 2) AS dividend_per_share_inr\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360`\nWHERE fiscal_year BETWEEN 'FY17' AND 'FY26'\nORDER BY fiscal_year ASC"
         },
         {
           "turn": 3,
@@ -1533,7 +1533,7 @@
             "Highest is FY23 (89.2%); lowest is FY21 (18.9%) across 10 groups.",
             "FY23 leads FY22 by 14.1 pts (89.2% vs 75.1%)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(standalone_roce_pct), 1) AS roce_pct, ROUND(AVG(consolidated_roce_pct), 1) AS consolidated_roce_pct, ROUND(AVG(roe_pct), 1) AS roe_pct, ROUND(AVG(roa_pct), 1) AS roa_pct FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING roce_pct IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(standalone_roce_pct), 1) AS roce_pct, ROUND(AVG(consolidated_roce_pct), 1) AS consolidated_roce_pct, ROUND(AVG(roe_pct), 1) AS roe_pct, ROUND(AVG(roa_pct), 1) AS roa_pct FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING roce_pct IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1553,7 +1553,7 @@
             "Solvency & Per-Share (FY26): Debt-to-Equity ratio is 0.02x with 8.55x Interest Coverage; Basic EPS is \u20b926.15/share and Dividend Per Share is \u20b913.25/share.",
             "1 is negative: row (-0.20)."
           ],
-          "sql": "SELECT\n  line_order,\n  ratio_name AS line_item,\n  category,\n  unit,\n  ROUND(value, 2) AS value,\n  ROUND(prior_fy_value, 2) AS prior_fy_value,\n  ROUND(yoy_delta, 2) AS yoy_delta,\n  formula,\n  line_code\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_ratios_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  ratio_name AS line_item,\n  category,\n  unit,\n  ROUND(value, 2) AS value,\n  ROUND(prior_fy_value, 2) AS prior_fy_value,\n  ROUND(yoy_delta, 2) AS yoy_delta,\n  formula,\n  line_code\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_ratios_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
         }
       ]
     },
@@ -1581,7 +1581,7 @@
             "Net debt to ebitda ratio: -0.20.",
             "Debt-to-equity ratio (x) is down 0.01 (-33.3%) vs FY25."
           ],
-          "sql": "SELECT ROUND(AVG(debt_to_equity_ratio), 2) AS debt_to_equity_ratio, ROUND(AVG(net_debt_to_ebitda_ratio), 2) AS net_debt_to_ebitda_ratio, ROUND(AVG(interest_coverage_ratio), 2) AS interest_coverage_ratio, ROUND(AVG(current_ratio), 2) AS current_ratio FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(AVG(debt_to_equity_ratio), 2) AS debt_to_equity_ratio, ROUND(AVG(net_debt_to_ebitda_ratio), 2) AS net_debt_to_ebitda_ratio, ROUND(AVG(interest_coverage_ratio), 2) AS interest_coverage_ratio, ROUND(AVG(current_ratio), 2) AS current_ratio FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -1600,7 +1600,7 @@
             "Highest is FY18 (0.13); lowest is FY17 (0) across 10 groups.",
             "FY18 leads FY19 by 0.02 (0.13 vs 0.11)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(debt_to_equity_ratio), 2) AS debt_to_equity_ratio, ROUND(AVG(net_debt_to_ebitda_ratio), 2) AS net_debt_to_ebitda_ratio, ROUND(AVG(interest_coverage_ratio), 2) AS interest_coverage_ratio, ROUND(AVG(current_ratio), 2) AS current_ratio FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING debt_to_equity_ratio IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(debt_to_equity_ratio), 2) AS debt_to_equity_ratio, ROUND(AVG(net_debt_to_ebitda_ratio), 2) AS net_debt_to_ebitda_ratio, ROUND(AVG(interest_coverage_ratio), 2) AS interest_coverage_ratio, ROUND(AVG(current_ratio), 2) AS current_ratio FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING debt_to_equity_ratio IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -1620,7 +1620,7 @@
             "FY17 leads FY24 by 0.80 (1.71 vs 0.91).",
             "FY17 is an outlier at 1.71 (median 0.66)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(current_ratio), 2) AS current_ratio, ROUND(AVG(debt_to_equity_ratio), 2) AS debt_to_equity_ratio, ROUND(AVG(net_debt_to_ebitda_ratio), 2) AS net_debt_to_ebitda_ratio, ROUND(AVG(interest_coverage_ratio), 2) AS interest_coverage_ratio FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING current_ratio IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(current_ratio), 2) AS current_ratio, ROUND(AVG(debt_to_equity_ratio), 2) AS debt_to_equity_ratio, ROUND(AVG(net_debt_to_ebitda_ratio), 2) AS net_debt_to_ebitda_ratio, ROUND(AVG(interest_coverage_ratio), 2) AS interest_coverage_ratio FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING current_ratio IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1640,7 +1640,7 @@
             "Solvency & Per-Share (FY24): Debt-to-Equity ratio is 0.03x with 11.35x Interest Coverage; Basic EPS is \u20b932.21/share and Dividend Per Share is \u20b912.25/share.",
             "1 is negative: row (-0.27)."
           ],
-          "sql": "SELECT\n  line_order,\n  ratio_name AS line_item,\n  category,\n  unit,\n  ROUND(value, 2) AS value,\n  ROUND(prior_fy_value, 2) AS prior_fy_value,\n  ROUND(yoy_delta, 2) AS yoy_delta,\n  formula,\n  line_code\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_ratios_lines`\nWHERE fiscal_year = 'FY24'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  ratio_name AS line_item,\n  category,\n  unit,\n  ROUND(value, 2) AS value,\n  ROUND(prior_fy_value, 2) AS prior_fy_value,\n  ROUND(yoy_delta, 2) AS yoy_delta,\n  formula,\n  line_code\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_ratios_lines`\nWHERE fiscal_year = 'FY24'\nORDER BY line_order ASC"
         }
       ]
     },
@@ -1668,7 +1668,7 @@
             "Book value per share inr: 254.87.",
             "Basic EPS (\u20b9/share) is down 2.16 (-7.6%) vs FY25."
           ],
-          "sql": "SELECT ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -1687,7 +1687,7 @@
             "Highest is FY24 (32.21); lowest is FY21 (8.94) across 10 groups.",
             "FY24 leads FY22 by 0.17 (32.21 vs 32.04)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING eps_basic_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING eps_basic_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -1706,7 +1706,7 @@
             "Highest is FY26 (254.87); lowest is FY17 (144.58) across 10 groups.",
             "FY26 leads FY25 by 12.90 (254.87 vs 241.97)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING book_value_per_share_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING book_value_per_share_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1725,7 +1725,7 @@
             "Highest is FY24 (32.21); lowest is FY23 (30.87) across 3 groups.",
             "FY24 leads FY22 by 0.17 (32.21 vs 32.04)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY22' AND 'FY24' GROUP BY fiscal_year HAVING eps_basic_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(eps_basic_inr), 2) AS eps_basic_inr, ROUND(AVG(book_value_per_share_inr), 2) AS book_value_per_share_inr, ROUND(AVG(dividend_per_share_inr), 2) AS dividend_per_share_inr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY22' AND 'FY24' GROUP BY fiscal_year HAVING eps_basic_inr IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -1752,7 +1752,7 @@
             "Crude oil realisation ($/bbl): $73.40 (FY26).",
             "Crude oil realisation ($/bbl) is down $5.23 (-6.7%) vs FY25."
           ],
-          "sql": "SELECT ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -1771,7 +1771,7 @@
             "Highest is FY23 ($91.90); lowest is FY21 ($42.78) across 10 groups.",
             "FY23 leads FY24 by $11.13 ($91.90 vs $80.77)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING crude_realisation_usd_bbl IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING crude_realisation_usd_bbl IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -1790,7 +1790,7 @@
             "Highest is FY23 ($91.90); lowest is FY21 ($42.78) across 10 groups.",
             "FY23 leads FY24 by $11.13 ($91.90 vs $80.77)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING crude_realisation_usd_bbl IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(AVG(crude_realisation_usd_bbl), 2) AS crude_realisation_usd_bbl FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year HAVING crude_realisation_usd_bbl IS NOT NULL ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1808,7 +1808,7 @@
             "FY19 accounts for 10.8% of the total (353,159,400 of 3,257,378,700).",
             "Highest is FY19 (353,159,400); lowest is FY26 (296,637,770) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_production_boe), 0) AS production_boe FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_production_boe), 0) AS production_boe FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -1835,7 +1835,7 @@
             "Champang leads Borholla by $2.19 ($64.59 vs $62.40).",
             "Champang is an outlier at $64.59 (median $17.21)."
           ],
-          "sql": "SELECT field_id AS field, ROUND(SUM(total_opex_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) AS lifting_cost_usd_per_boe FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND basin IN ('Western Offshore Basin', 'Western Onshore Basin', 'Assam & Assam-Arakan Basin') GROUP BY field_id HAVING lifting_cost_usd_per_boe IS NOT NULL ORDER BY lifting_cost_usd_per_boe DESC LIMIT 1000"
+          "sql": "SELECT field_id AS field, ROUND(SUM(total_opex_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) AS lifting_cost_usd_per_boe FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND basin IN ('Western Offshore Basin', 'Western Onshore Basin', 'Assam & Assam-Arakan Basin') GROUP BY field_id HAVING lifting_cost_usd_per_boe IS NOT NULL ORDER BY lifting_cost_usd_per_boe DESC LIMIT 1000"
         },
         {
           "turn": 2,
@@ -1853,7 +1853,7 @@
             "Highest is Mehsana Asset at $9.28; lowest is Mumbai High at $8.34.",
             "Mehsana Asset leads Mumbai High by $0.94 ($9.28 vs $8.34)."
           ],
-          "sql": "SELECT asset_wc_id AS asset, field_id AS field, ROUND(SUM(total_opex_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) AS lifting_cost_usd_per_boe FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND asset_wc_id IN ('WC-MUM', 'WC-MEH') GROUP BY asset_wc_id, field_id HAVING lifting_cost_usd_per_boe IS NOT NULL ORDER BY lifting_cost_usd_per_boe DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, field_id AS field, ROUND(SUM(total_opex_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) AS lifting_cost_usd_per_boe FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND asset_wc_id IN ('WC-MUM', 'WC-MEH') GROUP BY asset_wc_id, field_id HAVING lifting_cost_usd_per_boe IS NOT NULL ORDER BY lifting_cost_usd_per_boe DESC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -1873,7 +1873,7 @@
             "Eastern Offshore leads Ankleshwar Asset by 4.6 pts (65.4% vs 60.8%).",
             "Jorhat Asset is an outlier at -42.7% (median 44.7%)."
           ],
-          "sql": "SELECT asset_wc_id AS asset, ROUND(100 * SUM(ebitda_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS ebitda_margin_pct FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING ebitda_margin_pct IS NOT NULL ORDER BY ebitda_margin_pct DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, ROUND(100 * SUM(ebitda_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS ebitda_margin_pct FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING ebitda_margin_pct IS NOT NULL ORDER BY ebitda_margin_pct DESC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1893,7 +1893,7 @@
             "Eastern Offshore leads Ankleshwar Asset by 4.6 pts (65.4% vs 60.8%).",
             "Jorhat Asset is an outlier at -42.7% (median 44.7%)."
           ],
-          "sql": "SELECT asset_wc_id AS asset, ROUND(100 * SUM(ebitda_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS ebitda_margin_pct FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING ebitda_margin_pct IS NOT NULL ORDER BY ebitda_margin_pct DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, ROUND(100 * SUM(ebitda_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS ebitda_margin_pct FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING ebitda_margin_pct IS NOT NULL ORDER BY ebitda_margin_pct DESC LIMIT 1000"
         }
       ]
     },
@@ -1921,7 +1921,7 @@
             "Consolidated pat cr: 49,793.",
             "Standalone profit after tax \u2014 PAT (\u20b9 cr) is down \u20b92,716 cr (-7.6%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 2,
@@ -1940,7 +1940,7 @@
             "FY24 accounts for 16.3% of the total (\u20b957,101 cr of \u20b9349,979.50 cr).",
             "Highest is FY24 (\u20b957,101 cr); lowest is FY20 (\u20b911,456 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -1959,7 +1959,7 @@
             "FY24 accounts for 16.3% of the total (\u20b957,101 cr of \u20b9349,979.50 cr).",
             "Highest is FY24 (\u20b957,101 cr); lowest is FY20 (\u20b911,456 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -1978,7 +1978,7 @@
             "FY24 accounts for 39.3% of the total (\u20b957,101 cr of \u20b9145,223 cr).",
             "Highest is FY24 (\u20b957,101 cr); lowest is FY25 (\u20b938,329 cr) across 3 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY24' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(consolidated_pat_inr_cr), 2) AS consolidated_pat_cr, ROUND(SUM(pat_inr_cr), 2) AS pat_cr, ROUND(SUM(consolidated_revenue_inr_cr), 2) AS consolidated_revenue_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS corporate_revenue_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year BETWEEN 'FY24' AND 'FY26' GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         }
       ]
     },
@@ -2006,7 +2006,7 @@
             "Highest is HPCL (\u20b99,801.42 cr); lowest is OTPC (\u20b9337.98 cr) across 5 groups.",
             "The top 3 (HPCL, OVL, MRPL) hold 96.0% of the total."
           ],
-          "sql": "SELECT entity_code AS subsidiary, ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `ongc-hr-finance-agent.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26' GROUP BY entity_code ORDER BY subsidiary_pat_cr DESC LIMIT 1000"
+          "sql": "SELECT entity_code AS subsidiary, ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `yukti-finance-iocl.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26' GROUP BY entity_code ORDER BY subsidiary_pat_cr DESC LIMIT 1000"
         },
         {
           "turn": 2,
@@ -2026,7 +2026,7 @@
             "Highest is HPCL (\u20b9392,473.12 cr); lowest is OTPC (\u20b92,582.06 cr) across 5 groups.",
             "HPCL is an outlier at \u20b9392,473.12 cr (median \u20b920,656.48 cr)."
           ],
-          "sql": "SELECT entity_code AS subsidiary, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `ongc-hr-finance-agent.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26' GROUP BY entity_code ORDER BY subsidiary_revenue_cr DESC LIMIT 1000"
+          "sql": "SELECT entity_code AS subsidiary, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `yukti-finance-iocl.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26' GROUP BY entity_code ORDER BY subsidiary_revenue_cr DESC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -2046,7 +2046,7 @@
             "Highest is FY26 (\u20b912,505.26 cr); lowest is FY23 (\u2212\u20b97,522.24 cr) across 10 groups.",
             "The top 3 (FY26, FY24, FY21) hold 66.3% of the total."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `ongc-hr-finance-agent.hrfin_silver.subsidiary_financials` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' AND entity_code IN ('HPCL', 'MRPL') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pat_inr_cr), 2) AS subsidiary_pat_cr, ROUND(SUM(revenue_inr_cr), 2) AS subsidiary_revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS subsidiary_ebitda_cr FROM `yukti-finance-iocl.hrfin_silver.subsidiary_financials` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' AND entity_code IN ('HPCL', 'MRPL') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -2064,7 +2064,7 @@
             "Dividend received by ONGC (\u20b9 cr): \u20b92,882 cr (FY26).",
             "Dividend received by ONGC (\u20b9 cr) is up \u20b92,418.31 cr (+521.5%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(dividend_received_by_ongc_inr_cr), 2) AS subsidiary_dividend_cr FROM `ongc-hr-finance-agent.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(dividend_received_by_ongc_inr_cr), 2) AS subsidiary_dividend_cr FROM `yukti-finance-iocl.hrfin_silver.subsidiary_financials` WHERE fiscal_year = 'FY26'"
         }
       ]
     },
@@ -2092,7 +2092,7 @@
             "5 negative: Champang (\u2212\u20b9183.27 cr), Borholla (\u2212\u20b9181.18 cr), Khoraghat (\u2212\u20b9178.49 cr).",
             "Highest is Mumbai High South (\u20b97,753.84 cr); lowest is Champang (\u2212\u20b9183.27 cr) across 53 groups."
           ],
-          "sql": "SELECT field_id AS field, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY field_id ORDER BY pbt_cr DESC LIMIT 1000"
+          "sql": "SELECT field_id AS field, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY field_id ORDER BY pbt_cr DESC LIMIT 1000"
         },
         {
           "turn": 2,
@@ -2112,7 +2112,7 @@
             "Highest is Mori (\u2212\u20b911.27 cr); lowest is Champang (\u2212\u20b9183.27 cr) across 5 groups.",
             "Mori is an outlier at \u2212\u20b911.27 cr (median \u2212\u20b9178.49 cr)."
           ],
-          "sql": "SELECT field_id AS field, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND pbt_inr_cr < 0.0 GROUP BY field_id ORDER BY pbt_cr DESC LIMIT 1000"
+          "sql": "SELECT field_id AS field, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND pbt_inr_cr < 0.0 GROUP BY field_id ORDER BY pbt_cr DESC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -2132,7 +2132,7 @@
             "Highest is Mumbai High South (\u20b918,964.76 cr); lowest is Mukta (\u20b92,708.28 cr) across 10 groups.",
             "The top 3 (Mumbai High South, Mumbai High North, Bassein) hold 57.7% of the total."
           ],
-          "sql": "SELECT field_id AS field, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY field_id ORDER BY revenue_cr DESC LIMIT 10"
+          "sql": "SELECT field_id AS field, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY field_id ORDER BY revenue_cr DESC LIMIT 10"
         },
         {
           "turn": 4,
@@ -2152,7 +2152,7 @@
             "Highest is Mumbai High South (\u20b918,964.76 cr); lowest is Mukta (\u20b92,708.28 cr) across 10 groups.",
             "The top 3 (Mumbai High South, Mumbai High North, Bassein) hold 57.7% of the total."
           ],
-          "sql": "SELECT field_id AS field, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY field_id ORDER BY revenue_cr DESC LIMIT 10"
+          "sql": "SELECT field_id AS field, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY field_id ORDER BY revenue_cr DESC LIMIT 10"
         }
       ]
     },
@@ -2179,7 +2179,7 @@
             "Revenue cr: 15,993.40.",
             "PBT (\u20b9 cr) is down \u20b9328.34 cr (-6.8%) vs FY25."
           ],
-          "sql": "SELECT asset_wc_id AS asset, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND field_id IN ('FLD-BAS') AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id ORDER BY pbt_cr DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND field_id IN ('FLD-BAS') AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id ORDER BY pbt_cr DESC LIMIT 1000"
         },
         {
           "turn": 2,
@@ -2199,7 +2199,7 @@
             "Highest is FY23 (\u20b97,867.15 cr); lowest is FY21 (\u2212\u20b9128.85 cr) across 10 groups.",
             "The top 3 (FY23, FY24, FY25) hold 61.7% of the total."
           ],
-          "sql": "SELECT asset_wc_id AS asset, fiscal_year AS fy, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND field_id IN ('FLD-BAS') AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id, fiscal_year ORDER BY pbt_cr DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, fiscal_year AS fy, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND field_id IN ('FLD-BAS') AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id, fiscal_year ORDER BY pbt_cr DESC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -2217,7 +2217,7 @@
             "Mumbai High accounts for 59.8% of the total (\u20b937,573.75 cr of \u20b962,813.32 cr).",
             "Mumbai High leads Bassein & Satellite by \u20b912,334.18 cr (\u20b937,573.75 cr vs \u20b925,239.57 cr)."
           ],
-          "sql": "SELECT asset_wc_id AS asset, fiscal_year AS fy, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id, fiscal_year ORDER BY revenue_cr DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, fiscal_year AS fy, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id, fiscal_year ORDER BY revenue_cr DESC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -2235,7 +2235,7 @@
             "Highest is Bassein & Satellite at 60.2%; lowest is Mumbai High at 57.4%.",
             "Bassein & Satellite leads Mumbai High by 2.8 pts (60.2% vs 57.4%)."
           ],
-          "sql": "SELECT asset_wc_id AS asset, fiscal_year AS fy, ROUND(100 * SUM(ebitda_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS ebitda_margin_pct FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id, fiscal_year HAVING ebitda_margin_pct IS NOT NULL ORDER BY ebitda_margin_pct DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, fiscal_year AS fy, ROUND(100 * SUM(ebitda_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS ebitda_margin_pct FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND asset_wc_id IN ('WC-MUM', 'WC-BAS') GROUP BY asset_wc_id, fiscal_year HAVING ebitda_margin_pct IS NOT NULL ORDER BY ebitda_margin_pct DESC LIMIT 1000"
         }
       ]
     },
@@ -2261,7 +2261,7 @@
             "FY23 accounts for 14.5% of the total (\u20b922,410.14 cr of \u20b9154,486.89 cr).",
             "Highest is FY23 (\u20b922,410.14 cr); lowest is FY21 (\u20b99,145.44 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND asset_wc_id IN ('WC-MEH', 'WC-ANK') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND asset_wc_id IN ('WC-MEH', 'WC-ANK') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 2,
@@ -2279,7 +2279,7 @@
             "FY24 accounts for 14.6% of the total (\u20b98,389.80 cr of \u20b957,625.27 cr).",
             "Highest is FY24 (\u20b98,389.80 cr); lowest is FY21 (\u20b92,511.78 cr) across 10 groups."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND asset_wc_id IN ('WC-MEH', 'WC-ANK') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(pbt_inr_cr), 2) AS pbt_cr, ROUND(SUM(gross_revenue_inr_cr), 2) AS revenue_cr, ROUND(SUM(ebitda_inr_cr), 2) AS ebitda_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year BETWEEN 'FY17' AND 'FY26' AND asset_wc_id IN ('WC-MEH', 'WC-ANK') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -2296,7 +2296,7 @@
           "insights": [
             "Opex (\u20b9 cr): \u20b93,881.84 cr (Mehsana Asset, Ankleshwar Asset, FY26)."
           ],
-          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_opex_inr_cr), 2) AS opex_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND asset_wc_id IN ('WC-MEH', 'WC-ANK') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
+          "sql": "SELECT fiscal_year AS fy, ROUND(SUM(total_opex_inr_cr), 2) AS opex_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' AND asset_wc_id IN ('WC-MEH', 'WC-ANK') GROUP BY fiscal_year ORDER BY fiscal_year ASC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -2341,7 +2341,7 @@
             "Note 28 (Statutory Levies): Total levies were \u20b925,999 cr (-16.0% YoY; SAED windfall tax \u20b90 cr).",
             "Notes 32\u201337 (Below-EBITDA Drivers): Exploration dry-well & survey write-offs were \u20b97,790 cr, DD&A was \u20b925,197.01 cr, yielding PBT of \u20b943,247.02 cr and Tax Expense of \u20b910,353.02 cr."
           ],
-          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
+          "sql": "SELECT\n  line_order,\n  line_name AS line_item,\n  schedule_ref AS note_ref,\n  yahoo_finance_line,\n  ROUND(amount_inr_cr, 2) AS amount_cr,\n  ROUND(prior_fy_amount_inr_cr, 2) AS prior_fy_cr,\n  ROUND(yoy_delta_inr_cr, 2) AS yoy_delta_cr,\n  ROUND(yoy_change_pct, 1) AS yoy_change_pct,\n  ROUND(pct_of_revenue, 1) AS pct_of_revenue,\n  section,\n  line_code,\n  driver_note\nFROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_pnl_lines`\nWHERE fiscal_year = 'FY26'\nORDER BY line_order ASC"
         },
         {
           "turn": 2,
@@ -2360,7 +2360,7 @@
             "Jorhat Asset leads Cauvery Asset by $8.86 ($12.20 vs $3.34).",
             "Jorhat Asset is an outlier at $12.20 (median $1.91)."
           ],
-          "sql": "SELECT asset_wc_id AS asset, ROUND(SUM(allocated_manpower_cost_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) AS manpower_cost_usd_per_boe FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING manpower_cost_usd_per_boe IS NOT NULL ORDER BY manpower_cost_usd_per_boe DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, ROUND(SUM(allocated_manpower_cost_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) AS manpower_cost_usd_per_boe FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING manpower_cost_usd_per_boe IS NOT NULL ORDER BY manpower_cost_usd_per_boe DESC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -2379,7 +2379,7 @@
             "Jorhat Asset leads Cauvery Asset by 11.3 pts (19.7% vs 8.4%).",
             "Jorhat Asset is an outlier at 19.7% (median 3.8%)."
           ],
-          "sql": "SELECT asset_wc_id AS asset, ROUND(100 * SUM(allocated_manpower_cost_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS manpower_cost_pct_of_revenue FROM `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING manpower_cost_pct_of_revenue IS NOT NULL ORDER BY manpower_cost_pct_of_revenue DESC LIMIT 1000"
+          "sql": "SELECT asset_wc_id AS asset, ROUND(100 * SUM(allocated_manpower_cost_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0), 1) AS manpower_cost_pct_of_revenue FROM `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` WHERE field_id IS NOT NULL AND fiscal_year = 'FY26' GROUP BY asset_wc_id HAVING manpower_cost_pct_of_revenue IS NOT NULL ORDER BY manpower_cost_pct_of_revenue DESC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -2460,7 +2460,7 @@
             "CSR spend (\u20b9 cr): \u20b9949 cr (FY26).",
             "CSR spend (\u20b9 cr) is up \u20b941 cr (+4.5%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(csr_disbursed_inr_cr), 2) AS csr_spend_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(csr_disbursed_inr_cr), 2) AS csr_spend_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         },
         {
           "turn": 4,
@@ -2479,7 +2479,7 @@
             "CSR spend (\u20b9 cr): \u20b9949 cr (FY26).",
             "CSR spend (\u20b9 cr) is up \u20b941 cr (+4.5%) vs FY25."
           ],
-          "sql": "SELECT ROUND(SUM(csr_disbursed_inr_cr), 2) AS csr_spend_cr FROM `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
+          "sql": "SELECT ROUND(SUM(csr_disbursed_inr_cr), 2) AS csr_spend_cr FROM `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` WHERE fiscal_year = 'FY26'"
         }
       ]
     },
@@ -2507,7 +2507,7 @@
             "Capital Expenditure (Standalone) leads Revenue from Operations (Net of Levies) by 0.7 pts (97.4% vs 96.7%).",
             "Lost Time Injury Frequency Rate (LTIFR) is an outlier at 66.7% (median 93.3%)."
           ],
-          "sql": "SELECT parameter_name AS parameter, unit_of_measure AS unit, weightage AS weightage, very_good_target AS very_good_target, excellent_target AS excellent_target, actual_achievement AS achievement, ROUND(CASE WHEN parameter_id = 'MOU-HSE-SAFETY' THEN excellent_target * 100.0 / NULLIF(actual_achievement, 0) ELSE actual_achievement * 100.0 / NULLIF(excellent_target, 0) END, 1) AS pct_of_excellent, achieved_rating AS rating, projected_composite_score AS projected_composite_score, COUNT(*) OVER () AS _total_rows FROM `ongc-hr-finance-agent.hrfin_silver.mou_targets` WHERE fiscal_year = 'FY27' ORDER BY weightage DESC LIMIT 2000"
+          "sql": "SELECT parameter_name AS parameter, unit_of_measure AS unit, weightage AS weightage, very_good_target AS very_good_target, excellent_target AS excellent_target, actual_achievement AS achievement, ROUND(CASE WHEN parameter_id = 'MOU-HSE-SAFETY' THEN excellent_target * 100.0 / NULLIF(actual_achievement, 0) ELSE actual_achievement * 100.0 / NULLIF(excellent_target, 0) END, 1) AS pct_of_excellent, achieved_rating AS rating, projected_composite_score AS projected_composite_score, COUNT(*) OVER () AS _total_rows FROM `yukti-finance-iocl.hrfin_silver.mou_targets` WHERE fiscal_year = 'FY27' ORDER BY weightage DESC LIMIT 2000"
         },
         {
           "turn": 2,
@@ -2526,7 +2526,7 @@
             "Highest is Bassein & Satellite (1,833); lowest is Cauvery Basin (67) across 46 groups.",
             "Bassein & Satellite is an outlier at 1,833 (median 183.50)."
           ],
-          "sql": "SELECT wc_id AS work_centre, COUNT(*) AS headcount FROM `ongc-hr-finance-agent.hrfin_gold.ssot_workforce_employee` WHERE employment_status = 'Active' GROUP BY wc_id ORDER BY headcount DESC LIMIT 1000"
+          "sql": "SELECT wc_id AS work_centre, COUNT(*) AS headcount FROM `yukti-finance-iocl.hrfin_gold.ssot_workforce_employee` WHERE employment_status = 'Active' GROUP BY wc_id ORDER BY headcount DESC LIMIT 1000"
         },
         {
           "turn": 3,
@@ -2545,7 +2545,7 @@
             "Highest is Production (4,232); lowest is Medical Services (101) across 17 groups.",
             "Production is an outlier at 4,232 (median 857)."
           ],
-          "sql": "SELECT discipline_id AS discipline, COUNT(*) AS headcount FROM `ongc-hr-finance-agent.hrfin_gold.ssot_workforce_employee` WHERE employment_status = 'Active' GROUP BY discipline_id ORDER BY headcount DESC LIMIT 1000"
+          "sql": "SELECT discipline_id AS discipline, COUNT(*) AS headcount FROM `yukti-finance-iocl.hrfin_gold.ssot_workforce_employee` WHERE employment_status = 'Active' GROUP BY discipline_id ORDER BY headcount DESC LIMIT 1000"
         },
         {
           "turn": 4,
@@ -2563,7 +2563,7 @@
             "Highest is Silchar Basin (100.0%); lowest is Hazira Plant (55.7%) across 46 groups.",
             "Silchar Basin leads Cauvery Basin by 0.0 pts (100.0% vs 100.0%)."
           ],
-          "sql": "SELECT wc_id AS work_centre, ROUND(100 * COUNTIF(continuous_stay_years >= 5) / NULLIF(COUNT(*), 0), 1) AS long_stay_share_pct FROM `ongc-hr-finance-agent.hrfin_gold.ssot_workforce_employee` WHERE employment_status = 'Active' AND cadre = 'executive' GROUP BY wc_id HAVING long_stay_share_pct IS NOT NULL ORDER BY long_stay_share_pct DESC LIMIT 1000"
+          "sql": "SELECT wc_id AS work_centre, ROUND(100 * COUNTIF(continuous_stay_years >= 5) / NULLIF(COUNT(*), 0), 1) AS long_stay_share_pct FROM `yukti-finance-iocl.hrfin_gold.ssot_workforce_employee` WHERE employment_status = 'Active' AND cadre = 'executive' GROUP BY wc_id HAVING long_stay_share_pct IS NOT NULL ORDER BY long_stay_share_pct DESC LIMIT 1000"
         }
       ]
     }

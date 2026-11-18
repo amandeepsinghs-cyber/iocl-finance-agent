@@ -52,11 +52,11 @@ async def test_multiyear_pnl_statement_5_year():
     
     rev_ops = get_row(st, "PL.REV_OPS")
     assert rev_ops is not None
-    assert [round(rev_ops["values"][p], 1) if rev_ops["values"].get(p) is not None else None for p in st["periods"]] == [132508.1, 137846.3, 138402.1, 155517.3, 110345.4]
+    assert [round(rev_ops["values"][p], 1) if rev_ops["values"].get(p) is not None else None for p in st["periods"]] == [886224.4, 845512.6, 866345.4, 934952.7, 728445.4]
     
     other_inc = get_row(st, "PL.OTHER_INCOME")
     assert other_inc is not None
-    assert round(other_inc["values"]["FY24"], 1) == 10735.5
+    assert round(other_inc["values"]["FY24"], 1) == 4780.8
     
 @pytest.mark.asyncio
 async def test_multiyear_pnl_statement_10_year():
@@ -87,7 +87,7 @@ async def test_multiyear_pnl_statement_10_year():
     
     pat = get_row(st, "PL.PAT")
     assert pat is not None
-    assert round(pat["values"]["FY19"], 1) == 26764.6
+    assert round(pat["values"]["FY19"], 1) == 16894.2
 
 @pytest.mark.asyncio
 async def test_multiyear_balance_sheet():

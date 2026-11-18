@@ -59,19 +59,19 @@ def build_email_draft(
             "visual": {"type": "clarification"}
         }
         
-    is_aggregate = not is_admin and (persona == "DIR_FIN" or persona.startswith("E"))
+    is_aggregate = not is_admin and persona.startswith("E")
     
     my_info = PERSONA_DIRECTORY.get(persona, {})
     my_name = my_info.get("display_name", persona)
     my_desig = my_info.get("designation", "")
-    from_info = {"name": f"{my_name}, {my_desig}" if my_desig else my_name, "email": my_info.get("email", f"{persona.lower()}@ongc.example")}
+    from_info = {"name": f"{my_name}, {my_desig}" if my_desig else my_name, "email": my_info.get("email", f"{persona.lower()}@indianoil.example")}
     
-    to_info = [{"name": "Director (HR)", "email": "director.hr@ongc.example"}]
+    to_info = [{"name": "Director (Finance)", "email": "director.finance@indianoil.example"}]
     chips = []
     
-    if persona == "DIR_HR":
+    if persona in ("DIR_FIN", "DIR_REF", "DIR_MKT"):
         to_info = []
-        chips = ["CMD", "Transfer Board"]
+        chips = ["Chairman", "Finance Committee"]
         
     as_of = datetime.date.today().strftime('%Y-%m-%d')
     as_of_30 = (datetime.date.today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
@@ -123,9 +123,9 @@ def build_email_draft(
     
     display_text = "Drafted the email. Please review it on screen."
     spoken_summary = "I have drafted the email. You can review and edit the fields on screen."
-    if persona == "DIR_HR":
-        display_text = "Who should this go to?"
-        spoken_summary = "Who should this go to?"
+    if persona in ("DIR_FIN", "DIR_REF", "DIR_MKT"):
+        display_text = "Who should this Board Finance brief go to?"
+        spoken_summary = "Who should this Board Finance brief go to?"
         
     # Check if artifact exists in session cohort
     from app.tools.export_tool import DocumentExporter
@@ -206,7 +206,7 @@ def build_email_draft(
                 "attachments": [export_id] if not is_aggregate else [],
                 "citations": [
                     "JRTP Rev 4 clause 3.2 (Illustrative)",
-                    "Delhi HC 2018 ONGC v. B.V. Srihari Rao"
+                    "Delhi HC 2018 Administrative Rotation Jurisprudence"
                 ],
                 "editable": True
             }

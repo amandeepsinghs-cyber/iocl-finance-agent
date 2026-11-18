@@ -1,6 +1,6 @@
 # Spike Report: Voice → Answer → Chart Loop for ONGC HR & Finance Agent
 
-**Project:** `ongc-hr-finance-agent`  
+**Project:** `yukti-finance-iocl`  
 **Region:** `us-central1` (Vertex AI Live Models) / `asia-south1` (BigQuery Datasets) / `global` (Vertex AI Search)  
 **Spike Directory:** `spikes/voice_chart_spike/`  
 **Engineer:** Spike Engineer (Jetski AI Agent)  
@@ -42,7 +42,7 @@ Generated using [`voice_samples/generate_real_gemini_voice_samples.py`](file:///
 
 #### Generation Log Verification (from Vertex AI Live Call)
 ```text
-Initializing Vertex AI GenAI Client (Project: ongc-hr-finance-agent, Location: us-central1)...
+Initializing Vertex AI GenAI Client (Project: yukti-finance-iocl, Location: us-central1)...
 Targeting model: gemini-3.8-live
 Generating real audio for Aoede [en-IN] using model gemini-3.8-live...
   ✓ Saved real audio: aoede_en_c1_real.wav (635524 bytes)
@@ -63,7 +63,7 @@ Generating real audio for Leda [hi-IN] using model gemini-3.8-live...
 ## 3. Latency Benchmarks: True Live Cloud vs. Mock Baseline
 
 ### Table 3.1: TRUE LIVE Benchmark Results
-> **Methodology:** Live requests sent to WebSocket `/ws/live` driving Google ADK `LiveRequestQueue` → Vertex AI Live Native Audio Model (`us-central1`) → Autonomous tool decision → Execution on BigQuery `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` (`asia-south1`) / Vertex AI Search engine `hrfin-doc-search-engine` (`global`). Audio streaming tests stream genuine 16 kHz speech WAV clips through the `audio` path.
+> **Methodology:** Live requests sent to WebSocket `/ws/live` driving Google ADK `LiveRequestQueue` → Vertex AI Live Native Audio Model (`us-central1`) → Autonomous tool decision → Execution on BigQuery `yukti-finance-iocl.hrfin_gold.v_continuous_stay` (`asia-south1`) / Vertex AI Search engine `hrfin-doc-search-engine` (`global`). Audio streaming tests stream genuine 16 kHz speech WAV clips through the `audio` path.
 
 | Run ID | Model Evaluated | Input Medium | Language | Query Summary | Tool Autonomously Called | Model Decision Time ($t_{\text{tool\_call}}$) | Tool Execution Latency | Time to Chart Rendered | Total Turn Turnaround |
 |---|---|---|---|---|---|---|---|---|---|

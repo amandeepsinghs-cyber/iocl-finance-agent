@@ -54,7 +54,7 @@
         "name": "Shares Outstanding (Crore)",
         "value": 1258.03,
         "unit": "count",
-        "source": "ONGC Capital Structure",
+        "source": "IOCL Capital Structure",
         "as_of": "FY26"
       }
     ]
@@ -62,7 +62,7 @@
   "visual": {
     "type": "table",
     "mode": "replace",
-    "title": "ONGC Standalone DCF Valuation Summary (Illustrative)",
+    "title": "IOCL Standalone DCF Valuation Summary (Illustrative)",
     "subtitle": "As of 31-Mar-2026 · Source: Synthetic DCF Model (Illustrative)",
     "table": {
       "columns": [

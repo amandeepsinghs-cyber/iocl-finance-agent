@@ -11,4 +11,4 @@ Please have the Transfer Board review this cohort for the next rotation cycle an
 
 {{ sender_name }}
 Sent via Yukti (draft — please review before sending)
-Data: synthetic employee records calibrated to ONGC AR FY26 (Illustrative)
+Data: synthetic employee records calibrated to IOCL AR FY26 (Illustrative)

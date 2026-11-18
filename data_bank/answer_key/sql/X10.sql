@@ -28,7 +28,7 @@ exempt AS (
 ),
 overdue AS (
     SELECT v.emp_id, v.wc_id, v.grade_id, v.continuous_stay_months AS months_at_station
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
     WHERE v.is_current_stay AND STARTS_WITH(v.grade_id, 'E') AND v.continuous_stay_months >= 60
       AND v.emp_id NOT IN (SELECT emp_id FROM exempt)
       AND DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25

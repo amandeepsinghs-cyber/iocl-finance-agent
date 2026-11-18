@@ -1,7 +1,7 @@
 # Yukti AI — Autonomous Overnight Build Plan & Feature Checklist (`BUILD.md`)
 
 **Started:** 2026-10-20 17:35 UTC  
-**Target Project:** `ongc-hr-finance-agent` (BigQuery region: `asia-south1`, Cloud Run / Vertex AI)  
+**Target Project:** `yukti-finance-iocl` (BigQuery region: `asia-south1`, Cloud Run / Vertex AI)  
 **Application Root:** `/usr/local/google/home/amandeepsinghs/o&g agentic transformation/Oil & Gas Agent Portfolio/cloud_run_apps/HR and Finance_ONGC`
 
 ---
@@ -26,7 +26,7 @@
    - Generate live data-backed draft documents (Board Notes, Lok Sabha/Rajya Sabha Parliament Replies, Annual General Transfer Proposals, Show-Cause/Vigilance Summaries, Executive Briefings, Custom Analytical Memos) populated from live BigQuery results, with preview on canvas and working `.docx`, `.pdf`, `.xlsx`, and `.md` downloads.
 6. **End-to-End Verification & Cloud Run Deployment:**
    - Verify all features via automated tests (BigQuery SSOT reconciliation, multi-turn context, arbitrary chart plotting, document generation, and Playwright UI/voice tests).
-   - Deploy Yukti AI to **Google Cloud Run** (`ongc-hr-finance-agent`) so it can be accessed directly via an `https://...run.app` URL (just like Urvi AI / `wellpulse`) in addition to `http://localhost:3200`.
+   - Deploy Yukti AI to **Google Cloud Run** (`yukti-finance-iocl`) so it can be accessed directly via an `https://...run.app` URL (just like Urvi AI / `wellpulse`) in addition to `http://localhost:3200`.
 
 ---
 
@@ -74,7 +74,7 @@
   - On-demand plotting (`histogram`, `pie`, `donut`, `bar`, `hbar`, `line`, `scatter`, `waterfall`, `treemap`, `table`) from real BigQuery data
   - Live document drafting and `.docx` / `.pdf` / `.xlsx` file generation
   - Voice orb animation reactivity & `/ws/live` Leda voice streaming
-- [x] **5.2** Build production frontend & backend and deploy Yukti AI to **Google Cloud Run** (`ongc-hr-finance-agent`) with a live `https://...run.app` URL, while keeping `http://localhost:3200` running locally.
+- [x] **5.2** Build production frontend & backend and deploy Yukti AI to **Google Cloud Run** (`yukti-finance-iocl`) with a live `https://...run.app` URL, while keeping `http://localhost:3200` running locally.
 - [x] **5.3** Mark all checklist items `[x]` in `BUILD.md` and write final deployment & verification summary.
 
 ---

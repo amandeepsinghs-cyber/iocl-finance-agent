@@ -24,7 +24,7 @@ import duckdb
 import pandas as pd
 
 DATA_BANK_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "asia-south1"
 SEARCH_LOCATION = "global"
 SEARCH_DATA_STORE = "hrfin-doc-search-store"
@@ -262,7 +262,7 @@ def run_detailed_g4_diagnostics():
         "---",
         "",
         "## 1. Corrected OCR Page Counts (Item c)",
-        f"Live BigQuery audit of `ongc-hr-finance-agent.{DOCS_DATASET}.bronze_doc_text` confirms **1,103 Document AI OCR pages** across 462 scanned documents:",
+        f"Live BigQuery audit of `yukti-finance-iocl.{DOCS_DATASET}.bronze_doc_text` confirms **1,103 Document AI OCR pages** across 462 scanned documents:",
         "",
         "| Document Category | Ingestion Processor | Pages Count | OCR Engine / Source |",
         "|---|---|---|---|",
@@ -492,7 +492,7 @@ if __name__ == "__main__":
         "---",
         "",
         "## 1. Corrected OCR Page Counts (Item c)",
-        f"Live BigQuery audit of `ongc-hr-finance-agent.{DOCS_DATASET}.bronze_doc_text` confirms **1,103 Document AI OCR pages** across scanned documents:",
+        f"Live BigQuery audit of `yukti-finance-iocl.{DOCS_DATASET}.bronze_doc_text` confirms **1,103 Document AI OCR pages** across scanned documents:",
         "",
         "| Document Category | Ingestion Processor | Pages Count | OCR Engine / Source |",
         "|---|---|---|---|",

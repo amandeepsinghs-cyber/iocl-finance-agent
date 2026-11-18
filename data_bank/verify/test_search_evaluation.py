@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Tuple
 
 from google.cloud import discoveryengine_v1 as discoveryengine
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "global"
 DATA_STORE = "hrfin-doc-search-store"
 

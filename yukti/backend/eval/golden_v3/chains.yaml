@@ -72,7 +72,7 @@
         visual_type: chart:line
         points: 10
         fy_range: "FY17-FY26"
-        oracle_sql: "SELECT fiscal_year, wacc_pct, ke_pct, kd_used_pct FROM `ongc-hr-finance-agent.hrfin_gold.fact_wacc_annual` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' ORDER BY fiscal_year"
+        oracle_sql: "SELECT fiscal_year, wacc_pct, ke_pct, kd_used_pct FROM `yukti-finance-iocl.hrfin_gold.fact_wacc_annual` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' ORDER BY fiscal_year"
         badge: "Modelled"
         provenance: modelled
         cite:
@@ -83,7 +83,7 @@
       phrasing: "Why was it high in FY23?"
       expect:
         visual_type: chart:waterfall
-        oracle_sql: "SELECT input_code, marginal_contribution_pct FROM `ongc-hr-finance-agent.hrfin_gold.fact_wacc_shapley` WHERE fiscal_year = 'FY23' ORDER BY ABS(marginal_contribution_pct) DESC"
+        oracle_sql: "SELECT input_code, marginal_contribution_pct FROM `yukti-finance-iocl.hrfin_gold.fact_wacc_shapley` WHERE fiscal_year = 'FY23' ORDER BY ABS(marginal_contribution_pct) DESC"
         badge: "Modelled"
         provenance: modelled
         cite:

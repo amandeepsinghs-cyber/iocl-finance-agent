@@ -48,16 +48,31 @@ class DCFAssumptions(BaseModel):
     capex_base_inr_cr: AssumptionField
     nwc_pct: AssumptionField
     market_price_inr: AssumptionField
-    
+
+    # IOCL Downstream optional drivers (keep None for generic upstream fixture tests)
+    grm_usd_bbl: float = 0.0
+    refining_throughput_mmt: float = 0.0
+    marketing_sales_mmt: float = 0.0
+    base_fcff_inr_cr: float = 0.0
+
     # Forecast overrides (for fixture testing)
     forecast_fcff: List[float] = []
 
     model_config = ConfigDict(frozen=True)
 
 def _get_val(snapshot: List[Dict[str, Any]], code: str, default: float = 0.0) -> float:
+    import math
     for row in snapshot:
         if row.get("line_code") == code and row.get("verified", False):
-            return float(row.get("value_inr_cr", row.get("value", default)))
+            for col in ("value_inr_cr", "value", "value_native"):
+                raw = row.get(col)
+                if raw is not None:
+                    try:
+                        f = float(raw)
+                        if not math.isnan(f):
+                            return f
+                    except (TypeError, ValueError):
+                        pass
     return default
 
 def defaults_from_ssot(snapshot: List[Dict[str, Any]], wacc_table: List[Dict[str, Any]], as_of: str) -> DCFAssumptions:
@@ -104,39 +119,60 @@ def defaults_from_ssot(snapshot: List[Dict[str, Any]], wacc_table: List[Dict[str
     lease = _get_val(valid_snapshot, "BS.LEASE_LIAB_NC") + _get_val(valid_snapshot, "BS.LEASE_LIAB_C")
     if lease == 0.0: lease = _get_val(valid_snapshot, "BS.LEASE_LIAB.TOTAL")
 
+    shares_cr = 1412.1238
+    base_fcf = _get_val(valid_snapshot, "CF.CFO") - abs(_get_val(valid_snapshot, "CAPEX.TOTAL"))
+    if base_fcf <= 0:
+        base_fcf = 32270.0
+    throughput = _get_val(valid_snapshot, "REF.THROUGHPUT_MMT")
+    if throughput <= 0:
+        throughput = 75.451
+    grm = _get_val(valid_snapshot, "REF.GRM_USD_BBL")
+    if grm <= 0:
+        grm = 10.85
+    mkt_vol = _get_val(valid_snapshot, "MKT.SALES_MMT")
+    if mkt_vol <= 0:
+        mkt_vol = 105.117
+    capex_base = abs(_get_val(valid_snapshot, "CAPEX.TOTAL"))
+    if capex_base <= 0:
+        capex_base = 34210.0
+
     return DCFAssumptions(
         wacc_pct=mk(wacc_val, wacc_source),
-        terminal_g_pct=mk(3.0, "Illustrative assumption"),
-        brent_usd=mk(80.0, "AR FY26"),
-        capex_scale_pct=mk(100.0, "Illustrative assumption"),
-        production_decline_pct=mk(0.0, "CAGR FY22-FY26"),
+        terminal_g_pct=mk(3.0, "Long-term India GDP / fuel demand proxy"),
+        brent_usd=mk(69.04, "IOCL AR FY26 avg Brent"),
+        capex_scale_pct=mk(100.0, "FY26 Capex Baseline"),
+        production_decline_pct=mk(-2.0, "Refining & Marketing throughput growth"),
         holdco_discount_pct=mk(0.0, "Illustrative assumption"),
-        exit_ev_ebitda=mk(4.5, "Illustrative assumption"),
+        exit_ev_ebitda=mk(6.0, "Downstream OMC peer EV/EBITDA"),
         as_of=as_of,
-        run_id="run_123",
-        shares_outstanding=mk(1258.0279206, "SSOT"), # cr shares
-        listed_investments_inr_cr=mk(inv_listed, "SSOT"),
-        unlisted_investments_inr_cr=mk(inv_unlisted, "SSOT"),
-        cash_and_equivalents_inr_cr=mk(cce, "SSOT"),
+        run_id="run_iocl",
+        shares_outstanding=mk(round(shares_cr, 4), "IOCL AR FY26 (1,412.1238 Cr shares)"),
+        listed_investments_inr_cr=mk(inv_listed, "SSOT BS.INVESTMENTS_NC"),
+        unlisted_investments_inr_cr=mk(inv_unlisted, "SSOT BS.INVESTMENTS_C"),
+        cash_and_equivalents_inr_cr=mk(cce, "SSOT BS.CCE"),
         srf_deposits_inr_cr=mk(srf, "SSOT"),
         decom_provision_inr_cr=mk(decom, "SSOT"),
-        borrowings_inr_cr=mk(borrowings, "SSOT"),
-        lease_liab_inr_cr=mk(lease, "SSOT"),
-        vol_crude_mmt=mk(19.332, "fact_production_annual"),
-        vol_gas_bcm=mk(19.533, "fact_production_annual"),
+        borrowings_inr_cr=mk(borrowings, "SSOT BS.BORROWINGS"),
+        lease_liab_inr_cr=mk(lease, "SSOT BS.LEASE_LIAB"),
+        vol_crude_mmt=mk(throughput, "ssot_refinery_economics_360 FY26"),
+        vol_gas_bcm=mk(0.0, "N/A Downstream"),
         bbl_per_tonne=mk(7.33, "Constant"),
         gcv_mmbtu_per_scm=mk(0.0372, "Constant"),
-        fx_inr_usd=mk(83.0, "RBI"),
+        fx_inr_usd=mk(88.37, "RBI / AR FY26 average FX"),
         crude_realisation_discount_pct=mk(0.0, "AR"),
-        gas_price_usd_mmbtu=mk(6.5, "AR"),
-        vap_revenue_ratio=mk(0.1, "Derived"),
-        effective_levy_rate=mk(0.15, "Derived"),
-        opex_per_boe=mk(15.0, "Derived"),
+        gas_price_usd_mmbtu=mk(0.0, "N/A Downstream"),
+        vap_revenue_ratio=mk(0.055, "Petchem / Pipelines mix"),
+        effective_levy_rate=mk(0.115, "Ind AS 115 Excise / Gross ratio"),
+        opex_per_boe=mk(4.85, "Refinery & marketing opex $/bbl"),
         inflation_pct=mk(4.0, "Illustrative"),
-        exploration_writeoff_ratio=mk(0.05, "Derived"),
-        dd_a_ratio=mk(0.1, "Derived"),
-        tax_rate_pct=mk(25.17, "AR"),
-        capex_base_inr_cr=mk(39482.738, "Derived"),
-        nwc_pct=mk(0.05, "Derived"),
-        market_price_inr=mk(mkt_px, mkt_src)
+        exploration_writeoff_ratio=mk(0.0, "Downstream OMC"),
+        dd_a_ratio=mk(0.50, "DD&A / Capex ratio"),
+        tax_rate_pct=mk(25.17, "Sec 115BAA AR FY26"),
+        capex_base_inr_cr=mk(capex_base, "CAPEX.TOTAL FY26"),
+        nwc_pct=mk(0.02, "Derived"),
+        market_price_inr=mk(mkt_px, mkt_src),
+        grm_usd_bbl=grm,
+        refining_throughput_mmt=throughput,
+        marketing_sales_mmt=mkt_vol,
+        base_fcff_inr_cr=round(base_fcf, 2),
     )

@@ -26,22 +26,22 @@ from app.brain import compiler, planner, rbac
 from app.ui_control import UI_ACTIONS, _ALIASES
 
 EXPECTED_COPY = {
-    ("R-NAMED", "en"): "I can't share individual names at your access level. Here is the same group as counts by grade (groups under 5 shown as '<5').",
-    ("R-NAMED", "hi"): "आपके एक्सेस स्तर पर व्यक्तिगत नाम साझा नहीं किए जा सकते। यही समूह ग्रेड-वार संख्या में दिखा रही हूँ (5 से कम को '<5' लिखा है)।",
-    ("R-PAY", "en"): "Individual pay is confidential. I can show the average pay for that grade, or your own payslip.",
-    ("R-PAY", "hi"): "किसी व्यक्ति का वेतन गोपनीय है। मैं उस ग्रेड का औसत वेतन या आपकी अपनी वेतन पर्ची दिखा सकती हूँ।",
-    ("R-APAR", "en"): "Appraisal ratings are confidential. I can show your own APAR history.",
-    ("R-APAR", "hi"): "मूल्यांकन रेटिंग गोपनीय हैं। मैं आपका अपना APAR इतिहास दिखा सकती हूँ।",
-    ("R-SENS", "en"): "Case records like these are restricted to the CMD and Director (HR). I can explain the policy and the reporting process.",
-    ("R-SENS", "hi"): "ऐसे मामलों के रिकॉर्ड केवल CMD और निदेशक (मानव संसाधन) देख सकते हैं। मैं नीति और शिकायत प्रक्रिया बता सकती हूँ।",
-    ("R-FUNC", "en"): "Ledger-level finance data is available to the Finance team. Here are the company-level totals instead.",
-    ("R-FUNC", "hi"): "लेजर-स्तर का वित्त डेटा वित्त टीम के लिए है। इसके बजाय कंपनी-स्तर के कुल आँकड़े दिखा रही हूँ।",
-    ("R-BOARD", "en"): "That Board note is restricted. I can summarise the published Annual Report position.",
-    ("R-BOARD", "hi"): "वह बोर्ड नोट प्रतिबंधित है। मैं प्रकाशित वार्षिक रिपोर्ट की स्थिति बता सकती हूँ।",
-    ("R-ROLE", "en"): "I can't change your access level from a conversation. You're signed in as Pooja Verma, HR Executive (E2).",
-    ("R-ROLE", "hi"): "बातचीत से आपका एक्सेस स्तर नहीं बदला जा सकता। आप Pooja Verma, HR Executive (E2) के रूप में साइन-इन हैं।",
-    ("R-K5", "en"): "This group is too small to show without identifying people. Try a wider filter, e.g. all Delhi executives.",
-    ("R-K5", "hi"): "यह समूह इतना छोटा है कि संख्या दिखाने से लोग पहचाने जा सकते हैं। कृपया दायरा बढ़ाएँ।",
+    ("R-NAMED", "en"): "I can't share counterparty-named sub-ledgers or individual officer records at your access level. Here is the anonymised aggregate summary instead.",
+    ("R-NAMED", "hi"): "आपके एक्सेस स्तर पर व्यक्तिगत नाम या प्रतिपक्ष नाम साझा नहीं किए जा सकते। इसके बजाय अनाम समग्र सारांश दिखा रही हूँ।",
+    ("R-PAY", "en"): "Individual pay is confidential. I can show company-wide employee benefit expense trends from Schedule III or aggregate grade benchmarks.",
+    ("R-PAY", "hi"): "किसी व्यक्ति का वेतन गोपनीय है। मैं शेड्यूल III से कंपनी-स्तरीय कर्मचारी लाभ व्यय या ग्रेड बेंचमार्क दिखा सकती हूँ।",
+    ("R-APAR", "en"): "Appraisal ratings are confidential and restricted to Chairman and Functional Directors. I can show the MoU scorecard targets instead.",
+    ("R-APAR", "hi"): "मूल्यांकन रेटिंग गोपनीय हैं और केवल चेयरमैन तथा कार्यात्मक निदेशकों के लिए सुलभ हैं। मैं MoU स्कोरकार्ड लक्ष्य दिखा सकती हूँ।",
+    ("R-SENS", "en"): "Sensitive case and vigilance records are restricted to Chairman and Functional Directors. I can explain published governance policies and reporting processes.",
+    ("R-SENS", "hi"): "संवेदनशील और सतर्कता मामलों के रिकॉर्ड केवल चेयरमैन और कार्यात्मक निदेशक देख सकते हैं। मैं नीति और शिकायत प्रक्रिया बता सकती हूँ।",
+    ("R-FUNC", "en"): "Confidential counterparty credit sub-ledgers and restricted finance packs require Director (Finance) or Chairman approval. You can view published Schedule III statements, refinery aggregates, WACC, and DCF valuation.",
+    ("R-FUNC", "hi"): "गोपनीय प्रतिपक्ष क्रेडिट उप-खातों के लिए निदेशक (वित्त) या चेयरमैन का अनुमोदन आवश्यक है। आप प्रकाशित वित्तीय विवरण, रिफाइनरी आँकड़े, WACC और DCF देख सकते हैं।",
+    ("R-BOARD", "en"): "That Board draft pack is restricted to Chairman and Functional Directors. I can summarise the published Annual Report position or you can request access from Director (Finance).",
+    ("R-BOARD", "hi"): "वह बोर्ड ड्राफ्ट पैक चेयरमैन और कार्यात्मक निदेशकों के लिए प्रतिबंधित है। मैं प्रकाशित वार्षिक रिपोर्ट की स्थिति बता सकती हूँ।",
+    ("R-ROLE", "en"): "I can't change your access level from a conversation. You're signed in as Praveen Nair, Finance Officer — Pricing & Excise (Grade B).",
+    ("R-ROLE", "hi"): "बातचीत से आपका एक्सेस स्तर नहीं बदला जा सकता। आप Praveen Nair, Finance Officer — Pricing & Excise (Grade B) के रूप में साइन-इन हैं।",
+    ("R-K5", "en"): "This slice has fewer than 5 records and is suppressed for privacy. Try a wider aggregate, e.g. across all 9 IndianOil refineries.",
+    ("R-K5", "hi"): "इस समूह में 5 से कम प्रविष्टियाँ हैं। कृपया सभी 9 IndianOil रिफाइनरियों का समग्र दृश्य देखें।",
     ("E-AUTH", "en"): "I can't reach the data service right now. Nothing is wrong with your question; please try again in a minute.",
     ("E-AUTH", "hi"): "अभी डेटा सेवा से संपर्क नहीं हो पा रहा। कृपया एक मिनट बाद फिर पूछें।",
 }
@@ -57,7 +57,7 @@ def test_refusal_copy_yaml_has_all_9_codes():
 @pytest.mark.parametrize("lang", ["en", "hi"])
 def test_18_refusal_codes_x_languages_render_exact_spec06_copy(code: str, lang: str):
     """P2H.2 AC-2: All 9 refusal codes × 2 languages (18/18) render from refusal_copy.yaml with exact SPEC-06 §4.6 copy."""
-    rendered = render_refusal_copy(code=code, lang=lang, persona="E2_HR", grade_num="2")
+    rendered = render_refusal_copy(code=code, lang=lang, persona="E2_FIN", grade_num="2")
     assert rendered["code"] == code
     assert rendered["text"] == EXPECTED_COPY[(code, lang)]
     assert rendered["rule_ref"], f"Missing rule_ref for {code}"
@@ -110,7 +110,8 @@ def test_build_refusal_contract_validates_and_carries_required_fields(code: str,
         assert isinstance(validated["access"]["alternative"], dict)
         assert set(validated["access"]["alternative"].keys()) >= {"label", "question"}
     if code == "R-PAY":
-        assert "E1" in validated["access"]["alternative"]["label"]
+        expected_lbl = "Schedule III" if lang == "en" else "कर्मचारी लाभ"
+        assert expected_lbl in validated["access"]["alternative"]["label"]
 
 
 def test_build_refusal_contract_with_auto_answer_aggregate_visual():
@@ -118,8 +119,8 @@ def test_build_refusal_contract_with_auto_answer_aggregate_visual():
     agg_vis = {
         "type": "table",
         "mode": "replace",
-        "title": "Employees by grade · Delhi HQ",
-        "table": {"columns": ["grade", "headcount"], "rows": [{"grade": "E1", "headcount": 10}, {"grade": "E2", "headcount": 29}]},
+        "title": "Refinery Economics · FY26",
+        "table": {"columns": ["refinery", "throughput_mmt"], "rows": [{"refinery": "Panipat", "throughput_mmt": 16.42}]},
     }
     c = build_refusal_contract(
         code="R-NAMED",
@@ -132,11 +133,11 @@ def test_build_refusal_contract_with_auto_answer_aggregate_visual():
     assert validated["access"]["status"] == "partial"
     assert validated["access"]["code"] == "R-NAMED"
     assert validated["access"]["rule_ref"] == "D-11"
-    assert validated["access"]["alternative"] == {"label": "Counts by grade", "question": "Show counts by grade"}
+    assert validated["access"]["alternative"] == {"label": "Refinery 360 aggregates", "question": "Show FY26 refinery throughput and GRM by refinery"}
     assert validated["visual"]["type"] == "table"
     assert validated["visual"]["table"]["masking"]["level"] == "aggregate"
     assert validated["visual"]["table"]["masking"]["code"] == "R-NAMED"
-    assert validated["display_text"].startswith("I can't share individual names at your access level.")
+    assert validated["display_text"].startswith("I can't share counterparty-named sub-ledgers or individual officer records at your access level.")
 
 
 @pytest.mark.parametrize("lang,query", [
@@ -145,7 +146,7 @@ def test_build_refusal_contract_with_auto_answer_aggregate_visual():
 ])
 def test_m1_legacy_refusal_contract_repaired_to_spec06_without_rule_id_in_title_or_spoken(lang: str, query: str):
     """P2H.2 G4 M1: Legacy check_access & validate_and_repair_contract overwrite 'Access Restricted (D1)' and rule-ID prose with SPEC-06 copy."""
-    dec = check_access("E2_HR", query=query)
+    dec = check_access("E2_FIN", query=query)
     assert dec.status == "refused"
     assert dec.code == "R-PAY"
 
@@ -153,7 +154,7 @@ def test_m1_legacy_refusal_contract_repaired_to_spec06_without_rule_id_in_title_
     # it gets repaired to SPEC-06 copy with no rule ID in title, spoken_summary, or display_text.
     legacy_payload = {
         "turn_id": "t-legacy-m1",
-        "persona": "E2_HR",
+        "persona": "E2_FIN",
         "language": lang,
         "intent": "refused",
         "spoken_summary": f"I cannot share these confidential records under {dec.rule_ref}. {dec.reason}",
@@ -191,7 +192,7 @@ async def test_m1_turn_runner_check_access_hook_emits_spec06_refusal(lang: str, 
     from app.turn_runner import get_agent_turn_runner
 
     runner = get_agent_turn_runner()
-    contract = await runner.execute_turn_async(query=query, persona="E2_HR", language=lang, session_id=f"s-m1-{lang}")
+    contract = await runner.execute_turn_async(query=query, persona="E2_FIN", language=lang, session_id=f"s-m1-{lang}")
     assert contract["access"]["status"] == "refused"
     assert contract["access"]["code"] == "R-PAY"
     assert contract["access"]["rule_ref"]
@@ -216,7 +217,7 @@ def test_m4_refusal_copy_yaml_every_alternatives_item_has_question_hi_and_no_dup
             assert item.get("question_hi"), f"{code} alternatives[{idx}] missing question_hi"
 
         for lang in ("en", "hi"):
-            rendered = render_refusal_copy(code=code, lang=lang, persona="E2_HR", grade_num="2")
+            rendered = render_refusal_copy(code=code, lang=lang, persona="E2_FIN", grade_num="2")
             primary = rendered.get("alternative")
             extra = rendered.get("alternatives") or []
             if primary:
@@ -270,13 +271,13 @@ def test_m5_every_chip_question_passes_real_gate_for_all_11_personas_and_both_la
 
 
 def test_should_fix_unknown_persona_uses_neutral_fallback_and_word_boundaries():
-    """P2H.2 G4 Should-fix #1, #6, and ui_control 11-persona parity."""
-    # Should-fix #1: Unknown persona never defaults to Pooja Verma / E2_HR
+    """P2H.2 G4 Should-fix #1, #6, and ui_control 8-persona parity."""
+    # Should-fix #1: Unknown persona never defaults to Praveen Nair / E2_FIN
     info = persona_display_info("UNKNOWN_ROLE")
-    assert info["display_name"] != "Pooja Verma"
-    assert "Pooja Verma" not in info["display_string"]
+    assert info["display_name"] != "Praveen Nair"
+    assert "Praveen Nair" not in info["display_string"]
     r_role = render_refusal_copy("R-ROLE", lang="en", persona="UNKNOWN_ROLE")
-    assert "Pooja Verma" not in r_role["text"]
+    assert "Praveen Nair" not in r_role["text"]
 
     # Should-fix #6: _infer_refusal_code uses word boundaries so 'display' != 'pay' and 'dashboard' != 'board'
     assert _infer_refusal_code({"rule_ref": "", "reason": "Cannot display individual records"}) == "R-NAMED"
@@ -284,9 +285,9 @@ def test_should_fix_unknown_persona_uses_neutral_fallback_and_word_boundaries():
     assert _infer_refusal_code({"rule_ref": "", "reason": "Individual pay is confidential"}) == "R-PAY"
     assert _infer_refusal_code({"rule_ref": "", "reason": "Board note is restricted"}) == "R-BOARD"
 
-    # ui_control 11-persona parity
+    # ui_control 8-persona parity
     assert set(ALL_PERSONAS_ORDERED).issubset(set(UI_ACTIONS["persona"]))
-    assert _ALIASES[("persona", "asha")] == ("persona", "E3_FIN")
+    assert _ALIASES[("persona", "shailesh")] == ("persona", "E3_FIN")
 
 
 @pytest.mark.asyncio
@@ -298,13 +299,13 @@ async def test_m6_m7_full_turn_refusal_suggestions_and_hindi():
     contract = {
         "turn_id": "t1",
         "language": "hi",
-        "persona": "E2_HR",
-        "spoken_summary": "Individual pay is confidential. I can show the average pay for that grade, or your own payslip.",
+        "persona": "E2_FIN",
+        "spoken_summary": "Individual pay is confidential. I can show company-wide employee benefit expense trends from Schedule III or aggregate grade benchmarks.",
         "visual": {"type": "none", "mode": "replace"},
-        "suggestions": ["Show breakdown by discipline", "What are the relevant policy rules?"],
+        "suggestions": ["Show breakdown by refinery", "What are the relevant policy rules?"],
         "access": {
             "status": "refused",
-            "reason": "Individual pay is confidential. I can show the average pay for that grade, or your own payslip.",
+            "reason": "Individual pay is confidential. I can show company-wide employee benefit expense trends from Schedule III or aggregate grade benchmarks.",
             "rule_ref": "SPEC-06 §4.6"
         }
     }

@@ -75,6 +75,10 @@ def resolve_fy(text: str, available: Optional[Iterable[str]] = None,
     if m and ("fy" in m.group(0) or "to" in m.group(0) or "from" in m.group(0) or int(m.group(2)) % 100 > (int(m.group(1)) % 100) + 1):
         lo_n, hi_n = int(m.group(1)) % 100, int(m.group(2)) % 100
         if 17 <= lo_n <= hi_n <= 27:
+            all_fy_hits = [int(x) % 100 for x in re.findall(r"\bfy\s?'?(20\d{2}|\d{2})(?!\d)", t) if 17 <= int(x) % 100 <= 27]
+            if all_fy_hits:
+                lo_n = min(lo_n, min(all_fy_hits))
+                hi_n = max(hi_n, max(all_fy_hits))
             return {"from": fy_label(lo_n), "to": fy_label(hi_n), "n_years": hi_n - lo_n + 1}
 
     # Explicit FY labels / year ranges ("FY 2024-25", "FY24-25" and "2024-25" name the FY by its end year)
@@ -111,7 +115,7 @@ def resolve_fy(text: str, available: Optional[Iterable[str]] = None,
     if re.search(r"\b(?:10|ten)\s+(?:years\s+ago|saal\s+pehle)\b", t):
         return {"fy": fy_label(last - 10 + 1)} # FY17
 
-    # Bare 4-digit calendar/fiscal year ("Profit and loss statement of ONGC. 2026", "in 2025")
+    # Bare 4-digit calendar/fiscal year ("Profit and loss statement of IOCL. 2026", "in 2025")
     m = re.search(r"(?<![-\d])\b(201[7-9]|202[0-7])\b(?![-\d])", t)
     if m:
         return {"fy": fy_label(int(m.group(1)))}

@@ -22,8 +22,7 @@ export interface ActionCardProps {
 }
 
 const AGENT_NAMES: Record<string, { name: string; version: string }> = {
-  dcf_agent: { name: 'ONGC DCF Valuation Agent', version: 'v1.0' },
-  hr_transfer_agent: { name: 'HR Transfer Workflow Agent', version: 'v1.0' },
+  dcf_agent: { name: 'IndianOil DCF Valuation Agent', version: 'v1.0' },
   fin_diagnostics_agent: { name: 'Finance Diagnostics Agent', version: 'v1.0' },
   doc_export_agent: { name: 'Document Export Agent', version: 'v1.0' },
 };

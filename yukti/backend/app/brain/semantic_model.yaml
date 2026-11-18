@@ -1,1208 +1,345 @@
+# Yukti IOCL Semantic Model (100% Finance & Downstream OMC Scope — zero HR)
 version: 1
-anchor_date: '2026-10-19'
-subjects:
-  workforce:
-    domain: hr
-    table: hrfin_gold.ssot_workforce_employee
-    base_filter: "employment_status = 'Active'"
-    description: "One row per active employee (snapshot 19-Oct-2026): headcount, tenure, station stay, retirement, demographics. DO NOT use for past FY historical headcount."
-    period: snapshot            # past FY => compiled against v_continuous_stay as of 31-Mar of that FY (station tenure only)
-    fields:
-      wc: {column: wc_id, kind: "entity:wc", label: work_centre}
-      discipline: {column: discipline_id, kind: "entity:discipline", label: discipline}
-      grade: {column: current_grade_id, kind: "entity:grade", label: grade}
-      cadre: {column: cadre, kind: categorical}
-      gender: {column: gender, kind: categorical}
-      social_category: {column: social_category, kind: categorical}
-      sector: {column: sector, kind: categorical}
-      state: {column: state, kind: categorical}
-      hard_station_cat: {column: hard_station_cat, kind: categorical}
-      onshore_offshore: {column: onshore_offshore, kind: categorical}
-      age_band: {column: age_band, kind: categorical}
-      tenure_band: {column: tenure_band, kind: categorical}
-      exemption_tag: {column: exemption_tag, kind: categorical}
-      grade_level_order: {column: grade_level_order, kind: number}
-      station_tenure_years: {column: continuous_stay_years, kind: number}
-      delhi_tenure_years: {column: continuous_stay_years, kind: number}
-      total_tenure_years: {column: total_tenure_years, kind: number}
-      age: {column: age_years, kind: number}
-      years_to_retirement: {column: years_to_retirement, kind: number}
-      cluster_years: {column: cumulative_cluster_years, kind: number}
-      retiring_within_3yr: {column: is_retiring_within_3yr, kind: bool}
-      has_hard_station_tenure: {column: has_hard_station_tenure, kind: bool}
-    metrics:
-      headcount: {expr: "COUNT(*)", aggregation: count, unit: employees, label: "Employees"}
-      avg_age: {expr: "ROUND(AVG(age_years), 1)", aggregation: avg, unit: years, label: "Average age"}
-      avg_station_tenure: {expr: "ROUND(AVG(continuous_stay_years), 1)", aggregation: avg, unit: years, label: "Average station stay"}
-      avg_total_tenure: {expr: "ROUND(AVG(total_tenure_years), 1)", aggregation: avg, unit: years, label: "Average ONGC service"}
-      women_share_pct: {expr: "ROUND(100 * COUNTIF(gender = 'Female') / NULLIF(COUNT(*), 0), 1)", aggregation: ratio, unit: pct, label: "Women share"}
-      retiring_within_3yr: {expr: "COUNTIF(is_retiring_within_3yr)", aggregation: count, unit: employees, label: "Retiring within 3 years"}
-      long_stay_share_pct: {expr: "ROUND(100 * COUNTIF(continuous_stay_years >= 5) / NULLIF(COUNT(*), 0), 1)", aggregation: ratio, unit: pct, label: "Share with 5+ years' station stay (retention rate)"}
-      training_hours_per_employee: {expr: "ROUND(AVG(fy26_training_hours), 1)", aggregation: avg, unit: hours, label: "Training hours per employee (FY26)"}
-      avg_gross_salary_lakh: {expr: "ROUND(AVG(fy26_gross_salary_lakh), 2)", aggregation: avg, unit: inr_lakh, label: "Average gross pay (FY26, ₹ lakh)", data_class: pay}
-      avg_apar_score: {expr: "ROUND(AVG(fy26_apar_score), 1)", aggregation: avg, unit: score, label: "Average APAR score (FY26)", data_class: apar}
-    row_columns:   # roster grain (B3.1 / SPEC-07 §4.3): what "give me their names" returns
-      - {expr: emp_id, as: emp_id}
-      - {expr: emp_name, as: name, data_class: named}
-      - {expr: "CASE WHEN current_designation IS NOT NULL AND current_designation != '' THEN current_designation ELSE grade_designation END", as: functional_designation}
-      - {expr: grade_designation, as: designation}
-      - {expr: current_designation, as: current_designation}
-      - {expr: current_grade_id, as: grade}
-      - {expr: grade_level_order, as: grade_level_order}
-      - {expr: discipline_id, as: discipline_id}
-      - {expr: discipline_name, as: discipline}
-      - {expr: wc_name, as: work_centre}
-      - {expr: "ROUND(total_tenure_years, 1)", as: ongc_tenure_years}
-      - {expr: "ROUND(continuous_stay_years, 1)", as: delhi_tenure_years}
-      - {expr: "ROUND(continuous_stay_years, 1)", as: station_tenure_years}
-      - {expr: "ROUND(years_to_retirement, 1)", as: years_to_retirement}
-      - {expr: is_retiring_within_3yr, as: retiring_within_3yr}
-      - {expr: is_superannuation_exempt, as: is_superannuation_exempt}
-      - {expr: exemption_tag, as: exemption}
-    row_sort: {by: station_tenure_years, dir: desc}
-    asof:   # past-FY station-tenure questions ("last year") — continuous stays as of 31-Mar of the FY
-      table: hrfin_gold.v_continuous_stay
-      base_filter: grade_id LIKE 'E%'
-      fields:
-        wc: wc_id
-        discipline: discipline_id
-        grade: grade_id
-      tenure_from_column: continuous_from_date
-      tenure_to_column: continuous_to_date
-      count_expr: COUNT(DISTINCT emp_id)
-  posts:
-    domain: hr
-    table: hrfin_silver.sanctioned_posts
-    description: Sanctioned vs in-position posts and vacancies by work centre x discipline
-      x grade x FY.
-    period: fiscal_year
-    default_fy: FY26
-    fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      wc:
-        column: wc_id
-        kind: entity:wc
-        label: work_centre
-      discipline:
-        column: discipline_id
-        kind: entity:discipline
-        label: discipline
-      grade:
-        column: grade_id
-        kind: entity:grade
-        label: grade
-    metrics:
-      sanctioned_posts:
-        expr: SUM(sanctioned_strength)
-        aggregation: sum
-        unit: posts
-        label: Sanctioned posts
-      in_position:
-        expr: SUM(in_position_strength)
-        aggregation: sum
-        unit: employees
-        label: In position
-      vacancies:
-        expr: SUM(vacancy_count)
-        aggregation: sum
-        unit: posts
-        label: Vacancies
-      vacancy_rate_pct:
-        expr: ROUND(100 * SUM(vacancy_count) / NULLIF(SUM(sanctioned_strength), 0),
-          1)
-        aggregation: ratio
-        unit: pct
-        label: Vacancy rate
-      backlog_vacancies:
-        expr: SUM(backlog_vacancies)
-        aggregation: sum
-        unit: posts
-        label: Backlog vacancies
-    companions:
-      - sanctioned_posts
-      - in_position
-      - vacancies
-  separations:
-    domain: hr
-    table: hrfin_silver.separations
-    description: 'Employee exits (resignation, VRS, superannuation, death) per FY
-      with last grade and work centre: attrition / voluntary exits.'
-    period: fiscal_year
-    default_fy: FY26
-    fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      grade:
-        column: last_grade_id
-        kind: entity:grade
-        label: grade
-      wc:
-        column: last_wc_id
-        kind: entity:wc
-        label: work_centre
-      separation_type:
-        column: separation_type
-        kind: categorical
-    metrics:
-      separations:
-        expr: COUNT(*)
-        aggregation: count
-        unit: employees
-        label: Exits (all types)
-      voluntary_exits:
-        expr: COUNTIF(LOWER(separation_type) IN ('resignation', 'vrs'))
-        aggregation: count
-        unit: employees
-        label: Voluntary exits (resignation + VRS)
-      superannuations:
-        expr: COUNTIF(LOWER(separation_type) = 'superannuation')
-        aggregation: count
-        unit: employees
-        label: Superannuations
-    companions:
-      - separations
-      - voluntary_exits
-  work_centre:
-    domain: hr
-    table: hrfin_gold.ssot_work_centre_360
-    description: One row per work centre, FY26 KPIs reconciling HR, finance, production
-      and HSE.
-    period: fixed
-    default_fy: FY26
-    fields:
-      wc:
-        column: wc_id
-        kind: entity:wc
-        label: work_centre
-      sector:
-        column: sector
-        kind: categorical
-      state:
-        column: state
-        kind: categorical
-      wc_type:
-        column: wc_type
-        kind: categorical
-      hard_station_cat:
-        column: hard_station_cat
-        kind: categorical
-      onshore_offshore:
-        column: onshore_offshore
-        kind: categorical
-    metrics:
-      contractors:
-        expr: SUM(contractor_headcount_fy26)
-        aggregation: sum
-        unit: workers
-        label: Contract workers (FY26)
-      contractor_cost_cr:
-        expr: ROUND(SUM(contractor_annual_cost_inr_cr_fy26), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Contractor cost (\u20B9 cr)"
-      payroll_cr:
-        expr: ROUND(SUM(payroll_gross_inr_cr_fy26), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Payroll (\u20B9 cr)"
-      overtime_cost_cr:
-        expr: ROUND(SUM(overtime_cost_inr_cr_fy26), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Overtime cost (\u20B9 cr)"
-      hse_incidents:
-        expr: SUM(hse_incidents_fy26)
-        aggregation: sum
-        unit: incidents
-        label: HSE incidents (FY26)
-      lti_count:
-        expr: SUM(lti_count_fy26)
-        aggregation: sum
-        unit: incidents
-        label: Lost-time injuries (FY26)
-      wc_production_boe:
-        expr: SUM(production_total_boe_fy26)
-        aggregation: sum
-        unit: boe
-        label: Production (BOE)
-      wc_payroll_cost_usd_per_boe:
-        expr: ROUND(SUM(payroll_gross_inr_cr_fy26 * 10000000.0 / 88.33) / NULLIF(SUM(production_total_boe_fy26),
-          0), 2)
-        aggregation: ratio
-        unit: usd_per_boe
-        label: Work-centre payroll per BOE ($)
-      capex_actual_cr_fy26:
-        expr: ROUND(SUM(capex_actual_inr_cr_fy26), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Capex actual FY26 (\u20B9 cr)"
-      capex_utilisation_pct:
-        expr: ROUND(100 * SUM(capex_actual_inr_cr_fy26) / NULLIF(SUM(capex_re_inr_cr_fy26),
-          0), 1)
-        aggregation: ratio
-        unit: pct
-        label: Capex utilisation vs RE
-  field_pnl:
-    domain: finance
-    table: hrfin_gold.ssot_field_economics_360
-    base_filter: field_id IS NOT NULL
-    description: "Field P&L, production, lifting cost and 2P reserves, one row per\
-      \ field x FY (FY17\u2013FY26)."
-    period: fiscal_year
-    default_fy: FY26
-    fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      field:
-        column: field_id
-        kind: entity:field
-        label: field
-      asset:
-        column: asset_wc_id
-        kind: entity:wc
-        label: asset
-      basin:
-        column: basin
-        kind: categorical
-      onshore_offshore:
-        column: onshore_offshore
-        kind: categorical
-      maturity:
-        column: maturity
-        kind: categorical
-      loss_making_3yr:
-        column: is_loss_making_3yr_consecutive
-        kind: bool
-      divestment_candidate:
-        column: is_divestment_candidate
-        kind: bool
-      pbt_cr:
-        column: pbt_inr_cr
-        kind: number
-    dimension_fallbacks:
-      wc: asset
-    metrics:
-      pbt_cr:
-        expr: ROUND(SUM(pbt_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "PBT (\u20B9 cr)"
-        polarity: higher
-      ebitda_cr:
-        expr: ROUND(SUM(ebitda_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "EBITDA (\u20B9 cr)"
-        polarity: higher
-      revenue_cr:
-        expr: ROUND(SUM(gross_revenue_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Gross revenue (\u20B9 cr)"
-        polarity: higher
-      opex_cr:
-        expr: ROUND(SUM(total_opex_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Opex (\u20B9 cr)"
-        polarity: lower
-      production_boe:
-        expr: ROUND(SUM(total_production_boe), 0)
-        aggregation: sum
-        unit: boe
-        label: Production (BOE)
-        polarity: higher
-      lifting_cost_usd_per_boe:
-        expr: ROUND(SUM(total_opex_inr_cr * 10000000.0 / {FX_INR_PER_USD}) / NULLIF(SUM(total_production_boe),
-          0), 2)
-        aggregation: ratio
-        unit: usd_per_boe
-        label: Lifting cost ($/BOE)
-        polarity: lower
-      reserves_2p_mmtoe:
-        expr: ROUND(SUM(reserves_2p_total_mmtoe), 2)
-        aggregation: sum
-        unit: mmtoe
-        label: 2P reserves (MMTOE)
-        polarity: higher
-      drilling_cost_cr:
-        expr: ROUND(SUM(drilling_cost_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Drilling spend (\u20B9 cr)"
-      ebitda_margin_pct:
-        expr: ROUND(100 * SUM(ebitda_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0),
-          1)
-        aggregation: ratio
-        unit: pct
-        label: EBITDA margin (profit margin)
-        polarity: higher
-      lifting_cost_inr_per_boe:
-        expr: ROUND(SUM(total_opex_inr_cr * 10000000.0) / NULLIF(SUM(total_production_boe),
-          0), 0)
-        aggregation: ratio
-        unit: inr_per_boe
-        label: "Lifting cost (\u20B9/BOE)"
-        polarity: lower
-      pbt_margin_pct:
-        expr: ROUND(100 * SUM(pbt_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr), 0),
-          1)
-        aggregation: ratio
-        unit: pct
-        label: PBT margin
-        polarity: higher
-      manpower_cost_usd_per_boe:
-        expr: ROUND(SUM(allocated_manpower_cost_inr_cr * 10000000.0 / {FX_INR_PER_USD})
-          / NULLIF(SUM(total_production_boe), 0), 2)
-        aggregation: ratio
-        unit: usd_per_boe
-        label: Manpower cost per BOE ($)
-        polarity: lower
-      manpower_cost_pct_of_revenue:
-        expr: ROUND(100 * SUM(allocated_manpower_cost_inr_cr) / NULLIF(SUM(gross_revenue_inr_cr),
-          0), 1)
-        aggregation: ratio
-        unit: pct
-        label: Employee cost as % of revenue
-        polarity: lower
-    companions:
-      - pbt_cr
-      - revenue_cr
-      - ebitda_cr
-  capex:
-    domain: finance
-    table: hrfin_silver.capex_budget
-    description: "Capital expenditure by asset, capex head and project, monthly rows\
-      \ per FY (FY17\u2013FY27 YTD)."
-    period: fiscal_year
-    default_fy: FY26
-    fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      asset:
-        column: asset_wc_id
-        kind: entity:wc
-        label: asset
-      capex_head:
-        column: capex_head
-        kind: categorical
-    dimension_fallbacks:
-      field: asset
-      wc: asset
-    metrics:
-      capex_actual_cr: {expr: "ROUND(SUM(actual_spend_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Project/Asset Capex spent (₹ cr)"}
-      capex_be_cr: {expr: "ROUND(SUM(budget_estimate_be_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Capex BE (₹ cr)"}
-      capex_re_cr: {expr: "ROUND(SUM(revised_estimate_re_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Capex RE (₹ cr)"}
-      capex_vs_re_pct: {expr: "ROUND(100 * SUM(actual_spend_inr_cr) / NULLIF(SUM(revised_estimate_re_inr_cr), 0), 1)", aggregation: ratio, unit: pct, label: "Capex utilisation vs RE"}
+anchor_date: "2026-10-19"
 
-  reserves:
-    domain: finance
-    table: hrfin_silver.reserves_annual
-    base_filter: fiscal_year IS NOT NULL
-    description: 2P reserves, reserve replacement and finding/development cost per
-      field x FY.
-    period: fiscal_year
-    default_fy: FY26
-    fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      field:
-        column: field_id
-        kind: entity:field
-        label: field
-      asset:
-        column: asset_wc_id
-        kind: entity:wc
-        label: asset
-      basin:
-        column: basin_name
-        kind: categorical
-    metrics:
-      reserves_2p_total_mmtoe:
-        expr: ROUND(SUM(reserves_2p_total_mmtoe), 2)
-        aggregation: sum
-        unit: mmtoe
-        label: 2P reserves (MMTOE)
-      reserve_accretion_mmtoe:
-        expr: ROUND(SUM(gross_reserves_accretion_mmtoe), 2)
-        aggregation: sum
-        unit: mmtoe
-        label: Reserve accretion (MMTOE)
-      annual_production_mmtoe:
-        expr: ROUND(SUM(annual_production_mmtoe), 3)
-        aggregation: sum
-        unit: mmtoe
-        label: Production (MMTOE)
-      reserve_replacement_ratio:
-        expr: ROUND(SUM(gross_reserves_accretion_mmtoe) / NULLIF(SUM(annual_production_mmtoe),
-          0), 2)
-        aggregation: ratio
-        unit: ratio
-        label: Reserve replacement ratio (2P)
+subjects:
   corporate:
     domain: finance
     table: hrfin_gold.ssot_corporate_annual_360
-    description: "Company-level annual Schedule III 3-Statement financials (P&L, Balance Sheet, Cash Flow, Financial Ratios), Annual Report consolidated lines, realisations and KPIs, one row per FY (FY17–FY26). Includes historical total employee headcount."
+    description: "IOCL Standalone & Consolidated Schedule III 3-Statement financials (Gross/Excise/Net Revenue, Crude Consumed, EBITDA, PAT, Balance Sheet, Cash Flow, Macros & IOC.NS), one row per FY (FY17–FY26)."
     period: fiscal_year
     default_fy: FY26
     fields:
-      fy:
-        column: fiscal_year
-        kind: fy
+      fy: {column: fiscal_year, kind: fy}
     metrics:
-      corporate_revenue_cr: {expr: "ROUND(SUM(gross_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Revenue from operations (₹ cr)", polarity: higher}
-      crude_oil_revenue_cr: {expr: "ROUND(SUM(crude_oil_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Crude oil revenue (₹ cr)", polarity: higher}
-      natural_gas_revenue_cr: {expr: "ROUND(SUM(natural_gas_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Natural gas revenue (₹ cr)", polarity: higher}
-      crude_oil_production_mmt: {expr: "ROUND(SUM(crude_oil_production_mmt), 3)", aggregation: sum, unit: mmt, label: "Crude oil production (MMT)", polarity: higher}
-      natural_gas_sold_bcm: {expr: "ROUND(SUM(natural_gas_sold_bcm), 3)", aggregation: sum, unit: bcm, label: "Natural gas sold (BCM)", polarity: higher}
-      vap_revenue_cr: {expr: "ROUND(SUM(vap_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Value-added products revenue (₹ cr)", polarity: higher}
-      offshore_revenue_cr: {expr: "ROUND(SUM(offshore_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Offshore revenue (₹ cr)", polarity: higher}
-      onshore_revenue_cr: {expr: "ROUND(SUM(onshore_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Onshore revenue (₹ cr)", polarity: higher}
-      other_income_cr: {expr: "ROUND(SUM(other_income_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Other income — dividends & interest (₹ cr)", polarity: higher}
+      corporate_revenue_cr: {expr: "ROUND(SUM(gross_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Gross revenue from operations (₹ cr)", polarity: higher}
+      petroleum_products_revenue_cr: {expr: "ROUND(SUM(petroleum_products_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Petroleum products revenue (₹ cr)", polarity: higher}
+      petchem_and_other_op_rev_cr: {expr: "ROUND(SUM(petchem_and_other_op_rev_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Petrochemicals, pipelines & other operating revenue (₹ cr)", polarity: higher}
+      other_income_cr: {expr: "ROUND(SUM(other_income_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Other income (₹ cr)", polarity: higher}
       total_income_cr: {expr: "ROUND(SUM(total_income_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total income (₹ cr)", polarity: higher}
-      statutory_levies_cr: {expr: "ROUND(SUM(statutory_levies_total_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Statutory levies — Royalty + Cess + SAED (₹ cr)", polarity: lower}
-      royalty_cr: {expr: "ROUND(SUM(royalty_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Royalty (₹ cr)", polarity: lower}
-      oidb_cess_cr: {expr: "ROUND(SUM(oidb_cess_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "OIDB cess (₹ cr)", polarity: lower}
-      saed_windfall_tax_cr: {expr: "ROUND(SUM(saed_windfall_tax_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "SAED windfall tax (₹ cr)", polarity: lower}
-      net_revenue_cr: {expr: "ROUND(SUM(net_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net realised revenue after levies (₹ cr)", polarity: higher}
-      prod_transport_selling_exp_cr: {expr: "ROUND(SUM(prod_transport_selling_exp_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Production, transport & selling expense (₹ cr)", polarity: lower}
-      employee_cost_cr: {expr: "ROUND(SUM(employee_cost_total_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Gross employee cost (₹ cr)", polarity: lower}
-      employee_benefit_net_pnl_cr: {expr: "ROUND(SUM(employee_benefit_net_pnl_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Employee benefits expense in P&L (₹ cr)", polarity: lower}
+      excise_duty_cr: {expr: "ROUND(SUM(excise_duty_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Central excise duty (₹ cr)", polarity: lower}
+      net_revenue_cr: {expr: "ROUND(SUM(net_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net revenue from operations ex-excise (₹ cr)", polarity: higher}
+      cost_of_materials_consumed_cr: {expr: "ROUND(SUM(cost_of_materials_consumed_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Crude & materials consumed (₹ cr)", polarity: lower}
+      purchases_stock_in_trade_cr: {expr: "ROUND(SUM(purchases_stock_in_trade_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Purchases of stock-in-trade (₹ cr)", polarity: lower}
+      inventory_change_cr: {expr: "ROUND(SUM(inventory_change_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Inventory changes (₹ cr)"}
+      employee_benefit_net_pnl_cr: {expr: "ROUND(SUM(employee_benefit_net_pnl_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Employee benefits expense (₹ cr)", polarity: lower}
+      other_expenses_cr: {expr: "ROUND(SUM(other_expenses_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Other operating expenses (₹ cr)", polarity: lower}
       operating_expenses_cr: {expr: "ROUND(SUM(operating_expenses_total_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total operating expenses (₹ cr)", polarity: lower}
-      exploration_costs_written_off_cr: {expr: "ROUND(SUM(exploration_costs_written_off_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Exploration costs written off — Survey + Dry Wells (₹ cr)", polarity: lower}
-      survey_costs_written_off_cr: {expr: "ROUND(SUM(survey_costs_written_off_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Survey costs written off (₹ cr)", polarity: lower}
-      exploratory_wells_written_off_cr: {expr: "ROUND(SUM(exploratory_wells_written_off_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Exploratory dry wells written off (₹ cr)", polarity: lower}
       ebitda_corporate_cr: {expr: "ROUND(SUM(ebitda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Standalone EBITDA (₹ cr)", polarity: higher}
-      employee_headcount: {expr: "ROUND(SUM(employee_headcount), 0)", aggregation: sum, unit: employees, label: "Total employee headcount"}
-      ebitda_margin_corporate_pct: {expr: "ROUND(AVG(ebitda_margin_pct), 1)", aggregation: avg, unit: pct, label: "Standalone EBITDA margin (%)", polarity: higher}
-      dda_cr: {expr: "ROUND(SUM(dda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Depreciation, depletion & impairment — DD&A (₹ cr)", polarity: lower}
+      ebitda_margin_corporate_pct: {expr: "ROUND(AVG(ebitda_margin_pct), 2)", aggregation: avg, unit: pct, label: "EBITDA margin on Net Revenue (%)", polarity: higher}
+      dda_cr: {expr: "ROUND(SUM(dda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Depreciation & amortisation — DD&A (₹ cr)", polarity: lower}
       finance_costs_cr: {expr: "ROUND(SUM(finance_costs_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Finance costs (₹ cr)", polarity: lower}
-      exceptional_items_cr: {expr: "ROUND(SUM(exceptional_items_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Exceptional items — impairment / reversal (₹ cr)"}
+      exceptional_items_cr: {expr: "ROUND(SUM(exceptional_items_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Exceptional items (₹ cr)"}
       pbt_corporate_cr: {expr: "ROUND(SUM(pbt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Profit before tax — PBT (₹ cr)", polarity: higher}
-      tax_expense_cr: {expr: "ROUND(SUM(tax_expense_total_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Tax expense — Current + Deferred (₹ cr)", polarity: lower}
+      tax_expense_cr: {expr: "ROUND(SUM(tax_expense_total_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total tax expense (₹ cr)", polarity: lower}
       current_tax_cr: {expr: "ROUND(SUM(current_tax_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Current tax (₹ cr)", polarity: lower}
       deferred_tax_cr: {expr: "ROUND(SUM(deferred_tax_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Deferred tax (₹ cr)", polarity: lower}
-      pat_cr: {expr: "ROUND(SUM(pat_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Standalone profit after tax — PAT (₹ cr)", polarity: higher}
-      pat_margin_corporate_pct: {expr: "ROUND(AVG(pat_margin_pct), 1)", aggregation: avg, unit: pct, label: "Standalone net PAT margin (%)", polarity: higher}
-      consolidated_revenue_cr: {expr: "ROUND(SUM(consolidated_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group revenue (₹ cr)", polarity: higher}
-      consolidated_ebitda_cr: {expr: "ROUND(SUM(consolidated_ebitda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group EBITDA (₹ cr)", polarity: higher}
-      consolidated_pbt_cr: {expr: "ROUND(SUM(consolidated_pbt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group PBT (₹ cr)", polarity: higher}
-      consolidated_pat_cr: {expr: "ROUND(SUM(consolidated_pat_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group PAT (₹ cr)", polarity: higher}
-      # --- Balance Sheet Metrics (Schedule III Notes 5–23) ---
+      pat_cr: {expr: "ROUND(SUM(pat_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Standalone PAT (₹ cr)", polarity: higher}
+      pat_margin_corporate_pct: {expr: "ROUND(AVG(pat_margin_pct), 2)", aggregation: avg, unit: pct, label: "Standalone PAT margin on Net Revenue (%)", polarity: higher}
+      consolidated_revenue_cr: {expr: "ROUND(SUM(consolidated_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group revenue IOC.NS (₹ cr)", polarity: higher}
+      consolidated_ebitda_cr: {expr: "ROUND(SUM(consolidated_ebitda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group EBITDA IOC.NS (₹ cr)", polarity: higher}
+      consolidated_pbt_cr: {expr: "ROUND(SUM(consolidated_pbt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group PBT IOC.NS (₹ cr)", polarity: higher}
+      consolidated_pat_cr: {expr: "ROUND(SUM(consolidated_pat_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group PAT IOC.NS (₹ cr)", polarity: higher}
       total_assets_cr: {expr: "ROUND(SUM(total_assets_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total assets (₹ cr)", polarity: higher}
       non_current_assets_cr: {expr: "ROUND(SUM(non_current_assets_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total non-current assets (₹ cr)", polarity: higher}
-      oil_and_gas_assets_cr: {expr: "ROUND(SUM(oil_and_gas_assets_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Oil & gas producing properties net block (₹ cr)", polarity: higher}
-      other_ppe_and_rou_cr: {expr: "ROUND(SUM(other_ppe_and_rou_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Other PPE & ROU lease assets (₹ cr)", polarity: higher}
-      cwip_cr: {expr: "ROUND(SUM(cwip_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Capital work-in-progress — CWIP (₹ cr)"}
-      exploratory_wells_in_progress_cr: {expr: "ROUND(SUM(exploratory_wells_in_progress_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Exploratory wells-in-progress (₹ cr)"}
-      investments_subsidiaries_jv_cr: {expr: "ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Investments in subsidiaries & JVs — HPCL, OVL, MRPL, OPaL (₹ cr)", polarity: higher}
-      site_restoration_fund_cr: {expr: "ROUND(SUM(site_restoration_fund_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Site restoration / abandonment escrow deposit (₹ cr)", polarity: higher}
+      investments_subsidiaries_jv_cr: {expr: "ROUND(SUM(investments_subsidiaries_jv_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Investments in subsidiaries & JVs (₹ cr)", polarity: higher}
       current_assets_cr: {expr: "ROUND(SUM(current_assets_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total current assets (₹ cr)", polarity: higher}
       inventories_cr: {expr: "ROUND(SUM(inventories_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Inventories (₹ cr)"}
       trade_receivables_cr: {expr: "ROUND(SUM(receivables_outstanding_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Trade receivables (₹ cr)", polarity: lower}
-      disputed_receivables_cr: {expr: "ROUND(SUM(disputed_receivables_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Disputed trade receivables (₹ cr)", polarity: lower}
-      cash_and_bank_cr: {expr: "ROUND(SUM(cash_and_bank_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Cash, cash equivalents & bank deposits (₹ cr)", polarity: higher}
+      cash_and_bank_cr: {expr: "ROUND(SUM(cash_and_bank_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Cash & bank balances (₹ cr)", polarity: higher}
       equity_share_capital_cr: {expr: "ROUND(SUM(equity_share_capital_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Equity share capital (₹ cr)"}
-      other_equity_reserves_cr: {expr: "ROUND(SUM(other_equity_reserves_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Other equity — reserves & retained earnings (₹ cr)", polarity: higher}
+      other_equity_reserves_cr: {expr: "ROUND(SUM(other_equity_reserves_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Other equity reserves (₹ cr)", polarity: higher}
       net_worth_cr: {expr: "ROUND(SUM(net_worth_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Standalone net worth / equity (₹ cr)", polarity: higher}
-      consolidated_net_worth_cr: {expr: "ROUND(SUM(consolidated_net_worth_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated group net worth (₹ cr)", polarity: higher}
+      consolidated_net_worth_cr: {expr: "ROUND(SUM(consolidated_net_worth_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Consolidated net worth (₹ cr)", polarity: higher}
       non_current_liabilities_cr: {expr: "ROUND(SUM(non_current_liabilities_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total non-current liabilities (₹ cr)", polarity: lower}
       long_term_debt_cr: {expr: "ROUND(SUM(long_term_debt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Long-term borrowings (₹ cr)", polarity: lower}
       short_term_debt_cr: {expr: "ROUND(SUM(short_term_debt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Short-term borrowings (₹ cr)", polarity: lower}
-      total_debt_cr: {expr: "ROUND(SUM(total_debt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total borrowings — LT + ST debt (₹ cr)", polarity: lower}
-      net_debt_cr: {expr: "ROUND(SUM(net_debt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net debt — Total debt minus cash (₹ cr)", polarity: lower}
-      lease_liabilities_cr: {expr: "ROUND(SUM(total_lease_liabilities_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total Ind-AS 116 lease liabilities (₹ cr)", polarity: lower}
-      abandonment_provision_cr: {expr: "ROUND(SUM(abandonment_provision_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Site restoration / decommissioning provision ARO (₹ cr)", polarity: lower}
+      total_debt_cr: {expr: "ROUND(SUM(total_debt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total borrowings (₹ cr)", polarity: lower}
+      net_debt_cr: {expr: "ROUND(SUM(net_debt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net debt (₹ cr)", polarity: lower}
+      lease_liabilities_cr: {expr: "ROUND(SUM(lease_liabilities_non_current_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Non-current lease liabilities Ind AS 116 (₹ cr)", polarity: lower}
       deferred_tax_liability_net_cr: {expr: "ROUND(SUM(deferred_tax_liability_net_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Deferred tax liabilities net (₹ cr)", polarity: lower}
       current_liabilities_cr: {expr: "ROUND(SUM(current_liabilities_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total current liabilities (₹ cr)", polarity: lower}
       trade_payables_cr: {expr: "ROUND(SUM(trade_payables_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Trade payables (₹ cr)"}
       total_liabilities_cr: {expr: "ROUND(SUM(total_liabilities_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total liabilities (₹ cr)", polarity: lower}
-      net_working_capital_cr: {expr: "ROUND(SUM(net_working_capital_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net working capital (₹ cr)", polarity: higher}
+      net_working_capital_cr: {expr: "ROUND(SUM(net_working_capital_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net working capital (₹ cr)"}
       capital_employed_cr: {expr: "ROUND(SUM(capital_employed_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Capital employed (₹ cr)", polarity: higher}
-      # --- Cash Flow Metrics (Ind-AS 7) ---
-      total_capex_cr: {expr: "ROUND(SUM(total_capex_spent_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total ONGC Capital Expenditure — Capex (₹ cr)"}
       operating_cash_flow_cr: {expr: "ROUND(SUM(operating_cash_flow_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Operating cash flow — OCF (₹ cr)", polarity: higher}
-      investing_cash_flow_cr: {expr: "ROUND(SUM(investing_cash_flow_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net cash used in investing activities (₹ cr)"}
-      financing_cash_flow_cr: {expr: "ROUND(SUM(financing_cash_flow_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net cash used in financing activities (₹ cr)"}
-      net_cash_change_cr: {expr: "ROUND(SUM(net_cash_change_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net change in cash & cash equivalents (₹ cr)", polarity: higher}
+      investing_cash_flow_cr: {expr: "ROUND(SUM(investing_cash_flow_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Investing cash flow (₹ cr)"}
+      financing_cash_flow_cr: {expr: "ROUND(SUM(financing_cash_flow_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Financing cash flow (₹ cr)"}
+      net_cash_change_cr: {expr: "ROUND(SUM(net_cash_change_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net change in cash & equivalents (₹ cr)"}
       free_cash_flow_cr: {expr: "ROUND(SUM(free_cash_flow_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Free cash flow — FCF (₹ cr)", polarity: higher}
-      dividend_payout_cr: {expr: "ROUND(SUM(total_dividend_payout_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Dividend declared & payout (₹ cr)"}
+      dividend_payout_cr: {expr: "ROUND(SUM(total_dividend_payout_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Total dividend payout (₹ cr)"}
       csr_spend_cr: {expr: "ROUND(SUM(csr_disbursed_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "CSR spend (₹ cr)"}
-      exchequer_contribution_cr: {expr: "ROUND(SUM(exchequer_contribution_cr), 2)", aggregation: sum, unit: inr_cr, label: "Contribution to exchequer (₹ cr)"}
-      # --- Financial Ratios & Per-Share Metrics ---
-      roce_pct: {expr: "ROUND(AVG(standalone_roce_pct), 1)", aggregation: avg, unit: pct, label: "ROCE standalone (%)", polarity: higher}
-      consolidated_roce_pct: {expr: "ROUND(AVG(consolidated_roce_pct), 1)", aggregation: avg, unit: pct, label: "ROCE consolidated (%)", polarity: higher}
-      roe_pct: {expr: "ROUND(AVG(roe_pct), 1)", aggregation: avg, unit: pct, label: "Return on equity — ROE (%)", polarity: higher}
-      roa_pct: {expr: "ROUND(AVG(roa_pct), 1)", aggregation: avg, unit: pct, label: "Return on assets — ROA (%)", polarity: higher}
+      exchequer_contribution_cr: {expr: "ROUND(SUM(exchequer_contribution_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Contribution to Exchequer (₹ cr)"}
+      brent_avg_usd_bbl: {expr: "ROUND(AVG(brent_avg_usd_bbl), 2)", aggregation: avg, unit: usd_per_bbl, label: "Brent crude average ($/bbl)"}
+      fx_inr_per_usd: {expr: "ROUND(AVG(fx_inr_per_usd), 2)", aggregation: avg, unit: ratio, label: "USD/INR exchange rate"}
+      singapore_benchmark_grm_usd_bbl: {expr: "ROUND(AVG(singapore_benchmark_grm_usd_bbl), 2)", aggregation: avg, unit: usd_per_bbl, label: "Singapore Complex GRM ($/bbl)"}
+      gross_refining_margin_usd_bbl: {expr: "ROUND(AVG(gross_refining_margin_usd_bbl), 2)", aggregation: avg, unit: usd_per_bbl, label: "Corporate Reported GRM ($/bbl)", polarity: higher}
+      core_grm_usd_bbl: {expr: "ROUND(AVG(core_grm_usd_bbl), 2)", aggregation: avg, unit: usd_per_bbl, label: "Corporate Core GRM ex-inventory ($/bbl)", polarity: higher}
+      grm_premium_over_singapore_usd_bbl: {expr: "ROUND(AVG(grm_premium_over_singapore_usd_bbl), 2)", aggregation: avg, unit: usd_per_bbl, label: "IOCL GRM premium vs Singapore ($/bbl)", polarity: higher}
+      corporate_refining_throughput_mmt: {expr: "ROUND(SUM(refining_throughput_mmt), 3)", aggregation: sum, unit: mmt, label: "Corporate crude throughput (MMT)", polarity: higher}
+      corporate_refining_utilization_pct: {expr: "ROUND(AVG(refining_capacity_utilization_pct), 1)", aggregation: avg, unit: pct, label: "Corporate refining utilization (%)", polarity: higher}
+      corporate_distillate_yield_pct: {expr: "ROUND(AVG(distillate_yield_pct), 2)", aggregation: avg, unit: pct, label: "Corporate distillate yield (%)", polarity: higher}
+      corporate_fuel_and_loss_pct: {expr: "ROUND(AVG(fuel_and_loss_pct), 2)", aggregation: avg, unit: pct, label: "Corporate fuel & loss (%)", polarity: lower}
+      corporate_pipeline_throughput_mmt: {expr: "ROUND(SUM(pipeline_throughput_mmt), 3)", aggregation: sum, unit: mmt, label: "Corporate pipeline throughput (MMT)", polarity: higher}
+      corporate_marketing_sales_mmt: {expr: "ROUND(SUM(marketing_sales_mmt), 3)", aggregation: sum, unit: mmt, label: "Corporate marketing sales volume (MMT)", polarity: higher}
+
+  refinery_economics:
+    domain: finance
+    table: hrfin_gold.ssot_refinery_economics_360
+    base_filter: "is_refinery = TRUE"
+    description: "Refinery-level economics, GRM ($/bbl), throughput (MMT), utilization %, distillate yield %, fuel & loss %, and EBITDA across IOCL's 9 standalone refineries (FY17–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+      refinery: {column: refinery_id, kind: "entity:refinery", label: refinery}
+      refinery_name: {column: refinery_name, kind: categorical}
+      state: {column: state, kind: categorical}
+      region: {column: region, kind: categorical}
+    metrics:
+      refinery_capacity_mmtpa: {expr: "ROUND(SUM(installed_capacity_mmtpa), 2)", aggregation: sum, unit: mmtpa, label: "Installed refining capacity (MMTPA)", polarity: higher}
+      refinery_throughput_mmt: {expr: "ROUND(SUM(throughput_mmt), 3)", aggregation: sum, unit: mmt, label: "Refinery crude throughput (MMT)", polarity: higher}
+      refinery_utilization_pct: {expr: "ROUND(100.0 * SUM(throughput_mmt) / NULLIF(SUM(installed_capacity_mmtpa), 0), 1)", aggregation: ratio, unit: pct, label: "Capacity utilization (%)", polarity: higher}
+      refinery_grm_usd_bbl: {expr: "ROUND(SUM(grm_usd_bbl * throughput_mmt) / NULLIF(SUM(throughput_mmt), 0), 2)", aggregation: ratio, unit: usd_per_bbl, label: "Refinery GRM ($/bbl)", polarity: higher}
+      refinery_opex_usd_bbl: {expr: "ROUND(SUM(opex_usd_bbl * throughput_mmt) / NULLIF(SUM(throughput_mmt), 0), 2)", aggregation: ratio, unit: usd_per_bbl, label: "Refinery unit opex ($/bbl)", polarity: lower}
+      refinery_distillate_yield_pct: {expr: "ROUND(SUM(distillate_yield_pct * throughput_mmt) / NULLIF(SUM(throughput_mmt), 0), 2)", aggregation: ratio, unit: pct, label: "Distillate yield (%)", polarity: higher}
+      refinery_fuel_loss_pct: {expr: "ROUND(SUM(fuel_and_loss_pct * throughput_mmt) / NULLIF(SUM(throughput_mmt), 0), 2)", aggregation: ratio, unit: pct, label: "Fuel & loss (%)", polarity: lower}
+      refinery_gross_revenue_cr: {expr: "ROUND(SUM(gross_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Refinery gross revenue (₹ cr)", polarity: higher}
+      refinery_excise_cr: {expr: "ROUND(SUM(excise_duty_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Refinery excise duty (₹ cr)", polarity: lower}
+      refinery_net_revenue_cr: {expr: "ROUND(SUM(net_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Refinery net revenue (₹ cr)", polarity: higher}
+      refinery_ebitda_cr: {expr: "ROUND(SUM(ebitda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Refinery EBITDA (₹ cr)", polarity: higher}
+      refinery_pbt_cr: {expr: "ROUND(SUM(pbt_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Refinery PBT (₹ cr)", polarity: higher}
+    companions: [refinery_throughput_mmt, refinery_grm_usd_bbl, refinery_ebitda_cr]
+
+  marketing_sales:
+    domain: finance
+    table: hrfin_gold.fact_marketing_sales
+    description: "Product-wise marketing sales volumes (MMT), India market share %, revenue (₹ cr), and gross marketing margin (₹/KL) across 7 product categories (FY17–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+      product: {column: product_code, kind: "entity:product", label: product}
+      product_group: {column: product_group, kind: categorical}
+    metrics:
+      marketing_volume_mmt: {expr: "ROUND(SUM(sales_volume_mmt), 3)", aggregation: sum, unit: mmt, label: "Product sales volume (MMT)", polarity: higher}
+      marketing_revenue_cr: {expr: "ROUND(SUM(revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Product sales revenue (₹ cr)", polarity: higher}
+      marketing_market_share_pct: {expr: "ROUND(AVG(market_share_india_pct), 1)", aggregation: avg, unit: pct, label: "India market share (%)", polarity: higher}
+      marketing_margin_inr_kl: {expr: "ROUND(SUM(gross_marketing_margin_inr_kl * sales_volume_mmt) / NULLIF(SUM(sales_volume_mmt), 0), 1)", aggregation: ratio, unit: inr_kl, label: "Gross marketing margin (₹/KL)", polarity: higher}
+    companions: [marketing_volume_mmt, marketing_revenue_cr, marketing_market_share_pct]
+
+  pipeline_ops:
+    domain: finance
+    table: hrfin_gold.fact_pipeline_ops
+    description: "Cross-country Crude Oil, Product, and Natural Gas pipeline lengths (km), throughput (MMT), utilization %, tariff revenue & EBITDA (FY17–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+      pipeline: {column: pipeline_code, kind: "entity:pipeline", label: pipeline}
+    metrics:
+      pipeline_length_km: {expr: "ROUND(SUM(pipeline_length_km), 0)", aggregation: sum, unit: km, label: "Pipeline network length (km)", polarity: higher}
+      pipeline_capacity_mmtpa: {expr: "ROUND(SUM(installed_capacity_mmtpa), 2)", aggregation: sum, unit: mmtpa, label: "Pipeline capacity (MMTPA)", polarity: higher}
+      pipeline_throughput_mmt: {expr: "ROUND(SUM(throughput_mmt), 3)", aggregation: sum, unit: mmt, label: "Pipeline throughput (MMT)", polarity: higher}
+      pipeline_utilization_pct: {expr: "ROUND(100.0 * SUM(throughput_mmt) / NULLIF(SUM(installed_capacity_mmtpa), 0), 1)", aggregation: ratio, unit: pct, label: "Pipeline utilization (%)", polarity: higher}
+      pipeline_tariff_revenue_cr: {expr: "ROUND(SUM(tariff_revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Pipeline tariff revenue (₹ cr)", polarity: higher}
+      pipeline_ebitda_cr: {expr: "ROUND(SUM(ebitda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Pipeline EBITDA (₹ cr)", polarity: higher}
+      pipeline_unit_cost_inr_mt: {expr: "ROUND(SUM(unit_operating_cost_inr_mt * throughput_mmt) / NULLIF(SUM(throughput_mmt), 0), 1)", aggregation: ratio, unit: inr_mt, label: "Pipeline unit operating cost (₹/MT)", polarity: lower}
+    companions: [pipeline_throughput_mmt, pipeline_ebitda_cr, pipeline_utilization_pct]
+
+  segment_finance:
+    domain: finance
+    table: hrfin_gold.fact_segment
+    base_filter: "scope = 'standalone'"
+    description: "Ind AS 108 Statutory Segment Revenue, EBIT Result, Assets, and Capital Employed across Petroleum Products, Petrochemicals & Pipelines/Other (FY17–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+      segment: {column: segment_code, kind: categorical, label: segment}
+    metrics:
+      segment_revenue_cr: {expr: "ROUND(SUM(CASE WHEN metric = 'segment_revenue' THEN value_inr_cr ELSE 0 END), 2)", aggregation: sum, unit: inr_cr, label: "Segment revenue (₹ cr)", polarity: higher}
+      segment_ebit_cr: {expr: "ROUND(SUM(CASE WHEN metric = 'segment_result_ebit' THEN value_inr_cr ELSE 0 END), 2)", aggregation: sum, unit: inr_cr, label: "Segment EBIT result (₹ cr)", polarity: higher}
+      segment_assets_cr: {expr: "ROUND(SUM(CASE WHEN metric = 'segment_assets' THEN value_inr_cr ELSE 0 END), 2)", aggregation: sum, unit: inr_cr, label: "Segment assets (₹ cr)", polarity: higher}
+      segment_capital_employed_cr: {expr: "ROUND(SUM(CASE WHEN metric = 'segment_capital_employed' THEN value_inr_cr ELSE 0 END), 2)", aggregation: sum, unit: inr_cr, label: "Segment capital employed (₹ cr)", polarity: higher}
+    companions: [segment_revenue_cr, segment_ebit_cr, segment_capital_employed_cr]
+
+  subsidiary_finance:
+    domain: finance
+    table: hrfin_silver.subsidiary_financials
+    description: "IOCL Group Subsidiaries & JVs (CPCL, Lanka IOC, IOCME, IndOil Global, HURL/Petronet JVs, Consolidation Adj.) reconciling Standalone PAT to Consolidated IOC.NS PAT (FY17–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+      subsidiary: {column: entity_code, kind: "entity:subsidiary", label: subsidiary}
+    metrics:
+      subsidiary_revenue_cr: {expr: "ROUND(SUM(revenue_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Subsidiary revenue (₹ cr)", polarity: higher}
+      subsidiary_ebitda_cr: {expr: "ROUND(SUM(ebitda_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Subsidiary EBITDA (₹ cr)", polarity: higher}
+      subsidiary_pat_cr: {expr: "ROUND(SUM(pat_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Subsidiary PAT (₹ cr)", polarity: higher}
+      iocl_share_pat_cr: {expr: "ROUND(SUM(iocl_share_pat_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "IOCL share of PAT (₹ cr)", polarity: higher}
+      subsidiary_dividend_cr: {expr: "ROUND(SUM(dividend_received_by_iocl_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Dividend received by IOCL (₹ cr)", polarity: higher}
+      subsidiary_roce_pct: {expr: "ROUND(AVG(roce_pct), 1)", aggregation: avg, unit: pct, label: "Subsidiary ROCE (%)", polarity: higher}
+    companions: [subsidiary_pat_cr, iocl_share_pat_cr, subsidiary_revenue_cr]
+
+  mou:
+    domain: finance
+    table: hrfin_gold.fact_mou_scorecard
+    description: "IOCL DPE / MoPNG Maharatna MoU Scorecard parameters, targets, actual achievement, and composite score (FY25–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    row_only: true
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+      category: {column: category, kind: categorical}
+    metrics:
+      mou_scorecard: {expr: "COUNT(*)", aggregation: count, unit: parameters, label: "MoU scorecard"}
+    row_columns:
+      - {expr: parameter_id, as: parameter_id}
+      - {expr: parameter_name, as: parameter}
+      - {expr: category, as: category}
+      - {expr: unit_of_measure, as: unit}
+      - {expr: weightage, as: weightage}
+      - {expr: very_good_target, as: very_good_target}
+      - {expr: excellent_target, as: excellent_target}
+      - {expr: actual_achievement, as: achievement}
+      - {expr: achieved_rating, as: rating}
+      - {expr: projected_composite_score, as: projected_composite_score}
+    row_sort: {by: weightage, dir: desc}
+
+  capex:
+    domain: finance
+    table: hrfin_gold.ssot_corporate_annual_360
+    description: "Annual IOCL Capital Expenditure, CWIP, Net PPE & Capex Cash Outflow (FY17–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+    metrics:
+      capex_actual_cr: {expr: "ROUND(SUM(total_capex_spent_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Capital expenditure spent (₹ cr)"}
+      cwip_cr: {expr: "ROUND(SUM(cwip_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Capital work-in-progress — CWIP (₹ cr)"}
+      refinery_petchem_ppe_cr: {expr: "ROUND(SUM(refinery_petchem_ppe_inr_cr), 2)", aggregation: sum, unit: inr_cr, label: "Net PPE & ROU assets (₹ cr)", polarity: higher}
+
+  ratios:
+    domain: finance
+    table: hrfin_gold.ssot_corporate_annual_360
+    description: "IOCL Financial Ratios, Return Metrics, Liquidity, Leverage & Per-Share Indicators (FY17–FY26)."
+    period: fiscal_year
+    default_fy: FY26
+    fields:
+      fy: {column: fiscal_year, kind: fy}
+    metrics:
+      roce_pct: {expr: "ROUND(AVG(standalone_roce_pct), 2)", aggregation: avg, unit: pct, label: "Standalone ROCE (%)", polarity: higher}
+      consolidated_roce_pct: {expr: "ROUND(AVG(roce_pct), 2)", aggregation: avg, unit: pct, label: "Consolidated ROCE (%)", polarity: higher}
+      roe_pct: {expr: "ROUND(AVG(roe_pct), 2)", aggregation: avg, unit: pct, label: "Return on equity — ROE (%)", polarity: higher}
+      roa_pct: {expr: "ROUND(AVG(roa_pct), 2)", aggregation: avg, unit: pct, label: "Return on assets — ROA (%)", polarity: higher}
       debt_to_equity_ratio: {expr: "ROUND(AVG(debt_to_equity_ratio), 2)", aggregation: avg, unit: ratio, label: "Debt-to-equity ratio (x)", polarity: lower}
       net_debt_to_ebitda_ratio: {expr: "ROUND(AVG(net_debt_to_ebitda_ratio), 2)", aggregation: avg, unit: ratio, label: "Net debt-to-EBITDA ratio (x)", polarity: lower}
       interest_coverage_ratio: {expr: "ROUND(AVG(interest_coverage_ratio), 2)", aggregation: avg, unit: ratio, label: "Interest coverage ratio (x)", polarity: higher}
       current_ratio: {expr: "ROUND(AVG(current_ratio), 2)", aggregation: avg, unit: ratio, label: "Current ratio (x)", polarity: higher}
-      quick_ratio: {expr: "ROUND(AVG(quick_ratio), 2)", aggregation: avg, unit: ratio, label: "Quick ratio (x)", polarity: higher}
-      receivable_days: {expr: "ROUND(AVG(receivable_days), 1)", aggregation: avg, unit: ratio, label: "Trade receivable days — DSO (days)", polarity: lower}
-      revenue_per_employee_cr: {expr: "ROUND(AVG(revenue_per_employee_cr), 2)", aggregation: avg, unit: ratio, label: "Revenue per employee (₹ cr)", polarity: higher}
+      receivable_days: {expr: "ROUND(AVG(receivable_days), 1)", aggregation: avg, unit: days, label: "Trade receivable days — DSO", polarity: lower}
+      inventory_days: {expr: "ROUND(AVG(inventory_days), 1)", aggregation: avg, unit: days, label: "Inventory holding days — DIO", polarity: lower}
       eps_basic_inr: {expr: "ROUND(AVG(eps_basic_inr), 2)", aggregation: avg, unit: ratio, label: "Basic EPS (₹/share)", polarity: higher}
       book_value_per_share_inr: {expr: "ROUND(AVG(book_value_per_share_inr), 2)", aggregation: avg, unit: ratio, label: "Book value per share (₹/share)", polarity: higher}
       dividend_per_share_inr: {expr: "ROUND(AVG(dividend_per_share_inr), 2)", aggregation: avg, unit: ratio, label: "Dividend per share (₹/share)", polarity: higher}
-      crude_realisation_usd_bbl: {expr: "ROUND(AVG(crude_realisation_usd_bbl), 2)", aggregation: avg, unit: usd_per_boe, label: "Crude oil realisation ($/bbl)", polarity: higher}
-      gas_realisation_usd_mmbtu: {expr: "ROUND(AVG(gas_realisation_usd_mmbtu), 2)", aggregation: avg, unit: usd_per_boe, label: "Natural gas realisation ($/MMBtu)", polarity: higher}
-    companions: [[dividend_payout_cr, dividend_per_share_inr]]
+      dividend_yield_pct: {expr: "ROUND(AVG(dividend_yield_pct), 2)", aggregation: avg, unit: pct, label: "Dividend yield (%)", polarity: higher}
+      ocf_to_ebitda_pct: {expr: "ROUND(AVG(ocf_to_ebitda_pct), 1)", aggregation: avg, unit: pct, label: "OCF / EBITDA cash conversion (%)", polarity: higher}
 
-  subsidiaries:
+  retail_fuel_prices:
     domain: finance
-    table: hrfin_silver.subsidiary_financials
-    description: "ONGC Group subsidiaries & joint ventures (HPCL, MRPL, OVL, OPAL, OTPC) annual revenue, EBITDA, PAT, ROCE and dividend contribution to Consolidated ONGC Group (FY17–FY26)."
+    table: hrfin_gold.fact_retail_fuel_prices
+    description: "10-year IOCL metro retail fuel selling prices (MS Petrol ₹/L, HSD Diesel ₹/L, Indane LPG ₹/14.2kg, ATF ₹/kL) across Delhi, Mumbai, Kolkata, Chennai (FY17–FY27)."
     period: fiscal_year
     default_fy: FY26
     fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      subsidiary:
-        column: entity_code
-        kind: categorical
-        label: subsidiary
+      fy: {column: fiscal_year, kind: fy}
+      city: {column: city, kind: categorical, label: city}
+      fuel: {column: fuel_code, kind: categorical, label: fuel}
     metrics:
-      subsidiary_pat_cr:
-        expr: ROUND(SUM(pat_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Subsidiary PAT (\u20B9 cr)"
-        polarity: higher
-      subsidiary_revenue_cr:
-        expr: ROUND(SUM(revenue_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Subsidiary revenue (\u20B9 cr)"
-        polarity: higher
-      subsidiary_ebitda_cr:
-        expr: ROUND(SUM(ebitda_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Subsidiary EBITDA (\u20B9 cr)"
-        polarity: higher
-      subsidiary_dividend_cr:
-        expr: ROUND(SUM(dividend_received_by_ongc_inr_cr), 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Dividend received by ONGC (\u20B9 cr)"
-        polarity: higher
-      subsidiary_roce_pct:
-        expr: ROUND(AVG(roce_pct), 1)
-        aggregation: avg
-        unit: pct
-        label: Subsidiary ROCE (%)
-        polarity: higher
-    companions:
-      - subsidiary_pat_cr
-      - subsidiary_revenue_cr
-      - subsidiary_ebitda_cr
-  mou:
+      retail_fuel_rsp: {expr: "ROUND(AVG(rsp_value), 2)", aggregation: avg, unit: inr_per_l, label: "Retail selling price (RSP)"}
+      retail_fuel_price_change: {expr: "ROUND(SUM(rsp_change_inr), 2)", aggregation: sum, unit: inr_per_l, label: "Net price change (₹)"}
+    companions: [retail_fuel_rsp, retail_fuel_price_change]
+
+  fuel_price_buildup:
     domain: finance
-    table: hrfin_silver.mou_targets
-    description: "MoU (MoPNG/DPE) parameters, targets and achievement per FY (FY25\u2013\
-      FY27; FY27 = H1 run-rate projection). Mixed units: always one row per parameter."
-    period: fiscal_year
-    default_fy: FY27
-    row_only: true
-    fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      parameter_category:
-        column: parameter_category
-        kind: categorical
-    metrics:
-      mou_scorecard:
-        expr: COUNT(*)
-        aggregation: count
-        unit: parameters
-        label: MoU scorecard
-    row_columns:
-      - expr: parameter_name
-        as: parameter
-      - expr: unit_of_measure
-        as: unit
-      - expr: weightage
-        as: weightage
-      - expr: very_good_target
-        as: very_good_target
-      - expr: excellent_target
-        as: excellent_target
-      - expr: actual_achievement
-        as: achievement
-      - expr: ROUND(CASE WHEN parameter_id = 'MOU-HSE-SAFETY' THEN excellent_target
-          * 100.0 / NULLIF(actual_achievement, 0) ELSE actual_achievement * 100.0
-          / NULLIF(excellent_target, 0) END, 1)
-        as: pct_of_excellent
-      - expr: achieved_rating
-        as: rating
-      - expr: projected_composite_score
-        as: projected_composite_score
-    row_sort:
-      by: weightage
-      dir: desc
-  employee_360:
-    domain: hr
-    table: hrfin_gold.ssot_employee_360
-    base_filter: is_month_end_active = true
-    description: Employee 360
-    period: snapshot
-    fields:
-      grade_level_order:
-        column: grade_level_order
-        kind: number
-        label: Grade Order
-      emp_id: &id001
-        column: emp_id
-        kind: string
-        label: Employee ID
-      name: &id002
-        column: full_name
-        kind: string
-        label: Employee Name
-      cadre: &id003
-        column: cadre
-        kind: string
-        label: Cadre
-      grade: &id004
-        column: grade_id
-        kind: string
-        label: Grade
-      discipline: &id005
-        column: discipline_name
-        kind: string
-        label: Discipline
-      gender: &id006
-        column: gender
-        kind: string
-        label: Gender
-      age_band: &id007
-        column: age_band_brsr
-        kind: string
-        label: Age Band
-      work_centre: &id008
-        column: wc_name
-        kind: string
-        label: Work Centre
-      region: &id009
-        column: city_name
-        kind: string
-        label: Region
-      field: &id010
-        column: field_id
-        kind: string
-        label: Field
-      sector_type: &id011
-        column: location_type
-        kind: string
-        label: Sector Type
-      entry_channel: &id012
-        column: entry_mode
-        kind: string
-        label: Entry Channel
-      is_key_managerial_person: &id013
-        column: succession_pool_flag
-        kind: boolean
-        label: Is Key Managerial Person
-      fiscal_year: &id014
-        column: fiscal_year
-        kind: string
-        label: Fiscal Year
-      month_start: &id015
-        column: month_start
-        kind: string
-        label: Month Start
-    metrics:
-      headcount_fy_end:
-        expr: COUNT(*)
-        aggregation: count
-        unit: employees
-        label: Real
-        data_class: general_hr
-      avg_headcount:
-        expr: COUNT(*)
-        aggregation: count
-        unit: employees
-        label: Real
-        data_class: general_hr
-      hr_headcount_fy_end:
-        expr: COUNT(DISTINCT CASE WHEN is_month_end_active THEN emp_id END)
-        aggregation: count
-        unit: employees
-        label: Real (company)
-        data_class: general_hr
-      hr_avg_headcount:
-        expr: COUNT(DISTINCT emp_id)
-        aggregation: count
-        unit: employees
-        label: Real
-        data_class: general_hr
-      hr_fte:
-        expr: SUM(days_on_roll) / 30
-        aggregation: sum
-        unit: employees
-        label: Synthetic
-        data_class: general_hr
-      hr_employee_cost_cr:
-        expr: SUM(cost_total_inr)/1e7
-        aggregation: sum
-        unit: inr_cr
-        label: Real (company)
-        data_class: pay_aggregate
-      hr_cost_per_employee_lakh:
-        expr: SUM(cost_total_inr)/1e5 / NULLIF(COUNT(DISTINCT emp_id), 0)
-        aggregation: ratio
-        unit: inr_lakh
-        label: Derived from AR
-        data_class: general_hr
-      hr_ctc_per_grade_avg_lakh:
-        expr: AVG(ctc_annualised_inr)/1e5
-        aggregation: average
-        unit: inr_lakh
-        label: Synthetic
-        data_class: pay_aggregate
-      hr_revenue_per_employee_cr:
-        expr: SUM(cost_total_inr)/1e7 / NULLIF(COUNT(DISTINCT emp_id), 0)
-        aggregation: ratio
-        unit: inr_cr
-        label: Derived from AR
-        data_class: general_hr
-      hr_pat_per_employee_cr:
-        expr: SUM(cost_total_inr)/1e7 / NULLIF(COUNT(DISTINCT emp_id), 0)
-        aggregation: ratio
-        unit: inr_cr
-        label: Derived from AR
-        data_class: general_hr
-      hr_employee_cost_pct_revenue:
-        expr: SUM(cost_total_inr) / NULLIF(SUM(cost_total_inr), 0)
-        aggregation: ratio
-        unit: pct
-        label: Derived from AR
-        data_class: general_hr
-      hr_overtime_pct_of_pay:
-        expr: SUM(overtime_amount_inr) / NULLIF(SUM(gross_earnings_inr), 0)
-        aggregation: ratio
-        unit: pct
-        label: Synthetic
-        data_class: pay_aggregate
-      hr_overtime_hours_per_workman:
-        expr: SUM(overtime_hours) / NULLIF(COUNT(DISTINCT emp_id), 0)
-        aggregation: ratio
-        unit: hours
-        label: Synthetic
-        data_class: general_hr
-      hr_allowance_mix_pct:
-        expr: SUM(cafeteria_allowances_inr) / NULLIF(SUM(gross_earnings_inr), 0)
-        aggregation: ratio
-        unit: pct
-        label: Synthetic
-        data_class: pay_aggregate
-      hr_benefits_cost_per_employee_lakh:
-        expr: SUM(employer_cost_noncash_inr)/1e5 / NULLIF(COUNT(DISTINCT emp_id),
-          0)
-        aggregation: ratio
-        unit: inr_lakh
-        label: Synthetic
-        data_class: general_hr
-      hr_medical_cost_per_employee:
-        expr: (SUM(medical_scheme_cost_inr) + SUM(medical_reimbursement_inr)) / NULLIF(COUNT(DISTINCT
-          emp_id), 0)
-        aggregation: ratio
-        unit: inr_lakh
-        label: Synthetic
-        data_class: general_hr
-      hr_pay_compression_ratio:
-        expr: MAX(ctc_annualised_inr) / NULLIF(MIN(ctc_annualised_inr), 0)
-        aggregation: ratio
-        unit: ratio
-        label: Synthetic
-        data_class: pay_aggregate
-      hr_span_of_control:
-        expr: AVG(direct_reports_count)
-        aggregation: average
-        unit: employees
-        label: Synthetic
-        data_class: general_hr
-      hr_attrition_pct:
-        expr: SUM(CAST(is_attrition AS INT64)) / NULLIF(COUNT(DISTINCT emp_id), 0)
-        aggregation: ratio
-        unit: pct
-        label: Synthetic
-        data_class: general_hr
-      hr_turnover_pct_brsr:
-        expr: SUM(CAST(separated_in_month_flag AS INT64)) / NULLIF(COUNT(DISTINCT
-          emp_id), 0)
-        aggregation: ratio
-        unit: pct
-        label: Calibrated to BRSR
-        data_class: general_hr
-      hr_retirements_next_n:
-        expr: SUM(CAST(retiring_within_1y AS INT64))
-        aggregation: sum
-        unit: employees
-        label: Synthetic
-        data_class: general_hr
-      hr_transfer_overdue_cohort:
-        expr: SUM(CAST(transfer_due_flag AS INT64))
-        aggregation: sum
-        unit: employees
-        label: Synthetic
-        data_class: general_hr
-      hr_delhi_overdue_cohort_cost_cr:
-        expr: SUM(CASE WHEN delhi_overdue_flag THEN ctc_annualised_inr ELSE 0 END)/1e7
-        aggregation: sum
-        unit: inr_cr
-        label: Synthetic
-        data_class: pay_aggregate
-      hr_capitalised_share_pct:
-        expr: SUM(cost_capitalised_inr) / NULLIF(SUM(cost_total_inr), 0)
-        aggregation: ratio
-        unit: pct
-        label: Modelled
-        data_class: general_hr
-      hr_entry_pay_monthly:
-        expr: SUM(entry_pay_basic_inr)
-        aggregation: sum
-        unit: inr_lakh
-        label: Rule-based
-        data_class: pay_aggregate
-      hr_employee_cost_per_boe:
-        expr: SUM(cost_expensed_production_inr) / 1000
-        aggregation: ratio
-        unit: inr_lakh
-        label: Modelled
-        data_class: general_hr
-      hr_what_if_ot_cap:
-        expr: SUM(overtime_amount_inr)
-        aggregation: sum
-        unit: inr_lakh
-        label: Scenario
-        data_class: pay_aggregate
-      hr_what_if_cafeteria_cap:
-        expr: SUM(cafeteria_allowances_inr)
-        aggregation: sum
-        unit: inr_lakh
-        label: Scenario
-        data_class: pay_aggregate
-      hr_what_if_offshore_rotation:
-        expr: SUM(mining_offshore_allowance_inr)
-        aggregation: sum
-        unit: inr_lakh
-        label: Scenario
-        data_class: pay_aggregate
-      hr_what_if_delhi_rotation:
-        expr: SUM(hra_inr)
-        aggregation: sum
-        unit: inr_lakh
-        label: Scenario
-        data_class: pay_aggregate
-      hr_what_if_hiring_freeze:
-        expr: SUM(cost_total_inr)
-        aggregation: sum
-        unit: inr_lakh
-        label: Scenario
-        data_class: pay_aggregate
-      hr_what_if_prp_kitty:
-        expr: SUM(prp_inr)
-        aggregation: sum
-        unit: inr_lakh
-        label: Scenario
-        data_class: pay_aggregate
-  employee_month:
-    domain: hr
-    table: hrfin_gold.ssot_employee_360
-    description: Month
-    fields:
-      emp_id: *id001
-      name: *id002
-      cadre: *id003
-      grade: *id004
-      discipline: *id005
-      gender: *id006
-      age_band: *id007
-      work_centre: *id008
-      region: *id009
-      field: *id010
-      sector_type: *id011
-      entry_channel: *id012
-      is_key_managerial_person: *id013
-      fiscal_year: *id014
-      month_start: *id015
-    metrics: {}
-  employee_fy:
-    domain: hr
-    table: hrfin_gold.v_employee_360_fy
-    description: FY
-    fields:
-      emp_id: *id001
-      name: *id002
-      cadre: *id003
-      grade: *id004
-      discipline: *id005
-      gender: *id006
-      age_band: *id007
-      work_centre: *id008
-      region: *id009
-      field: *id010
-      sector_type: *id011
-      entry_channel: *id012
-      is_key_managerial_person: *id013
-      fiscal_year: *id014
-      month_start: *id015
-    metrics:
-      cost_per_employee_lakh:
-        expr: SUM(cost_total_fy)/1e5 / NULLIF(@avg_headcount,0)
-        aggregation: ratio
-        unit: inr_lakh
-        label: "Employee cost per employee (\u20B9 lakh)"
-        data_class: general_hr
-  field_econ:
-    domain: finance
-    table: hrfin_gold.v_field_economics_fy
-    description: "Specialized RAS cost-object Field Economics-360 rollup (hrfin_gold.v_field_economics_fy) for per-BOE unit economics, Note 35 opex by nature, breakeven crude price, capex intensity, and company bridge. For standard field revenue, profit/loss (PBT), EBITDA, and lifting cost rankings/trends, use field_pnl."
+    table: hrfin_gold.fact_fuel_price_buildup
+    description: "Delhi retail petrol and diesel price build-up breaking down Base Price, Freight, Central Excise Duty, Dealer Commission, State VAT, and total tax share (FY17–FY27)."
     period: fiscal_year
     default_fy: FY26
     fields:
-      fy:
-        column: fiscal_year
-        kind: fy
-      object_id:
-        column: object_id
-        kind: entity:field
-        label: cost object
-      object_name:
-        column: object_name
-        kind: categorical
-        label: object name
-      object_type:
-        column: object_type
-        kind: categorical
-        label: object type
-      field:
-        column: object_id
-        kind: entity:field
-        label: field
-      asset:
-        column: asset_wc_id
-        kind: entity:wc
-        label: asset
-      basin:
-        column: basin
-        kind: categorical
-        label: basin
-      state:
-        column: state
-        kind: categorical
-        label: state
-      segment:
-        column: segment
-        kind: categorical
-        label: segment
-      operatorship:
-        column: operatorship
-        kind: categorical
-        label: operatorship
-      maturity:
-        column: maturity
-        kind: categorical
-        label: maturity
-      hydrocarbon:
-        column: hydrocarbon
-        kind: categorical
-        label: hydrocarbon
-      prod_basis:
-        column: prod_basis
-        kind: categorical
-        label: production basis
-    dimension_fallbacks:
-      wc: asset
+      fy: {column: fiscal_year, kind: fy}
+      city: {column: city, kind: categorical, label: city}
+      fuel: {column: fuel_code, kind: categorical, label: fuel}
     metrics:
-      field_revenue_cr:
-        expr: ROUND(SUM(revenue_from_operations) / 10.0, 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "RAS cost-object revenue from operations (\u20B9 cr) \u2014 Modelled (use revenue_cr for standard field revenue)"
-        data_class: fin_internal
-      opex_per_boe_inr:
-        expr: ROUND(SUM(opex_operating_excl_corporate) * 1000000.0 / NULLIF(SUM(prod_boe), 0), 2)
-        aggregation: ratio
-        unit: inr_per_boe
-        label: "Operating expenditure per BOE (\u20B9/BOE) \u2014 Modelled"
-        data_class: fin_internal
-      opex_per_boe_usd:
-        expr: ROUND((SUM(opex_operating_excl_corporate) * 1000000.0 / NULLIF(SUM(prod_boe), 0)) / NULLIF(AVG(inr_usd_fx_rate), 0), 2)
-        aggregation: ratio
-        unit: usd_per_boe
-        label: "Operating expenditure per BOE ($/BOE) \u2014 Modelled"
-        data_class: fin_internal
-      lifting_cost_per_boe_usd:
-        expr: ROUND((SUM(opex_lifting) * 1000000.0 / NULLIF(SUM(prod_boe), 0)) / NULLIF(AVG(inr_usd_fx_rate), 0), 2)
-        aggregation: ratio
-        unit: usd_per_boe
-        label: "RAS cost-object lifting cost per BOE ($/BOE) \u2014 Modelled (use lifting_cost_usd_per_boe for standard lifting cost)"
-        data_class: fin_internal
-      employee_cost_per_boe:
-        expr: ROUND(SUM(staff_expenditure) * 1000000.0 / NULLIF(SUM(prod_boe), 0), 2)
-        aggregation: ratio
-        unit: inr_per_boe
-        label: "Employee cost per BOE (\u20B9/BOE) \u2014 Modelled (total Real)"
-        data_class: fin_internal
-      field_ebitda_cr:
-        expr: ROUND(SUM(ebitda) / 10.0, 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "RAS cost-object field EBITDA (\u20B9 cr) \u2014 Modelled (use ebitda_cr for standard field EBITDA)"
-        data_class: fin_internal
-      field_ebitda_margin_pct:
-        expr: ROUND(100.0 * SUM(ebitda) / NULLIF(SUM(revenue_from_operations), 0), 2)
-        aggregation: ratio
-        unit: pct
-        label: "RAS cost-object field EBITDA margin (%) \u2014 Modelled (use ebitda_margin_pct for standard field margin)"
-        data_class: fin_internal
-      field_pbt_cr:
-        expr: ROUND(SUM(pbt_contrib) / 10.0, 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "RAS cost-object field PBT contribution (\u20B9 cr) \u2014 Modelled (use pbt_cr for standard field PBT)"
-        data_class: fin_internal
-      levies_pct_revenue:
-        expr: ROUND(100.0 * SUM(levies_total) / NULLIF(SUM(revenue_from_operations), 0), 2)
-        aggregation: ratio
-        unit: pct
-        label: "Statutory levies as % of revenue \u2014 Modelled (total Real)"
-        data_class: fin_internal
-      revenue_per_employee_field_cr:
-        expr: ROUND((SUM(revenue_from_operations) / 10.0) / NULLIF(AVG(headcount_direct) + AVG(headcount_allocated_fte), 0), 2)
-        aggregation: ratio
-        unit: inr_cr
-        label: "Revenue per employee by field (\u20B9 cr) \u2014 Modelled"
-        data_class: fin_internal
-      boe_per_employee:
-        expr: ROUND(SUM(prod_boe) / NULLIF(AVG(headcount_direct) + AVG(headcount_allocated_fte), 0), 2)
-        aggregation: ratio
-        unit: boe
-        label: "Production BOE per employee \u2014 Modelled"
-        data_class: fin_internal
-      breakeven_crude_usd_bbl:
-        expr: ROUND(((SUM(rev_crude) - SUM(pbt_contrib)) * 1000000.0 / NULLIF(SUM(oil_sales_mt), 0)) / (7.33 * NULLIF(AVG(inr_usd_fx_rate), 0)), 2)
-        aggregation: ratio
-        unit: usd_per_boe
-        label: "Breakeven crude price ($/bbl) \u2014 Modelled"
-        data_class: fin_internal
-      capex_intensity_usd_boe:
-        expr: ROUND((SUM(capex_total) * 1000000.0 / NULLIF(SUM(prod_boe), 0)) / NULLIF(AVG(inr_usd_fx_rate), 0), 2)
-        aggregation: ratio
-        unit: usd_per_boe
-        label: "Capex intensity ($/BOE) \u2014 Modelled"
-        data_class: fin_internal
-      offshore_vs_onshore_revenue_cr:
-        expr: ROUND(SUM(CASE WHEN segment IN ('Offshore', 'Onshore') THEN revenue_from_operations ELSE 0 END) / 10.0, 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Offshore vs Onshore segment revenue (\u20B9 cr) \u2014 Real"
-        data_class: general_fin
-      offshore_vs_onshore_result_cr:
-        expr: ROUND(SUM(CASE WHEN segment IN ('Offshore', 'Onshore') THEN segment_result_contrib ELSE 0 END) / 10.0, 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Offshore vs Onshore segment profit (\u20B9 cr) \u2014 Real"
-        data_class: general_fin
-      company_bridge:
-        expr: ROUND(SUM(pbt_contrib) / 10.0, 2)
-        aggregation: sum
-        unit: inr_cr
-        label: "Company bridge reconciled PBT total (\u20B9 cr) \u2014 Real vs Modelled"
-        data_class: general_fin
+      buildup_rsp_inr_l: {expr: "ROUND(AVG(rsp_inr_l), 2)", aggregation: avg, unit: inr_per_l, label: "Delhi pump price RSP (₹/L)"}
+      buildup_base_price_inr_l: {expr: "ROUND(AVG(base_price_inr_l), 2)", aggregation: avg, unit: inr_per_l, label: "Base refinery transfer price (₹/L)"}
+      buildup_excise_inr_l: {expr: "ROUND(AVG(excise_duty_inr_l), 2)", aggregation: avg, unit: inr_per_l, label: "Central excise duty (₹/L)"}
+      buildup_vat_inr_l: {expr: "ROUND(AVG(vat_inr_l), 2)", aggregation: avg, unit: inr_per_l, label: "State VAT (₹/L)"}
+      buildup_tax_share_pct: {expr: "ROUND(AVG(total_tax_pct), 2)", aggregation: avg, unit: pct, label: "Total tax share of RSP (%)"}
+    companions: [buildup_rsp_inr_l, buildup_excise_inr_l, buildup_vat_inr_l, buildup_tax_share_pct]
+
 templates:
-  headcount_change:
-    domain: hr
-    label: Headcount change by work centre
-    description: Headcount at 31-Mar before the start FY vs 31-Mar at the end FY,
-      per work centre (growth / no increase over N years).
-    period: range
-    default_from: FY22
-    default_to: FY26
-  capex_vs_reserves:
-    domain: finance
-    label: Capex invested vs 2P reserves (under-investment)
-    description: Actual capex over a FY range by asset vs FY26 2P reserves; flags
-      assets whose capex per MMTOE is below half the average (C7 logic).
-    period: range
-    default_from: FY22
-    default_to: FY26
-    certified_id: C7
   pnl_statement:
     domain: finance
-    label: "ONGC Schedule III Statement of Profit & Loss"
-    description: "Complete Ind-AS Schedule III Annual Report Statement of Profit & Loss (Revenue from Operations, Crude/Gas/VAP, Other Income, Royalty, OIDB Cess, SAED Windfall Tax, Net Revenue, Operating Expenses, Exploration Write-Offs, DD&A, Finance Costs, Exceptional Items, PBT, Tax Expense, Standalone PAT & Consolidated PAT) for a single FY (with YoY comparison) or across a 10-year range (FY17–FY26)."
+    label: "IOCL Schedule III Statement of Profit & Loss"
+    description: "Complete Ind-AS Schedule III Statement of Profit & Loss including Gross Revenue, Central Excise Duty, Net Revenue, Crude Consumed, Purchases, Inventory Change, EBITDA, DD&A, Finance Costs, Exceptional Items, PBT, Tax, Standalone PAT & Consolidated IOC.NS PAT (FY17–FY26)."
     period: fiscal_year
     default_from: FY17
     default_to: FY26
   balance_sheet:
     domain: finance
-    label: "ONGC Schedule III Balance Sheet"
-    description: "Complete Ind-AS Schedule III Annual Report Balance Sheet (Oil & Gas Producing Properties, Other PPE & ROU Lease Assets, CWIP, Exploratory Wells-in-Progress, Subsidiary/JV Investments in HPCL/OVL/MRPL/OPaL, Site Restoration Escrow Fund, Inventories, Trade Receivables, Cash & Bank, Total Assets, Equity Share Capital, Other Equity Reserves, Net Worth, Long-Term & Short-Term Debt, Ind-AS 116 Lease Liabilities, ARO Decommissioning Provision, Deferred Tax Liabilities & Current Liabilities) for a single FY or across FY17–FY26."
+    label: "IOCL Schedule III Balance Sheet"
+    description: "Complete Ind-AS Schedule III Balance Sheet including Net PPE, CWIP, Subsidiary/JV Investments (CPCL, HURL, Petronet LNG), Inventories, Trade Receivables, Cash & Bank, Net Worth, Borrowings, Ind-AS 116 Lease Liabilities & Indane LPG Security Deposits (FY17–FY26)."
     period: fiscal_year
     default_from: FY17
     default_to: FY26
   cash_flow_statement:
     domain: finance
-    label: "ONGC Ind-AS 7 Statement of Cash Flows"
-    description: "Complete Ind-AS 7 Annual Report Statement of Cash Flows (PBT, Non-Cash DD&A/Exploration Adjustments, Working Capital Changes, Taxes Paid, Net Operating Cash Flow OCF, Capex Outflows, Subsidiary Acquisitions, Dividends/Interest Received, Investing Cash Flow, Net Borrowings, Lease Payments, Interest & Dividends Paid, Financing Cash Flow, Opening/Closing Cash & Free Cash Flow FCF) for a single FY or across FY17–FY26."
+    label: "IOCL Ind-AS 7 Statement of Cash Flows"
+    description: "Complete Ind-AS 7 Statement of Cash Flows (PBT, Working Capital Changes, Taxes Paid, OCF, Capex Outflow, Investing Cash Flow, Net Borrowings, Lease & Dividend Payments, Financing Cash Flow & Closing Cash) (FY17–FY26)."
     period: fiscal_year
     default_from: FY17
     default_to: FY26
   financial_ratios:
     domain: finance
-    label: ONGC Financial Ratios & Credit Scorecard
-    description: "Complete 18-line Corporate Financial Ratios Scorecard (EBITDA Margin,\
-      \ EBIT Margin, PBT Margin, Net PAT Margin, Standalone & Consolidated ROCE, ROE,\
-      \ ROA, Debt-to-Equity, Net Debt-to-EBITDA, Interest Coverage, Current Ratio,\
-      \ Receivable Days DSO, EPS, Book Value Per Share, Dividend Per Share, Crude\
-      \ Realisation & Lifting Cost) for a single FY or across FY17\u2013FY26."
+    label: "IOCL Financial Ratios & Credit Scorecard"
+    description: "Corporate Financial Ratios Scorecard (EBITDA Margin, PAT Margin, ROCE, ROE, Debt-to-Equity, Current Ratio, DSO, DIO, EPS, BVPS, DPS & GRM benchmarks) (FY17–FY26)."
+    period: fiscal_year
+    default_from: FY17
+    default_to: FY26
+  working_capital:
+    domain: finance
+    label: "IOCL Working Capital, Inventory Days & Receivable Days"
+    description: "10-year working capital cycle tracking Inventories, Trade Receivables, Trade Payables, Net Working Capital, Inventory Days (DIO), Receivable Days (DSO), and Current Ratio (FY17–FY26)."
     period: fiscal_year
     default_from: FY17
     default_to: FY26
   wacc_pct:
     domain: finance
-    label: "ONGC Weighted Average Cost of Capital (WACC %)"
-    description: "Historical Weighted Average Cost of Capital (WACC %) series (FY17–FY26 or 5-year FY22–FY26), including Cost of Equity (Ke) and Post-Tax Cost of Debt (Kd*(1-t)), modelled from RBI/FBIL G-Sec, Damodaran ERP, and NSE equity beta."
+    label: "IOCL Weighted Average Cost of Capital (WACC %)"
+    description: "Historical WACC (%) series (FY17–FY26 or FY22–FY26), including Cost of Equity (Ke) and Post-Tax Cost of Debt (Kd*(1-t)), modelled from RBI/FBIL G-Sec, Damodaran ERP, and NSE:IOC equity beta."
     period: range
     default_from: FY22
     default_to: FY26
   wacc_components:
     domain: finance
-    label: "ONGC WACC Build-up and Component Breakdown"
-    description: "Stacked components of WACC across years: Risk-free rate (Rf), Equity Risk Premium (Beta * ERP), and Cost of Debt, with weighted contributions to total WACC."
+    label: "IOCL WACC Build-up and Component Breakdown"
+    description: "Stacked components of WACC across years: Risk-free rate (Rf), Equity Risk Premium (Beta * ERP), and Post-tax Cost of Debt weighted by capital structure."
     period: range
     default_from: FY22
     default_to: FY26
   wacc_build_up:
     domain: finance
-    label: "ONGC WACC Single-Year Parameter Build-Up"
-    description: "Single-year WACC parameter table and KPI: all 16 inputs and parameters (Rf, beta, ERP, CRP, Kd pretax, tax rate, equity/debt weights, Ke, Kd post-tax, WACC) with lineage sources."
+    label: "IOCL WACC Single-Year Parameter Build-Up"
+    description: "Single-year WACC parameter table and KPI: Rf, beta, ERP, CRP, Kd pretax, tax rate, equity/debt weights, Ke, Kd post-tax, and WACC with lineage."
     period: fiscal_year
     default_from: FY26
     default_to: FY26
   wacc_change_attribution:
     domain: finance
-    label: "ONGC WACC Change Attribution (Shapley)"
-    description: "Exact 5-factor Shapley attribution (Rf, ERP, Beta, Kd after tax, Capital weights) explaining YoY changes in WACC, rendered as a waterfall bridge."
+    label: "IOCL WACC Change Attribution (Shapley)"
+    description: "Exact 5-Factor Shapley attribution (Rf, ERP, Beta, Kd after tax, Capital weights) explaining YoY changes in IOCL WACC."
     period: fiscal_year
-    default_from: FY22
-    default_to: FY23
-  pay_scale_min_inr:
-    domain: policy
-    label: Executive Grade Pay Scale (Starting & Maximum Basic Pay)
-    description: "Official DPE / ONGC executive grade pay scale bands (pay_scale_min_inr\
-      \ and pay_scale_max_inr) from hrfin_silver.dim_grade (E0\u2013E9)."
-    period: fixed
-    default_from: FY26
+    default_from: FY25
     default_to: FY26

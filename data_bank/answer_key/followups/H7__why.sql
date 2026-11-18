@@ -7,6 +7,6 @@
 -- Now: the relevant passages (body text, not header) from P1-03 Parts 4 and 28.
 SELECT doc_id, clause_ref, heading,
        TRIM(REGEXP_REPLACE(REGEXP_EXTRACT(text, r'(?is)([^.]{0,200}female medical officer[^.]*\.[^.]*\.?)'), r'\s+', ' ')) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P1-03' AND clause_ref IN ('Part 4', 'Part 28')
 ORDER BY clause_ref DESC;

@@ -18,8 +18,10 @@ EXPORTS_DIR = BACKEND_DIR / "exports"
 
 EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# GCP settings
-GCP_PROJECT = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or "ongc-hr-finance-agent"
+# GCP settings (ignore ambient workstation GOOGLE_CLOUD_PROJECT unless TARGET_PROJECT/YUKTI_GCP_PROJECT is explicitly set)
+GCP_PROJECT = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or "yukti-finance-iocl"
+COMPANY_SHORT_NAME = os.getenv("YUKTI_COMPANY_SHORT_NAME", "IOCL")
+COMPANY_FULL_NAME = os.getenv("YUKTI_COMPANY_FULL_NAME", "Indian Oil Corporation Limited")
 BQ_LOCATION = os.getenv("BQ_LOCATION", "asia-south1")
 VERTEX_LOCATION = os.getenv("VERTEX_LOCATION", "us-central1")
 VERTEX_TEXT_LOCATION = os.getenv("YUKTI_TEXT_LOCATION", "global")
@@ -27,7 +29,7 @@ VERTEX_SEARCH_LOCATION = os.getenv("VERTEX_SEARCH_LOCATION", "global")
 VERTEX_SEARCH_ENGINE = "hrfin-doc-search-engine"
 
 # Models and Voices
-DEFAULT_TEXT_MODEL = os.getenv("YUKTI_TEXT_MODEL", "gemini-2.5-flash")
+DEFAULT_TEXT_MODEL = os.getenv("YUKTI_TEXT_MODEL", "gemini-3-flash-preview")
 DEFAULT_LIVE_MODEL = os.getenv("YUKTI_LIVE_MODEL", "gemini-3.8-live")
 FALLBACK_LIVE_MODEL = "gemini-live-2.5-flash-native-audio"
 DEFAULT_VOICE = "Leda"
@@ -131,28 +133,12 @@ def rewrite_dataset_sql(sql: str) -> str:
         if target_ds != base_ds:
             out = re.sub(rf"\b{base_ds}\b", target_ds, out)
     if BQ_GOLD_DATASET == "hrfin_gold_v3":
-        # Route unqualified field_pnl_annual (e.g. C6) to the RAS-reconciled v3 view in hrfin_gold_v3
+        # Route unqualified refinery_pnl_annual to reconciled v_refinery_pnl_v3 in hrfin_gold_v3
         out = re.sub(
-            r"(?<![.\w`])field_pnl_annual\b",
-            f"`{GCP_PROJECT}.hrfin_gold_v3.v_field_pnl_v3`",
+            r"(?<![.\w`])refinery_pnl_annual\b",
+            f"`{GCP_PROJECT}.hrfin_gold_v3.v_refinery_pnl_v3`",
             out,
         )
-        # Route annual field_pnl queries on ssot_field_economics_360 (field_id IS NOT NULL) to v_field_pnl_v3 (over v_field_economics_fy)
-        if "hrfin_gold_v3.ssot_field_economics_360" in out and "field_id IS NOT NULL" in out:
-            out = (
-                out.replace(
-                    f"`{GCP_PROJECT}.hrfin_gold_v3.ssot_field_economics_360`",
-                    f"`{GCP_PROJECT}.hrfin_gold_v3.v_field_pnl_v3`",
-                )
-                .replace(
-                    "WHERE field_id IS NOT NULL",
-                    "WHERE field_id IS NOT NULL AND LOWER(line_type) = 'field'",
-                )
-                .replace(
-                    "AND pnl.field_id IS NOT NULL",
-                    "AND pnl.field_id IS NOT NULL AND LOWER(pnl.line_type) = 'field'",
-                )
-            )
     return out
 
 
@@ -163,7 +149,7 @@ FX_INR_PER_USD = float(os.getenv("YUKTI_FX_INR_PER_USD", "88.33"))
 # P0.5 (BUG-32, SPEC-06 §4.7): deployment environment, admin routes and CORS allow-list
 YUKTI_ENV = os.getenv("YUKTI_ENV", "dev").strip().lower()
 YUKTI_ENABLE_ADMIN = os.getenv("YUKTI_ENABLE_ADMIN", "0").strip() == "1"
-DEFAULT_ALLOWED_ORIGINS = "http://localhost:3300,http://127.0.0.1:3300,http://localhost:3200,http://127.0.0.1:3200"
+DEFAULT_ALLOWED_ORIGINS = "http://localhost:3400,http://127.0.0.1:3400"
 
 
 def allowed_origins() -> list:
@@ -182,5 +168,8 @@ def allowed_origins() -> list:
     return items
 
 def v3_field_enabled(field: str) -> bool:
-    fields = [x.strip() for x in os.getenv("YUKTI_CONTRACT_V3_FIELDS", "").split(",") if x.strip()]
-    return field in fields
+    raw = os.getenv("YUKTI_CONTRACT_V3_FIELDS", "")
+    if not raw:
+        return False
+    tokens = {x.strip().lower() for x in raw.split(",") if x.strip()}
+    return field.strip().lower() in tokens or "all" in tokens or "*" in tokens

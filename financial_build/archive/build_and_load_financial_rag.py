@@ -4,10 +4,10 @@
 """
 Stage 4: Build & Load Hybrid Financial Context Database (10-Year Historical + Present FY17-FY26):
 1. Builds `financial_build/data/ssot_financial_line_context.json` (100 structured line-item context + Director Finance action records across FY17-FY26)
-   and loads into `ongc-hr-finance-agent.hrfin_gold.ssot_financial_line_context`.
+   and loads into `yukti-finance-iocl.hrfin_gold.ssot_financial_line_context`.
 2. Generates `financial_build/data/financial_notes_corpus.jsonl` (65+ rich causal & action chunks anchored by
    `fiscal_year`, `line_code`, `note_ref`, `section_type`, `causal_tags`, `yahoo_finance_equivalent`).
-3. Computes 768-d embeddings using Vertex AI `text-embedding-005` and loads into `ongc-hr-finance-agent.hrfin_docs.financial_notes_chunks`.
+3. Computes 768-d embeddings using Vertex AI `text-embedding-005` and loads into `yukti-finance-iocl.hrfin_docs.financial_notes_chunks`.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from google.cloud import bigquery
 from google import genai
 from google.genai import types
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "us-central1"
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"

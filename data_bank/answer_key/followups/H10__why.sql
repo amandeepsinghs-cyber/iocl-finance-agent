@@ -5,6 +5,6 @@
 -- body (discipline-for-discipline replacement and asset-head certification) is quoted.
 SELECT doc_id, clause_ref, heading,
        TRIM(SUBSTR(REGEXP_EXTRACT(text, r'(?s)\n\n(.*)'), 1, 700)) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'JRTP' AND clause_ref = 'Clause 10.0'
 ORDER BY doc_id, clause_ref;

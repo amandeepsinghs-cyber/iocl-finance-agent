@@ -1,24 +1,24 @@
 -- =============================================================================
 -- Yukti v3 Financial SSOT BigQuery DDL (SPEC-01 §5–§7, Packet P1.6)
--- Project: ongc-hr-finance-agent
+-- Project: yukti-finance-iocl
 -- Datasets: hrfin_bronze, hrfin_gold_staging, hrfin_gold
 -- Additive only: creates new v3 tables and views; never modifies or drops existing
 -- ssot_corporate_* tables.
 -- =============================================================================
 
-CREATE SCHEMA IF NOT EXISTS `ongc-hr-finance-agent.hrfin_bronze`
+CREATE SCHEMA IF NOT EXISTS `yukti-finance-iocl.hrfin_bronze`
   OPTIONS(location = "asia-south1", description = "Yukti v3 Financial SSOT Bronze landing tables");
 
-CREATE SCHEMA IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold_staging`
+CREATE SCHEMA IF NOT EXISTS `yukti-finance-iocl.hrfin_gold_staging`
   OPTIONS(location = "asia-south1", description = "Yukti v3 Financial SSOT Gold staging dataset for pre-promotion gate verification");
 
-CREATE SCHEMA IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold`
+CREATE SCHEMA IF NOT EXISTS `yukti-finance-iocl.hrfin_gold`
   OPTIONS(location = "asia-south1", description = "Yukti v3 Financial SSOT Verified Gold tables and views");
 
 -- -----------------------------------------------------------------------------
 -- 1. Bronze: raw extractions across AR 10-yr, AR statements/notes, and XBRL (SPEC-01 §5.3)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_bronze.fin_extract_raw` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_bronze.fin_extract_raw` (
   extract_id STRING NOT NULL,
   source_system STRING NOT NULL,
   source_doc STRING NOT NULL,
@@ -40,7 +40,7 @@ CLUSTER BY source_system, source_doc;
 -- -----------------------------------------------------------------------------
 -- 2. Gold: dim_financial_line (SPEC-01 §5.2 columns + backward-compatible aliases)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.dim_financial_line` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.dim_financial_line` (
   line_code STRING NOT NULL,
   statement STRING NOT NULL,
   display_name STRING NOT NULL,
@@ -84,7 +84,7 @@ CLUSTER BY statement, section;
 -- 3. Gold: fact_financial_statement_line (SPEC-01 §5.1)
 -- Partitioned by period_end (yearly), clustered by scope, statement, line_code
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` (
   fiscal_year STRING NOT NULL,
   period_type STRING NOT NULL,
   period_end DATE NOT NULL,
@@ -148,7 +148,7 @@ CLUSTER BY scope, statement, line_code;
 -- -----------------------------------------------------------------------------
 -- 4. Gold: Conflict & Restatement Audit Table (SPEC-01 §5.4 / §6.3)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_financial_line_conflict` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fact_financial_line_conflict` (
   fiscal_year STRING NOT NULL,
   scope STRING NOT NULL,
   line_code STRING NOT NULL,
@@ -170,7 +170,7 @@ CLUSTER BY fiscal_year, scope, line_code;
 -- -----------------------------------------------------------------------------
 -- 5. Gold: Gate Run Audit Table (SPEC-01 §6.3, Packet P1.6 §4)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fin_gate_run` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fin_gate_run` (
   run_id STRING NOT NULL,
   run_at STRING NOT NULL,
   gate_id STRING NOT NULL,
@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fin_gate_run` (
 -- -----------------------------------------------------------------------------
 -- 6. Gold: Anchor Tables (P1.7 / SPEC-01 §10)
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_segment` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fact_segment` (
   fiscal_year STRING NOT NULL,
   scope STRING NOT NULL,
   segment_code STRING NOT NULL,
@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_segment` (
   notes STRING
 );
 
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_production_annual` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fact_production_annual` (
   fiscal_year STRING NOT NULL,
   product STRING NOT NULL,
   basis STRING NOT NULL,
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_production_ann
   verified_rule_ids ARRAY<STRING>
 );
 
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_reserves` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fact_reserves` (
   fiscal_year STRING NOT NULL,
   as_of_date STRING,
   category STRING NOT NULL,
@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_reserves` (
   notes STRING
 );
 
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_hr_aggregates` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fact_hr_aggregates` (
   fiscal_year STRING NOT NULL,
   metric STRING NOT NULL,
   dimension STRING,
@@ -275,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_hr_aggregates`
   notes STRING
 );
 
-CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_price_realisation` (
+CREATE TABLE IF NOT EXISTS `yukti-finance-iocl.hrfin_gold.fact_price_realisation` (
   fiscal_year STRING NOT NULL,
   product STRING NOT NULL,
   basis STRING,
@@ -302,7 +302,7 @@ CREATE TABLE IF NOT EXISTS `ongc-hr-finance-agent.hrfin_gold.fact_price_realisat
 -- 7. Serving Views (SPEC-01 §5.5 & §7.1, B3 & I1)
 -- Guaranteed <= 1 row per (fiscal_year, scope, line_code)
 -- -----------------------------------------------------------------------------
-CREATE OR REPLACE VIEW `ongc-hr-finance-agent.hrfin_gold.v_fin_statement_as_reported` AS
+CREATE OR REPLACE VIEW `yukti-finance-iocl.hrfin_gold.v_fin_statement_as_reported` AS
 SELECT
   f.*,
   d.display_name,
@@ -332,14 +332,14 @@ SELECT
     WHEN f.source_system = 'xbrl' THEN CONCAT(f.fiscal_year, ' from ', f.report_vintage, ' BSE Reg 33 filing (AR PDF scanned)')
     ELSE NULL
   END AS footnote_marker
-FROM `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` f
-JOIN `ongc-hr-finance-agent.hrfin_gold.dim_financial_line` d
+FROM `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` f
+JOIN `yukti-finance-iocl.hrfin_gold.dim_financial_line` d
   USING (line_code)
 WHERE f.verified = TRUE
   AND f.period_type = 'annual'
   AND (f.is_own_vintage = TRUE OR f.is_fallback_vintage = TRUE);
 
-CREATE OR REPLACE VIEW `ongc-hr-finance-agent.hrfin_gold.v_fin_trend_latest` AS
+CREATE OR REPLACE VIEW `yukti-finance-iocl.hrfin_gold.v_fin_trend_latest` AS
 SELECT
   f.*,
   d.display_name,
@@ -369,14 +369,14 @@ SELECT
     WHEN f.is_fallback_vintage THEN CONCAT(f.fiscal_year, ' not printed in AR ', f.fiscal_year, '; taken from ', f.report_vintage, ' comparative/10-yr')
     ELSE NULL
   END AS footnote_marker
-FROM `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` f
-JOIN `ongc-hr-finance-agent.hrfin_gold.dim_financial_line` d
+FROM `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` f
+JOIN `yukti-finance-iocl.hrfin_gold.dim_financial_line` d
   USING (line_code)
 WHERE f.verified = TRUE
   AND f.period_type = 'annual'
   AND f.is_latest_vintage = TRUE;
 
-CREATE OR REPLACE VIEW `ongc-hr-finance-agent.hrfin_gold.v_fin_quarterly_xbrl` AS
+CREATE OR REPLACE VIEW `yukti-finance-iocl.hrfin_gold.v_fin_quarterly_xbrl` AS
 SELECT
   f.*,
   d.display_name,
@@ -387,13 +387,13 @@ SELECT
   d.line_kind,
   d.unit_default,
   d.is_kpi
-FROM `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` f
-JOIN `ongc-hr-finance-agent.hrfin_gold.dim_financial_line` d
+FROM `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` f
+JOIN `yukti-finance-iocl.hrfin_gold.dim_financial_line` d
   USING (line_code)
 WHERE f.verified = TRUE
   AND f.period_type = 'quarter';
 
-CREATE OR REPLACE VIEW `ongc-hr-finance-agent.hrfin_gold.v_fin_opening_bs` AS
+CREATE OR REPLACE VIEW `yukti-finance-iocl.hrfin_gold.v_fin_opening_bs` AS
 SELECT
   f.*,
   d.display_name,
@@ -404,13 +404,13 @@ SELECT
   d.line_kind,
   d.unit_default,
   d.is_kpi
-FROM `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` f
-JOIN `ongc-hr-finance-agent.hrfin_gold.dim_financial_line` d
+FROM `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` f
+JOIN `yukti-finance-iocl.hrfin_gold.dim_financial_line` d
   USING (line_code)
 WHERE f.verified = TRUE
   AND f.period_type = 'opening';
 
-CREATE OR REPLACE VIEW `ongc-hr-finance-agent.hrfin_gold.v_fin_yahoo_view` AS
+CREATE OR REPLACE VIEW `yukti-finance-iocl.hrfin_gold.v_fin_yahoo_view` AS
 SELECT
   f.fiscal_year,
   f.period_type,
@@ -427,14 +427,14 @@ SELECT
   f.report_vintage,
   f.source_doc,
   f.source_page
-FROM `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` f
-JOIN `ongc-hr-finance-agent.hrfin_gold.dim_financial_line` d
+FROM `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` f
+JOIN `yukti-finance-iocl.hrfin_gold.dim_financial_line` d
   USING (line_code)
 WHERE f.verified = TRUE
   AND f.source_system = 'yahoo'
   AND f.scope = 'consolidated';
 
-CREATE OR REPLACE VIEW `ongc-hr-finance-agent.hrfin_gold.v_fin_coverage` AS
+CREATE OR REPLACE VIEW `yukti-finance-iocl.hrfin_gold.v_fin_coverage` AS
 SELECT
   f.fiscal_year,
   f.scope,
@@ -447,7 +447,7 @@ SELECT
   COUNTIF(f.is_restated) AS restated_lines,
   MIN(f.report_vintage) AS earliest_vintage,
   MAX(f.report_vintage) AS latest_vintage
-FROM `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` f
-LEFT JOIN `ongc-hr-finance-agent.hrfin_gold.dim_financial_line` d
+FROM `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` f
+LEFT JOIN `yukti-finance-iocl.hrfin_gold.dim_financial_line` d
   USING (line_code)
 GROUP BY 1, 2, 3, 4;

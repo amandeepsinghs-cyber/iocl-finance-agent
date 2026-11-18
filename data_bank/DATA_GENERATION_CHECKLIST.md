@@ -1,6 +1,6 @@
 # ONGC HR & Finance Data Bank: Generation Checklist
 
-**Project root:** `HR and Finance_ONGC/` · **GCP project:** `ongc-hr-finance-agent` · **Region:** `asia-south1` (Mumbai)
+**Project root:** `HR and Finance_ONGC/` · **GCP project:** `yukti-finance-iocl` · **Region:** `asia-south1` (Mumbai)
 **Specs:** [`docs/data_requirements_spec.md`](../docs/data_requirements_spec.md) · [`docs/question_bank.md`](../docs/question_bank.md) · [`knowledge/public_sources/grounding_data/FACTS.md`](../knowledge/public_sources/grounding_data/FACTS.md) · [`knowledge/public_sources/policies/MANIFEST.md`](../knowledge/public_sources/policies/MANIFEST.md)
 
 > [!IMPORTANT]
@@ -91,9 +91,9 @@ data_bank/
 | # | Step | Owner | Output | Automated test |
 |---|---|---|---|---|
 | [x] 0.1 | Scaffold folders, `pyproject.toml` (pandas, numpy, faker[en_IN], pyyaml, openpyxl, python-docx, reportlab, pillow, pdf2image, pytest, google-cloud-bigquery, google-cloud-storage), `uv sync` | F | Folder tree, `.venv` | `uv run pytest tests/test_00_env.py` (imports, folders exist) |
-| [x] 0.2 | `gcloud auth login` + `gcloud auth application-default login`; set project | **U** | Authenticated CLI | `gcloud config get-value project` = `ongc-hr-finance-agent` |
+| [x] 0.2 | `gcloud auth login` + `gcloud auth application-default login`; set project | **U** | Authenticated CLI | `gcloud config get-value project` = `yukti-finance-iocl` |
 | [x] 0.3 | Enable APIs: bigquery, storage, documentai, discoveryengine, aiplatform, dataform, run, cloudbuild | L (needs your OK) | APIs enabled | `gcloud services list --enabled` contains all |
-| [x] 0.4 | Create buckets `gs://ongc-hr-finance-agent-landing` (versioned), `gs://ongc-hr-finance-agent-docs`; datasets `hrfin_bronze`, `hrfin_silver`, `hrfin_gold`, `hrfin_docs` (asia-south1) | L | Buckets + datasets | `bq ls`, `gcloud storage ls` |
+| [x] 0.4 | Create buckets `gs://yukti-finance-iocl-landing` (versioned), `gs://yukti-finance-iocl-docs`; datasets `hrfin_bronze`, `hrfin_silver`, `hrfin_gold`, `hrfin_docs` (asia-south1) | L | Buckets + datasets | `bq ls`, `gcloud storage ls` |
 
 ## Phase 1: World Bible (the contract for everything else)
 | # | Step | Owner | Output | Automated test |

@@ -36,9 +36,9 @@ export const V2_FIXTURES: FixtureMeta[] = [
   },
   {
     id: 'v2_roster_aggregate_e2',
-    name: 'V2 Delhi Roster Aggregate (E2_HR)',
+    name: 'V2 Delhi Roster Aggregate (E2_FIN)',
     question: 'Delhi executives with 5+ years stay by grade',
-    persona: 'E2_HR',
+    persona: 'E2_FIN',
     type: 'table (aggregate)',
     data: v2RosterAggregateE2 as unknown as AnswerContract,
   },

@@ -10,7 +10,12 @@ import React from 'react';
 import type { ActionsSpec, ActionItem } from '@/contracts/answerContract';
 import { fmtNum } from '@/charts/format';
 
-const OWNER_LABEL: Record<string, string> = { CMD: 'CMD', DIR_FIN: 'Director (Finance)', DIR_HR: 'Director (HR)' };
+const OWNER_LABEL: Record<string, string> = {
+  CMD: 'Chairman',
+  DIR_FIN: 'Director (Finance)',
+  DIR_REF: 'Director (Refineries)',
+  DIR_MKT: 'Director (Marketing)',
+};
 
 export function impactText(i: ActionItem['impact']): string {
   const f = (v?: number) => (typeof v === 'number' && Number.isFinite(v) ? `₹${fmtNum(v, Math.abs(v) >= 100 ? 0 : 1)} cr` : '');

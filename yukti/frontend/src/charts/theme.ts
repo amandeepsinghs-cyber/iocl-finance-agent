@@ -1,5 +1,5 @@
 /**
- * Chart theme tokens (AlphaEvolve deck + ONGC maroon), light & dark.
+ * Chart theme tokens (AlphaEvolve deck + IndianOil Navy/Saffron), light & dark.
  * All colours are read from the single design-token source: src/design/tokens.json (U1.1).
  */
 import * as echarts from 'echarts';

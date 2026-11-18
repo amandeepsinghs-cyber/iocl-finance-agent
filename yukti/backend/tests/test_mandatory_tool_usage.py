@@ -1,4 +1,4 @@
-"""Unit test verifying that any question about ONGC numbers/metrics must call a tool,
+"""Unit test verifying that any question about IOCL numbers/metrics must call a tool,
 ensuring W1 spoken contains '$60', and checking politician name hygiene.
 """
 
@@ -10,16 +10,17 @@ import pytest
 # Add backend directory to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from app.config import DEFAULT_TEXT_MODEL
 from app.tools.draft_document import sanitize_fictional_names
 from app.turn_runner import AgentTurnRunner
 
 
 @pytest.mark.asyncio
 async def test_data_query_calls_tool_or_blocks_ungrounded():
-    runner = AgentTurnRunner(model_name="gemini-2.5-flash")
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
 
-    # Numerical query about water cut and lifting cost (ST-1)
-    q = "What is the correlation between water cut percentage and lifting cost across our top 10 producing onshore fields in FY26?"
+    # Numerical query about IOCL refinery throughput and GRM in FY26
+    q = "Compare FY26 crude throughput and GRM across our 9 standalone refineries."
     res = await runner.execute_turn_async(q, session_id="test-mandatory-tool-1", persona="CMD")
 
     tool = res.get("tool_called")
@@ -37,7 +38,7 @@ async def test_data_query_calls_tool_or_blocks_ungrounded():
 
 @pytest.mark.asyncio
 async def test_greeting_allows_direct_response():
-    runner = AgentTurnRunner(model_name="gemini-2.5-flash")
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
 
     q = "Hello"
     res = await runner.execute_turn_async(q, session_id="test-greeting-1", persona="CMD")
@@ -47,9 +48,9 @@ async def test_greeting_allows_direct_response():
 
 @pytest.mark.asyncio
 async def test_w1_contains_60_dollars():
-    runner = AgentTurnRunner(model_name="gemini-2.5-flash")
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
 
-    q = "What-if: If Brent crude price drops to $60 per barrel, which fields become cash negative?"
+    q = "What-if: If Brent crude price drops to $60 per barrel, how do IOCL refinery economics and GRM change?"
     res = await runner.execute_turn_async(q, session_id="test-w1-60", persona="CMD")
 
     spoken = res.get("spoken_summary", "")

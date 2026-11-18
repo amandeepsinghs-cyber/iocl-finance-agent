@@ -7,7 +7,7 @@
   "visual": {
     "type": "chart",
     "mode": "replace",
-    "title": "ONGC Field Profitability (PBT in \u20b9 Crore) \u2014 FY26 Top Earners vs Loss Fields",
+    "title": "Operating Unit Profitability (PBT in \u20b9 Crore) \u2014 FY26 Comparison (Illustrative)",
     "chart": {
       "kind": "hbar",
       "y": "field",

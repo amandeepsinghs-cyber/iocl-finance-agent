@@ -21,14 +21,14 @@ def handle_greeting(query: str, session_state: Any, norm_persona: str, det_lang:
         return None
         
     role_title = {
-        "CMD": "Arun",
-        "DIR_HR": "Director HR",
+        "CMD": "Mr. Sahney",
         "DIR_FIN": "Director Finance",
-        "E1_HR": "Officer",
-        "E2_HR": "Manager",
-        "E3_HR": "Chief Manager",
-        "E1_FIN": "Officer",
-        "E2_FIN": "Manager",
+        "DIR_REF": "Director Refineries",
+        "DIR_MKT": "Director Marketing",
+        "E1_FIN": "Ajay",
+        "E2_FIN": "Praveen",
+        "E3_FIN": "Shailesh",
+        "E4_FIN": "Santosh",
     }.get(norm_persona, norm_persona)
 
     coverage_text = ""
@@ -37,16 +37,16 @@ def handle_greeting(query: str, session_state: Any, norm_persona: str, det_lang:
         manifest = get_manifest()
         coverage_text = manifest.get_summary_text(lang=det_lang)
     except Exception:
-        coverage_text = "I can analyze workforce tenure and vacancies across all work centres, track field-level P&L and lifting costs, run Brent crude what-if simulations, and draft Board Notes or Parliament replies."
+        coverage_text = "I can analyze IndianOil's 10-year Schedule III statements (Gross vs. Net of Excise), refinery GRMs and downstream 360 performance, Brent/INR what-if scenarios, NSE:IOC DCF valuation, and MoU scorecards."
 
     if is_hindi_cap_q:
         spoken_conv = f"हाँ {role_title}, मैं हिंदी में बात कर सकती हूँ और आपकी मदद कर सकती हूँ।"
     elif det_lang == "hi":
-        spoken_conv = f"नमस्ते {role_title}। मैं युक्ति हूँ, आपकी एचआर और वित्त मुख्य सलाहकार। {coverage_text}"
+        spoken_conv = f"नमस्ते {role_title}। मैं युक्ति हूँ, IndianOil की वित्त और डाउनस्ट्रीम मुख्य सलाहकार। {coverage_text}"
     elif det_lang == "hi-en":
-        spoken_conv = f"Namaste {role_title}! Main Yukti hoon, aapki HR aur Finance Chief of Staff. {coverage_text}"
+        spoken_conv = f"Namaste {role_title}! Main Yukti hoon, aapki IndianOil Finance & Downstream Chief of Staff. {coverage_text}"
     elif is_who_q or is_cap_q:
-        spoken_conv = f"I am Yukti, your executive HR and Finance intelligence partner at ONGC. {coverage_text}"
+        spoken_conv = f"I am Yukti, your executive Finance and Downstream intelligence partner at IndianOil. {coverage_text}"
     elif "thank" in q_clean or q_clean in ("ok", "okay", "great"):
         spoken_conv = f"Glad to help, {role_title}. Let me know what we should examine next."
     else:
@@ -61,7 +61,11 @@ def handle_greeting(query: str, session_state: Any, norm_persona: str, det_lang:
         "visual": {"type": "none", "mode": "replace"},
         "insights": [],
         "sources": [],
-        "suggestions": ["What can you do?", "Show me the balance sheet", "How many employees in Delhi?"],
+        "suggestions": [
+            "Compare FY17–FY26 Gross vs Net Revenue and PAT",
+            "Compare FY26 refinery throughput and GRM across refineries",
+            "Run live NSE:IOC DCF valuation",
+        ],
         "access": {"status": "allowed"},
         "export_options": [],
         "status_events": ["Conversational greeting"],

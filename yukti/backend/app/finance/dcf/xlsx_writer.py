@@ -9,7 +9,7 @@ def write_dcf_xlsx(result: Dict[str, Any], filename: str):
     # 1. Cover
     ws_cover = wb.active
     ws_cover.title = "Cover"
-    ws_cover["A1"] = "ONGC DCF Valuation"
+    ws_cover["A1"] = "IndianOil (NSE:IOC) DCF Valuation"
     ws_cover["A1"].font = Font(bold=True, size=14)
     ws_cover["A3"] = result.get("disclaimer", "Illustrative valuation, not investment advice.")
     ws_cover["A3"].font = Font(bold=True)

@@ -14,7 +14,7 @@ WITH d AS (
         COUNT(DISTINCT CASE WHEN v.continuous_stay_months >= 60 AND v.grade_id = 'E5' THEN v.emp_id END) AS e5_past_5yr,
         COUNT(DISTINCT CASE WHEN v.continuous_stay_months >= 60 AND v.grade_id = 'E6' THEN v.emp_id END) AS e6_past_5yr,
         COUNT(DISTINCT CASE WHEN v.continuous_stay_months >= 60 AND v.grade_id = 'E7' THEN v.emp_id END) AS e7_past_5yr
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
     WHERE v.is_current_stay = TRUE
       AND v.wc_id = 'WC-DEL'
       AND v.grade_id IN ('E5', 'E6', 'E7')

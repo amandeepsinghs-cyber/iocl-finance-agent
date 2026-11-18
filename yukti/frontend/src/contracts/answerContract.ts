@@ -5,12 +5,9 @@
 
 export type PersonaV3Type =
   | 'CMD'
-  | 'DIR_HR'
   | 'DIR_FIN'
-  | 'E1_HR'
-  | 'E2_HR'
-  | 'E3_HR'
-  | 'E4_HR'
+  | 'DIR_REF'
+  | 'DIR_MKT'
   | 'E1_FIN'
   | 'E2_FIN'
   | 'E3_FIN'
@@ -120,7 +117,7 @@ export interface TableSpec {
   row_actions?: RowAction[];
   /** P2H.3 (SPEC-07 §4.3): header text per column key (falls back to humanizeKey) */
   column_labels?: Record<string, string>;
-  /** P2H.3: present in rows but hidden by default; CMD / DIR_HR can reveal them with the column picker */
+  /** P2H.3: present in rows but hidden by default; CMD / DIR_FIN can reveal them with the column picker */
   hidden_columns?: string[];
   /** P2H.3: initial sort, e.g. { key: 'delhi_tenure_years', dir: 'desc' } */
   default_sort?: { key: string; dir: 'asc' | 'desc' };
@@ -223,6 +220,8 @@ export interface StatementRow {
   is_total?: boolean;
   is_subtotal?: boolean;
   indent?: number;
+  /** optional per-row display unit override (e.g. 'x' for Discount factor) */
+  unit?: string;
   /** period → value; null/absent renders "—" (never 0) */
   values: Record<string, number | null>;
   amount_cr?: number | null;
@@ -312,8 +311,8 @@ export interface ActionItem {
   what_to_do: string;
   impact: ActionImpact;
   quantified_impact?: ActionImpact;
-  /** absent for E1–E4 personas ("for discussion", SPEC-08 §7.4) */
-  owner?: 'CMD' | 'DIR_FIN' | 'DIR_HR' | string | null;
+  /** absent for E1–E4 / Grade A–D personas ("for discussion", SPEC-08 §7.4) */
+  owner?: 'CMD' | 'DIR_FIN' | 'DIR_REF' | 'DIR_MKT' | string | null;
   horizon_days?: 30 | 90 | 180 | number | null;
   kpi: string;
   evidence: ({ type: 'data' | 'ar'; ref: string } | Record<string, any>)[];
@@ -430,7 +429,6 @@ export interface ClarifySpec {
 // ---------- P3.1 (SPEC-03 §5.2): proposed_action, editable_input, job, provenance ----------
 export type AgentKind =
   | 'dcf_agent'
-  | 'hr_transfer_agent'
   | 'fin_diagnostics_agent'
   | 'doc_export_agent';
 

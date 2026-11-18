@@ -50,7 +50,7 @@ def setup_config(monkeypatch):
     
     class MockRetriever:
         def retrieve(self, *args, **kwargs):
-            return [{"text": "We saw an impact.", "citation": "[AR FY25 p.100]", "source_doc": "ONGC_AR_FY2024-25.txt", "source_page": "100"}]
+            return [{"text": "We saw an impact.", "citation": "[AR FY25 p.100]", "source_doc": "IOCL_AR_FY2024-25.txt", "source_page": "100"}]
     
     import app.agents.fin_diagnostics.why
     monkeypatch.setattr(app.agents.fin_diagnostics.why, "ARRetriever", lambda: MockRetriever())

@@ -177,7 +177,7 @@ class JobExecutor:
 
         if agent_id in self._agent_runners:
             result = await self._agent_runners[agent_id](job_id, proposed_action, session_id, report_step)
-        elif agent_id in ("dcf_agent", "fin_diagnostics_agent", "hr_transfer_agent", "doc_export_agent"):
+        elif agent_id in ("dcf_agent", "fin_diagnostics_agent", "doc_export_agent"):
             for i, st in enumerate(job_steps):
                 await report_step(st["id"], "running", i / max(len(job_steps), 1))
                 await asyncio.sleep(self.step_delay_sec)
@@ -229,7 +229,7 @@ class JobExecutor:
                     verdict = dcf_res["per_share"]["verdict"]
                     spoken = (
                         f"The DCF valuation is ready. Intrinsic value is ₹{iv:.2f} per share against a market price of ₹{px:.2f} "
-                        f"(as of {px_meta.get('date', '2026-03-30')}), so the model suggests ONGC is {verdict} by {abs(upside):.1f}%. "
+                        f"(as of {px_meta.get('date', '2026-03-30')}), so the model suggests IOCL is {verdict} by {abs(upside):.1f}%. "
                         f"{disclaimer}"
                     )
                     result = {
@@ -241,7 +241,7 @@ class JobExecutor:
                         "visual": {
                             "type": "dcf_model",
                             "mode": "replace",
-                            "title": "ONGC Standalone DCF Valuation (Illustrative)",
+                            "title": "IOCL Standalone DCF Valuation (Illustrative)",
                             "dcf_model": dcf_model,
                             "model_id": dcf_res.get("model_id") or f"dcf_{job_id}",
                             "as_of": dcf_res["as_of"],
@@ -262,12 +262,12 @@ class JobExecutor:
                             {
                                 "kind": "data",
                                 "object": wacc_meta.get("object", "hrfin_gold.fact_wacc_annual"),
-                                "title": f"ONGC WACC SSOT FY26 ({asm.wacc_pct.value:.4f}%)",
+                                "title": f"IOCL WACC SSOT FY26 ({asm.wacc_pct.value:.4f}%)",
                             },
                             {
                                 "kind": "data",
                                 "object": px_meta.get("source_doc", "market_prices_seed.csv"),
-                                "title": f"NSE ONGC.NS Close ({px_meta.get('date', '2026-03-30')}: ₹{px:.2f})",
+                                "title": f"NSE IOC.NS Close ({px_meta.get('date', '2026-03-30')}: ₹{px:.2f})",
                             },
                         ],
                         "export_options": ["xlsx", "pdf"],
@@ -289,7 +289,7 @@ class JobExecutor:
                     },
                     "access": {"status": "allowed"},
                     "sources": [
-                        {"kind": "data", "object": "hrfin_gold.fact_wacc_annual", "title": "ONGC WACC SSOT FY26"},
+                        {"kind": "data", "object": "hrfin_gold.fact_wacc_annual", "title": "IOCL WACC SSOT FY26"},
                     ],
                     "export_options": ["xlsx", "pdf"],
                     "caveat": disclaimer,
@@ -329,6 +329,9 @@ class JobExecutor:
         sm = get_session_manager()
         if session_id in sm.sessions:
             sess = sm.sessions[session_id]
+            pa_id_done = proposed_action.get("id")
+            if pa_id_done and hasattr(sess, "pending_actions"):
+                sess.pending_actions.pop(pa_id_done, None)
             sess.jobs.append({"id": job_id, "agent": agent_id, "status": "succeeded", "turn_id": f"job:{job_id}"})
             sess.last_agent_result = {"agent": agent_id, "run_id": job_id, "turn_id": f"job:{job_id}", "inputs": proposed_action.get("inputs") or {}}
             sess.record_turn(result)

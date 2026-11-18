@@ -667,12 +667,9 @@
     "persona": {
       "enum": [
         "CMD",
-        "DIR_HR",
         "DIR_FIN",
-        "E1_HR",
-        "E2_HR",
-        "E3_HR",
-        "E4_HR",
+        "DIR_REF",
+        "DIR_MKT",
         "E1_FIN",
         "E2_FIN",
         "E3_FIN",
@@ -698,7 +695,6 @@
         "agent": {
           "enum": [
             "dcf_agent",
-            "hr_transfer_agent",
             "fin_diagnostics_agent",
             "doc_export_agent"
           ]
@@ -940,7 +936,7 @@
         },
         "detail": {
           "type": "string",
-          "description": "e.g. 'ONGC AR FY2023-24, Standalone P&L p.245'"
+          "description": "e.g. 'IOCL AR FY2023-24, Standalone P&L p.245'"
         },
         "snapshot_date": {
           "type": [
@@ -1227,7 +1223,8 @@
                 "enum": [
                   "CMD",
                   "DIR_FIN",
-                  "DIR_HR"
+                  "DIR_REF",
+                  "DIR_MKT"
                 ]
               },
               "horizon_days": {

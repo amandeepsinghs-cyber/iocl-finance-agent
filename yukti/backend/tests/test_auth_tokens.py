@@ -32,10 +32,10 @@ def _client():
 
 
 def test_issue_and_verify_roundtrip():
-    tok = auth.issue_token("E2_HR")
+    tok = auth.issue_token("E2_FIN")
     p = auth.verify_token(tok)
-    assert p.persona == "E2_HR" and p.grade == "E2" and p.function == "HR" and not p.is_admin
-    assert p.display_name == "Pooja Verma"
+    assert p.persona == "E2_FIN" and p.grade == "B" and p.function == "FIN" and not p.is_admin
+    assert p.display_name == "Praveen Nair"
     hdr = json.loads(base64.urlsafe_b64decode(tok.split(".")[0] + "=="))
     assert hdr == {"alg": "HS256", "typ": "JWT"}
     claims = json.loads(base64.urlsafe_b64decode(tok.split(".")[1] + "=="))
@@ -44,7 +44,7 @@ def test_issue_and_verify_roundtrip():
 
 
 def test_forged_signature_rejected():
-    tok = auth.issue_token("E2_HR")
+    tok = auth.issue_token("E2_FIN")
     h, p, s = tok.split(".")
     claims = json.loads(base64.urlsafe_b64decode(p + "=="))
     claims["persona"] = "CMD"
@@ -110,12 +110,9 @@ def test_personas_listing_has_p0_set():
     ids = [p["id"] for p in _client().get("/api/auth/personas").json()["personas"]]
     assert ids == [
         "CMD",
-        "DIR_HR",
         "DIR_FIN",
-        "E1_HR",
-        "E2_HR",
-        "E3_HR",
-        "E4_HR",
+        "DIR_REF",
+        "DIR_MKT",
         "E1_FIN",
         "E2_FIN",
         "E3_FIN",
@@ -138,7 +135,7 @@ def test_admin_session_requires_configured_passphrase(monkeypatch):
 # ---------------------------------------------------------------- P0.4 r2 (G4 must-fix 1, 2; minors 3, 5)
 @pytest.mark.parametrize("mutate", ["sig_non_ascii", "hdr_non_ascii", "junk_chars"])
 def test_non_ascii_or_junk_tokens_are_401_not_500(mutate):
-    tok = auth.issue_token("E2_HR")
+    tok = auth.issue_token("E2_FIN")
     h, p, s = tok.split(".")
     bad = {"sig_non_ascii": f"{h}.{p}.é", "hdr_non_ascii": f"hé{h}.{p}.{s}", "junk_chars": f"{h}.{p}.{s}+/="}[mutate]
     with pytest.raises(auth.AuthError):

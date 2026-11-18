@@ -7,7 +7,7 @@ import { ChartSpec } from '@/contracts/answerContract';
 import { ChartTokens, px } from './theme';
 import { legendName } from './options';
 
-export type OilBenchmark = 'brent' | 'wti' | 'inr';
+export type OilBenchmark = 'brent' | 'wti' | 'grm' | 'inr';
 
 export interface OilPricePayload {
   benchmark: OilBenchmark;

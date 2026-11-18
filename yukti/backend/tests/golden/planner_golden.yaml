@@ -1,405 +1,297 @@
 - id: G01
-  question: "How many executives have been posted in the Delhi office for 5 years or more?"
+  question: "Show the Schedule III Profit and Loss statement of IOCL for FY26"
   prior: null
   expect:
     intent: data
-    metric: headcount
-    grain: aggregate
-    dimensions: ['grade']
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
+    metric: pnl_statement
+    period: {fy: FY26}
   spec:
     version: 1
-    domain: hr
-    metric: headcount
+    domain: finance
+    metric: pnl_statement
     grain: aggregate
-    dimensions: ['grade']
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
+    dimensions: []
+    filters: []
+    period:
+      fy: FY26
 
 - id: G02
-  question: "Give me their names"
+  question: "Show this as a waterfall chart"
   prior: G01
   expect:
+    intent: data
     is_followup: true
-    grain: row
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-  spec:
-    version: 1
-    domain: hr
-    metric: headcount
-    grain: row
-    dimensions: []
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
+    metric: pnl_statement
 
 - id: G03
-  question: "Break it down by discipline"
-  prior: G02
+  question: "What was Central Excise Duty in FY26?"
+  prior: null
   expect:
-    grain: aggregate
-    dimensions: [discipline]
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-  spec:
-    version: 1
-    domain: hr
-    metric: headcount
-    grain: aggregate
-    dimensions: [discipline]
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
+    intent: data
+    metric: excise_duty_cr
+    period: {fy: FY26}
 
 - id: G04
-  question: "Compare with Mumbai"
-  prior: G03
+  question: "Compare IOCL Net Revenue and PAT from FY17 to FY26 year by year"
+  prior: null
   expect:
-    dimensions: [wc, discipline]
-    filters:
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-      - {field: wc, op: in, value: [WC-DEL, WC-MUM]}
-  spec:
-    version: 1
-    domain: hr
-    metric: headcount
-    grain: aggregate
-    dimensions: [wc, discipline]
-    filters:
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-      - {field: wc, op: in, value: [WC-DEL, WC-MUM]}
+    intent: data
+    metric_in: [net_revenue_cr, pat_cr, corporate_revenue_cr]
+    dimensions_include: [fy]
+    period: {from: FY17, to: FY26}
 
 - id: G05
-  question: "Only E5 and above"
-  prior: G04
+  question: "Show IOCL's Consolidated PAT in FY26"
+  prior: null
   expect:
-    dimensions: [wc, discipline]
-    filters:
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-      - {field: wc, op: in, value: [WC-DEL, WC-MUM]}
-      - {field: grade, op: ">=", value: E5}
-  spec:
-    version: 1
-    domain: hr
-    metric: headcount
-    grain: aggregate
-    dimensions: [wc, discipline]
-    filters:
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-      - {field: wc, op: in, value: [WC-DEL, WC-MUM]}
-      - {field: grade, op: ">=", value: E5}
+    intent: data
+    metric: consolidated_pat_cr
+    period: {fy: FY26}
 
 - id: G06
-  question: "What about last year?"
-  prior: G05
+  question: "Show IOCL subsidiary PAT by subsidiary for FY26"
+  prior: null
   expect:
+    intent: data
+    metric_in: [subsidiary_pat_cr, iocl_share_pat_cr]
+    dimensions_include: [subsidiary]
     period: {fy: FY26}
-    filters:
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-      - {field: wc, op: in, value: [WC-DEL, WC-MUM]}
-      - {field: grade, op: ">=", value: E5}
   spec:
     version: 1
-    domain: hr
-    metric: headcount
+    domain: finance
+    metric: subsidiary_pat_cr
     grain: aggregate
-    dimensions: [wc, discipline]
-    filters:
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-      - {field: wc, op: in, value: [WC-DEL, WC-MUM]}
-      - {field: grade, op: ">=", value: E5}
+    dimensions: [subsidiary]
+    filters: []
     period:
       fy: FY26
 
 - id: G07
-  question: "Draft a transfer note for them"
+  question: "What about FY25?"
   prior: G06
   expect:
-    intent: document
+    is_followup: true
+    period: {fy: FY25}
 
 - id: G08
-  question: "Mumbai mein 5 saal se zyada kitne executives hain?"
+  question: "Rank all IOCL refineries by Gross Refining Margin ($/bbl) in FY26"
   prior: null
   expect:
-    metric: headcount
-    filters:
-      - {field: wc, op: "=", value: WC-MUM}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
+    intent: data
+    metric_in: [refinery_grm_usd_bbl, gross_refining_margin_usd_bbl]
+    dimensions_include: [refinery]
+    period: {fy: FY26}
+  spec:
+    version: 1
+    domain: finance
+    metric: refinery_grm_usd_bbl
+    grain: aggregate
+    dimensions: [refinery]
+    filters: []
+    period:
+      fy: FY26
 
 - id: G09
-  question: "Dilli HQ mein paanch saal se zyada officers kitne hain?"
-  prior: null
-  expect:
-    metric: headcount
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-
-- id: G10
-  question: "How many officers in Dehradun have stayed more than five years?"
-  prior: null
-  expect:
-    metric: headcount
-    filters:
-      - {field: wc, op: "=", value: WC-DDN}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-
-- id: G11
-  question: "Delhi HQ executives with 5+ years of station tenure, by grade"
-  prior: null
-  expect:
-    metric: headcount
-    dimensions: [grade]
-    filters:
-      - {field: wc, op: "=", value: WC-DEL}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-
-- id: G12
-  question: "What about Mumbai?"
-  prior: G01
+  question: "Compare with refinery EBITDA"
+  prior: G08
   expect:
     is_followup: true
-    filters:
-      - {field: wc, op: "=", value: WC-MUM}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
-  spec:
-    version: 1
-    domain: hr
-    metric: headcount
-    grain: aggregate
-    dimensions: ['grade']
-    filters:
-      - {field: wc, op: "=", value: WC-MUM}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
+    metric: refinery_ebitda_cr
+
+- id: G10
+  question: "Show crude throughput (MMT) across all refineries in FY26"
+  prior: null
+  expect:
+    intent: data
+    metric_in: [refinery_throughput_mmt, corporate_refining_throughput_mmt]
+    dimensions_include: [refinery]
+    period: {fy: FY26}
+
+- id: G11
+  question: "Compare distillate yield % across IOCL refineries in FY26"
+  prior: null
+  expect:
+    intent: data
+    metric_in: [refinery_distillate_yield_pct, corporate_distillate_yield_pct]
+    dimensions_include: [refinery]
+    period: {fy: FY26}
+
+- id: G12
+  question: "Compare fuel and loss % across all IOCL refineries in FY26"
+  prior: null
+  expect:
+    intent: data
+    metric_in: [refinery_fuel_loss_pct, corporate_fuel_and_loss_pct]
+    dimensions_include: [refinery]
+    period: {fy: FY26}
 
 - id: G13
-  question: "List them"
-  prior: G12
+  question: "Show IOCL pipeline throughput (MMT) by pipeline in FY26"
+  prior: null
   expect:
-    grain: row
-    filters:
-      - {field: wc, op: "=", value: WC-MUM}
-      - {field: cadre, op: "=", value: executive}
-      - {field: station_tenure_years, op: ">=", value: 5}
+    intent: data
+    metric_in: [pipeline_throughput_mmt, corporate_pipeline_throughput_mmt]
+    dimensions_include: [pipeline]
+    period: {fy: FY26}
 
 - id: G14
-  question: "Which fields were the most profitable and which made losses in FY26?"
+  question: "Break down IOCL marketing sales volume (MMT) by product in FY26"
   prior: null
   expect:
-    metric: pbt_cr
-    dimensions: [field]
+    intent: data
+    metric_in: [marketing_volume_mmt, corporate_marketing_sales_mmt]
+    dimensions_include: [product]
     period: {fy: FY26}
-    filters: []
-  spec:
-    version: 1
-    domain: finance
-    metric: pbt_cr
-    grain: aggregate
-    dimensions: [field]
-    filters: []
-    period:
-      fy: FY26
 
 - id: G15
-  question: "Show the same by capex invested"
-  prior: G14
+  question: "Compare segment EBIT by segment in FY26"
+  prior: null
   expect:
-    metric: capex_actual_cr
-    dimensions: [asset]
+    intent: data
+    metric_in: [segment_ebit_cr, segment_revenue_cr]
+    dimensions_include: [segment]
+    period: {fy: FY26}
+
+- id: G16
+  question: "Show IOCL's Schedule III Balance Sheet for FY26"
+  prior: null
+  expect:
+    intent: data
+    metric: balance_sheet
+    period: {fy: FY26}
   spec:
     version: 1
     domain: finance
-    metric: capex_actual_cr
+    metric: balance_sheet
     grain: aggregate
-    dimensions: [asset]
+    dimensions: []
     filters: []
     period:
       fy: FY26
 
-- id: G16
-  question: "Which assets are under-invested relative to their reserves?"
-  prior: G15
-  expect:
-    metric: capex_vs_reserves
-
 - id: G17
-  question: "How are we tracking against our MoU targets this year?"
+  question: "Show IOCL's Balance Sheet trend from FY17 to FY26"
   prior: null
   expect:
-    metric: mou_scorecard
-    period: {fy: FY27}
+    intent: data
+    metric: balance_sheet
+    dimensions_include: [fy]
+    period: {from: FY17, to: FY26}
 
 - id: G18
-  question: "Draft a board note on this"
-  prior: G14
+  question: "How did IOCL's Total Borrowings move from FY17 to FY26?"
+  prior: null
   expect:
-    intent: document
+    intent: data
+    metric_in: [total_debt_cr, net_debt_cr]
+    dimensions_include: [fy]
+    period: {from: FY17, to: FY26}
 
 - id: G19
-  question: "Which fields lost money last year?"
+  question: "What was IOCL's Inventory Days from FY22 to FY26?"
   prior: null
   expect:
-    metric: pbt_cr
-    dimensions: [field]
-    period: {fy: FY26}
+    intent: data
+    metric_in: [inventory_days, inventories_cr]
+    dimensions_include: [fy]
+    period: {from: FY22, to: FY26}
 
 - id: G20
-  question: "Lifting cost by asset in FY26"
+  question: "Show IOCL's CWIP and Capex trend from FY17 to FY26"
   prior: null
   expect:
-    metric: lifting_cost_usd_per_boe
-    dimensions: [asset]
-    period: {fy: FY26}
+    intent: data
+    metric_in: [capex_actual_cr, cwip_cr]
+    dimensions_include: [fy]
+    period: {from: FY17, to: FY26}
 
 - id: G21
-  question: "What was ONGC's profit last year?"
+  question: "Show IOCL's Cash Flow Statement for FY26"
   prior: null
   expect:
-    metric: pat_cr
+    intent: data
+    metric: cash_flow_statement
     period: {fy: FY26}
 
 - id: G22
-  question: "Capex by asset over the last five years"
+  question: "Compare Operating Cash Flow from FY17 to FY26"
   prior: null
   expect:
-    metric: capex_actual_cr
-    dimensions: [asset]
-    period: {from: FY22, to: FY26}
+    intent: data
+    metric_in: [operating_cash_flow_cr, cash_flow_statement, free_cash_flow_cr]
+    dimensions_include: [fy]
+    period: {from: FY17, to: FY26}
 
 - id: G23
-  question: "Show me Champang's P&L"
+  question: "Show IOCL's Financial Ratios scorecard for FY26"
   prior: null
   expect:
-    metric_in: [pbt_cr, ebitda_cr, revenue_cr, pnl_statement]
-    filters_include:
-      - {field: field, op: "=", value: FLD-CHP}
+    intent: data
+    metric: financial_ratios
+    period: {fy: FY26}
 
 - id: G24
-  question: "What is the vacancy position by asset and discipline?"
+  question: "How is IOCL tracking against its FY26 MoU targets?"
   prior: null
   expect:
-    metric_in: [vacancies, sanctioned_posts, in_position, vacancy_rate_pct]
-    dimensions: [wc, discipline]
+    intent: data
+    metric: mou_scorecard
+    period: {fy: FY26}
 
 - id: G25
-  question: "North East vacancies by work centre"
+  question: "What is IOCL's WACC in FY26?"
   prior: null
   expect:
-    metric_in: [vacancies, vacancy_rate_pct]
-    dimensions: [wc]
-    filter_fields_any: [region, sector, wc]
+    intent: data
+    metric_in: [wacc_pct, wacc_components, wacc_build_up]
+    period: {fy: FY26}
 
 - id: G26
-  question: "How many women employees are there in each work centre?"
+  question: "Compare WACC build-up from FY22 to FY26"
   prior: null
   expect:
-    metric_in: [headcount, women_share_pct]
-    dimensions: [wc]
+    intent: data
+    metric_in: [wacc_components, wacc_pct, wacc_build_up, wacc_change_attribution]
 
 - id: G27
-  question: "How many GMs retire in the next 3 years?"
+  question: "What was IOCL's ROCE in FY26?"
   prior: null
   expect:
-    metric_in: [retiring_within_3yr, headcount]
-    filters_include:
-      - {field: grade, op: "=", value: E7}
+    intent: data
+    metric: roce_pct
+    period: {fy: FY26}
 
 - id: G28
-  question: "Average age of employees in Ahmedabad"
+  question: "Pichle saal IOCL ka kitna profit hua?"
   prior: null
   expect:
-    metric: avg_age
-    filters_include:
-      - {field: wc, op: "=", value: WC-AHM}
+    intent: data
+    metric: pat_cr
+    period: {fy: FY26}
 
 - id: G29
-  question: "Training hours per executive by discipline"
+  question: "Show PAT by fiscal year for the last 5 years"
   prior: null
   expect:
-    metric: training_hours_per_employee
-    dimensions: [discipline]
-    filters_include:
-      - {field: cadre, op: "=", value: executive}
+    intent: data
+    metric: pat_cr
+    dimensions_include: [fy]
+    period: {from: FY22, to: FY26}
 
 - id: G30
-  question: "Show this as a pie chart"
-  prior: G03
-  expect:
-    intent: replot
-
-- id: G31
-  question: "What is the minimum tenure at a station as per the transfer policy?"
+  question: "Under IOCL's Delegation of Financial Powers (DoA), what are the approval limits for spot crude procurement?"
   prior: null
   expect:
     intent: policy
 
-- id: G32
-  question: "Pichle saal kitna profit hua?"
-  prior: null
-  expect:
-    metric: pat_cr
-    period: {fy: FY26}
-
-- id: G33
-  question: "Compare Delhi and Mumbai headcount"
-  prior: null
-  expect:
-    metric: headcount
-    dimensions_include: [wc]
-    filters_include:
-      - {field: wc, op: in, value: [WC-DEL, WC-MUM]}
-
-- id: G34
-  question: "Revenue for each field over the last 5 years"
-  prior: null
-  expect:
-    metric: revenue_cr
-    dimensions_include: [field]
-    period: {from: FY22, to: FY26}
-
-- id: G35
-  question: 'If Brent falls to $60, which fields go into loss?'
+- id: G31
+  question: "If GRM improves by $1.50/bbl across refineries, what is the EBITDA impact?"
   prior: null
   expect:
     intent: what_if
 
-# --- Added by Opus after G4 B2 review (F-9: explicit year-wise breakdowns must keep the fy dimension)
-- id: G36
-  question: "Capex by asset year-wise over the last 5 years"
-  prior: null
+- id: G32
+  question: "Draft a board note on FY26 refinery GRM performance"
+  prior: G08
   expect:
-    metric: capex_actual_cr
-    dimensions: [asset, fy]
-    period: {from: FY22, to: FY26}
-
-- id: G37
-  question: "Show PAT by fiscal year for the last 5 years"
-  prior: null
-  expect:
-    metric: pat_cr
-    dimensions_include: [fy]
-    period: {from: FY22, to: FY26}
+    intent: document

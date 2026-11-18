@@ -1,9 +1,9 @@
 from google.auth import default
 from google.cloud import bigquery
 
-credentials, _ = default(quota_project_id='ongc-hr-finance-agent')
+credentials, _ = default(quota_project_id='yukti-finance-iocl')
 bq_client = bigquery.Client(
-    project='ongc-hr-finance-agent',
+    project='yukti-finance-iocl',
     credentials=credentials,
     location='asia-south1',
     default_query_job_config=bigquery.QueryJobConfig(labels={'datacloud': 'ai-agent'})

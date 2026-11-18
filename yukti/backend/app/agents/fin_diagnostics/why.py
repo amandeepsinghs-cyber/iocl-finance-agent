@@ -47,19 +47,16 @@ async def run_why_turn(
         line_code = mc
     
     q_low = query.lower()
-    if "royalty" in q_low: line_code = "PL.EXP.ROYALTY"
-    elif "saed" in q_low or "windfall" in q_low: line_code = "PL.EXP.SAED"
-    elif "statutory" in q_low or "levies" in q_low: line_code = "PL.EXP.STATUTORY"
-    elif "opex" in q_low or "operating" in q_low: line_code = "PL.EXP.OPEX"
-    elif "dd&a" in q_low or "depreciation" in q_low or "depletion" in q_low: line_code = "PL.EXP.DDA"
-    elif "finance cost" in q_low or "interest" in q_low: line_code = "PL.EXP.FINANCE"
-    elif "exchange" in q_low or "forex" in q_low: line_code = "PL.EXP.FOREX"
-    elif "provision" in q_low: line_code = "PL.EXP.PROVISIONS"
-    elif "crude" in q_low: line_code = "PL.REV.CRUDE"
-    elif "gas" in q_low: line_code = "PL.REV.GAS"
-    elif "vap" in q_low or "value added" in q_low: line_code = "PL.REV.VAP"
-    elif "other income" in q_low: line_code = "PL.REV.OTHER"
-    elif "exploration" in q_low and "written off" in q_low: line_code = "PL.EXP.EXPLORATION_WRITTEN_OFF"
+    if "excise" in q_low or "statutory" in q_low or "levies" in q_low: line_code = "LEVY.TOTAL"
+    elif "crude" in q_low or "material" in q_low: line_code = "PL.COST_MATERIALS"
+    elif "purchase" in q_low or "traded" in q_low: line_code = "PL.PURCHASES_TRADED"
+    elif "inventory" in q_low: line_code = "PL.INVENTORY_CHANGE"
+    elif "other exp" in q_low or "operating" in q_low: line_code = "PL.OTHER_EXP"
+    elif "dd&a" in q_low or "depreciation" in q_low: line_code = "PL.DDA"
+    elif "finance cost" in q_low or "interest" in q_low: line_code = "PL.FIN_COST"
+    elif "employee" in q_low: line_code = "PL.EMP_BENEFIT"
+    elif "petchem" in q_low or "petrochemical" in q_low: line_code = "REV.PETCHEM"
+    elif "other income" in q_low: line_code = "PL.OTHER_INCOME"
     elif "pbt" in q_low: line_code = "PL.PBT"
     elif "pat" in q_low: line_code = "PL.PAT"
     
@@ -158,7 +155,7 @@ async def run_why_turn(
         src = rows[0].inputs[0]
         sources.append({"kind": "data", "object": "ssot", "doc": src.get("source_doc"), "page": src.get("source_page_label", "297"), "ref": "v_fin_statement_as_reported"})
     else:
-        sources.append({"kind": "data", "object": "ssot", "doc": "ONGC_AR_FY2025-26.txt", "page": "297", "ref": "v_fin_statement_as_reported"})
+        sources.append({"kind": "data", "object": "ssot", "doc": "IOCL_AR_FY2025-26.pdf", "page": "250", "ref": "v_fin_statement_as_reported"})
 
     for c in chunks:
         sources.append({"kind": "ar", "doc": c.get("source_doc"), "page": c.get("source_page"), "ref": c.get("citation"), "text": c.get("text")})

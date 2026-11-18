@@ -63,7 +63,7 @@ All 5 stages of the **10-Year ONGC Financial Intelligence + Historical Causal Ve
 
 ## Stage 4: Line-Item-Anchored Vector Embeddings (`build_and_load_financial_rag.py`)
 - [x] **4.1 Built Audited Historical Causal Corpus (`financial_build/data/financial_notes_corpus.jsonl`).**
-- [x] **4.2 Generated `768`-d Embeddings with Vertex AI `text-embedding-005` and Loaded into `ongc-hr-finance-agent.hrfin_docs.financial_notes_chunks`.**
+- [x] **4.2 Generated `768`-d Embeddings with Vertex AI `text-embedding-005` and Loaded into `yukti-finance-iocl.hrfin_docs.financial_notes_chunks`.**
 - [x] **4.3 Wired Hybrid Causal Retrieval into `insight_context.py`, `pipeline.py`, and `policy_search.py`.**
 
 ---

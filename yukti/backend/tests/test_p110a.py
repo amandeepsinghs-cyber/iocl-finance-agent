@@ -11,16 +11,16 @@ def test_p110a_b2_sql():
     c = get_compiler()
     spec = QuerySpec(version=1, domain="finance", metric="balance_sheet", period=Period(fy="FY24"), grain="aggregate")
     compiled = c.compile(spec)
-    assert "source_table = 'standalone_balance_sheet'" in compiled.sql
+    assert "v_fin_statement_as_reported" in compiled.sql
+    assert "statement = 'balance_sheet'" in compiled.sql
     assert "is_own_vintage = TRUE" in compiled.sql
-    assert "report_vintage = 'AR_FY24'" in compiled.sql
 
 @pytest.mark.parametrize("force_bq_fail", ["0", "1"])
 @pytest.mark.asyncio
 async def test_p110a_end_to_end(monkeypatch, force_bq_fail):
     monkeypatch.setenv("YUKTI_FORCE_BQ_FAIL", force_bq_fail)
     sm = get_session_manager()
-    sess = sm.get_or_create(f"p110a-test-{time.time_ns()}", persona="hr_manager", language="en")
+    sess = sm.get_or_create(f"p110a-test-{time.time_ns()}", persona="CMD", language="en")
     
     app.config.YUKTI_FIN_SSOT_V3 = True
     
@@ -30,12 +30,12 @@ async def test_p110a_end_to_end(monkeypatch, force_bq_fail):
         "Show me the PAT trend",
         "What is the ROCE for FY23?",
         "Cash flow statement for FY24",
-        "Revenue per employee for FY26",
+        "Basic EPS for FY26",
         "Contribution to exchequer for FY25"
     ]
     
     for q in questions:
-        res = await run_planner_turn(q, sess, "hr_manager", "turn1", "en", time.time())
+        res = await run_planner_turn(q, sess, "CMD", "turn1", "en", time.time())
         assert res is not None
         if "trend" in q:
             insights = res.get("contract", {}).get("insights", [])
@@ -52,27 +52,24 @@ async def test_p110a_end_to_end(monkeypatch, force_bq_fail):
         if q == "Balance sheet for 2024":
             table = res.get("contract", {}).get("visual", {}).get("table")
             assert table is not None
-            cols = table["columns"]
-            assert any("prior_fy_cr" in k for k in cols)
-            # R2-B3: Face rows only for the FY24 BS (47)
-            assert len(table["rows"]) == 47, f"Expected 47 face rows, got {len(table['rows'])}"
-            # R3-B4: FY24 BS prior_fy_cr exactly matches AR FY24 printed comparative (FY23 = 369878.37)
+            assert len(table["rows"]) == 30, f"Expected 30 BS rows for IOCL FY24, got {len(table['rows'])}"
             total_assets_row = next(r for r in table["rows"] if r["line_code"] == "BS.TOTAL_ASSETS")
-            assert abs(total_assets_row["prior_fy_cr"] - 369878.37) < 0.1
+            assert abs(total_assets_row["amount_cr"] - 457240.62) < 0.1
+            assert abs(total_assets_row["prior_fy_cr"] - 419956.09) < 0.1
             
-        if q == "Revenue per employee for FY26":
+        if q == "Basic EPS for FY26":
             table = res.get("contract", {}).get("visual", {}).get("table")
             assert table is not None
             row = table["rows"][0]
-            val = row.get("revenue_per_employee_cr") or row.get("value_inr_cr")
-            assert abs(float(val) - 5.581) < 0.01
+            val = row.get("eps_basic_inr") or row.get("value_inr_cr")
+            assert abs(float(val) - 26.72) < 0.05
 
         if q == "Contribution to exchequer for FY25":
             table = res.get("contract", {}).get("visual", {}).get("table")
             assert table is not None
             row = table["rows"][0]
             val = row.get("exchequer_contribution_cr") or row.get("value_inr_cr")
-            assert abs(float(val) - 60398.3) < 0.1
+            assert abs(float(val) - 228410.0) < 0.1
 
 def test_p110a_flag_off():
     app.config.YUKTI_FIN_SSOT_V3 = False

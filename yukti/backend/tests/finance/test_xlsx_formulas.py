@@ -9,7 +9,7 @@ def test_xlsx_writer(tmp_path):
     a = defaults_from_ssot([], [], "2026-10-23")
     res = run_dcf(a)
     
-    file_path = tmp_path / "ONGC_DCF_test_run.xlsx"
+    file_path = tmp_path / "IOCL_DCF_test_run.xlsx"
     write_dcf_xlsx(res, str(file_path))
     
     assert file_path.exists()

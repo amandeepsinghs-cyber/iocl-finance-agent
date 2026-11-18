@@ -15,7 +15,7 @@ WITH c AS (
            r'\d*\s*Chapter 2—Personnel Policies\s*\d*', ' '),
            r'Page \d+ of \d+', ' '),
            r'\s+', ' ') AS body
-  FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+  FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
   WHERE (doc_id = 'G-06' AND clause_ref = '25. Procedure for imposing major penalties')
      OR (doc_id = 'P2-16' AND clause_ref = 'Part 4')
      OR (doc_id = 'P2-16' AND clause_ref = 'Part 8')

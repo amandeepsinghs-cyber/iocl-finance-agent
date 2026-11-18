@@ -50,23 +50,23 @@ def compute_tornado(assumptions, base_ps):
 
     res = []
     drivers = [
-        ("brent_usd", "brent", lambda v: (v - 10, v + 10)),
-        ("opex_per_boe", "opex", lambda v: (v * 0.85, v * 1.15)),
-        ("capex_scale_pct", "capex", lambda v: (v - 20, v + 20)),
-        # 27-Oct (sponsor): ±3 pts/yr (was ±10, which swung value ₹17–685/share and dwarfed every other driver;
-        # ±2–3%/yr is a realistic range for ONGC's mature fields)
-        ("production_decline_pct", "prod", lambda v: (v - 3, v + 3)),
-        ("wacc_pct", "wacc", lambda v: (v - 1, v + 1)),
-        ("terminal_g_pct", "g", lambda v: (v - 1, v + 1)),
-        ("fx_inr_usd", "fx", lambda v: (v * 0.95, v * 1.05)),
-        ("holdco_discount_pct", "holdco", lambda v: (0.0, 30.0))
+        ("brent_usd", "brent", lambda v: (v - 10, v + 10), lambda lo, hi: (f"${lo:.0f}/bbl", f"${hi:.0f}/bbl")),
+        ("opex_per_boe", "opex", lambda v: (v * 0.85, v * 1.15), lambda lo, hi: ("-15%", "+15%")),
+        ("capex_scale_pct", "capex", lambda v: (v - 20, v + 20), lambda lo, hi: (f"{lo:.0f}%", f"{hi:.0f}%")),
+        # ±3 pts/yr realistic throughput sensitivity around base growth
+        ("production_decline_pct", "prod", lambda v: (v - 3, v + 3), lambda lo, hi: ("+3% vol", "-3% vol")),
+        ("wacc_pct", "wacc", lambda v: (v - 1, v + 1), lambda lo, hi: (f"{lo:.2f}%", f"{hi:.2f}%")),
+        ("terminal_g_pct", "g", lambda v: (v - 1, v + 1), lambda lo, hi: (f"{lo:.1f}%", f"{hi:.1f}%")),
+        ("fx_inr_usd", "fx", lambda v: (v * 0.95, v * 1.05), lambda lo, hi: (f"₹{lo:.1f}", f"₹{hi:.1f}")),
+        ("holdco_discount_pct", "holdco", lambda v: (0.0, 30.0), lambda lo, hi: ("0%", "30%")),
     ]
     
     asm_dict = assumptions.model_dump() if hasattr(assumptions, "model_dump") else assumptions.dict()
     
-    for field, name, mutator in drivers:
+    for field, name, mutator, fmt_range in drivers:
         val = asm_dict[field]["value"]
         low_val, high_val = mutator(val)
+        low_lbl, high_lbl = fmt_range(low_val, high_val)
         
         # low
         a_low = deepcopy(asm_dict)
@@ -81,6 +81,8 @@ def compute_tornado(assumptions, base_ps):
         
         res.append({
             "driver": name,
+            "low_input": low_lbl,
+            "high_input": high_lbl,
             "low_inr": ps_low,
             "high_inr": ps_high
         })

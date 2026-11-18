@@ -49,5 +49,7 @@ financial_build/data/stress_test_*
 !financial_ssot/out/fact_snapshot.parquet
 !financial_ssot/out/fact_wacc_annual.parquet
 !financial_ssot/out/fact_wacc_input.parquet
+!financial_ssot/out/fact_retail_fuel_prices.parquet
+!financial_ssot/out/fact_fuel_price_buildup.parquet
 financial_ssot/out/*.jsonl
 financial_ssot/raw/

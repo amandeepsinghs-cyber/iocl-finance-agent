@@ -24,12 +24,17 @@ from app.auth import Principal, audit, require_principal
 
 router = APIRouter()
 
-APPROVER_PERSONAS: Dict[str, List[str]] = {"HR": ["DIR_HR"], "FIN": ["DIR_FIN"]}
-APPROVER_LABEL: Dict[str, str] = {
-    "HR": "Director (HR) / Executive Director (HR)",
-    "FIN": "Director (Finance) / Executive Director (Finance)",
+APPROVER_PERSONAS: Dict[str, List[str]] = {
+    "FIN": ["DIR_FIN"],
+    "OPS": ["DIR_FIN", "DIR_REF"],
+    "MKT": ["DIR_FIN", "DIR_MKT"],
 }
-JUNIOR_PREFIXES = ("E1_", "E2_", "E3_", "E4_")
+APPROVER_LABEL: Dict[str, str] = {
+    "FIN": "Director (Finance) / Chairman",
+    "OPS": "Director (Refineries) / Director (Finance) / Chairman",
+    "MKT": "Director (Marketing) / Director (Finance) / Chairman",
+}
+JUNIOR_PREFIXES = ("E1_", "E2_", "E3_", "E4_", "A_", "B_", "C_", "D_")
 MAX_REQUESTS = 500
 
 _LOCK = threading.Lock()
@@ -40,7 +45,7 @@ def _function_of(p: Principal) -> str:
     fn = (p.function or "").upper()
     if fn in APPROVER_LABEL:
         return fn
-    return "FIN" if p.persona.upper().endswith("_FIN") else "HR"
+    return "FIN"
 
 
 def _is_junior(p: Principal) -> bool:
@@ -51,7 +56,7 @@ def _can_decide(p: Principal, req: Dict[str, Any]) -> bool:
     persona = p.persona.upper()
     if persona == "CMD":
         return True
-    return persona in APPROVER_PERSONAS.get(req["function"], [])
+    return persona in APPROVER_PERSONAS.get(req["function"], ["DIR_FIN"])
 
 
 def _clip(v: Any, n: int) -> str:
@@ -149,10 +154,10 @@ def decide_access_request(request_id: str, request: Request, body: Dict[str, Any
         req["decided_by"] = {"emp_id": p.emp_id, "persona": p.persona, "display_name": p.display_name,
                              "designation": p.functional_designation or p.designation}
         req["note"] = note
-        channel = "HR" if req["function"] == "HR" else "Finance"
+        channel = "Finance"
         req["outcome"] = (
             f"Approved by {who}. The requested details will be shared with you through the official {channel} "
-            f"channel; Yukti keeps names hidden at your access level."
+            f"channel; Yukti keeps restricted records masked at your access level."
             if decision == "approved"
             else f"Rejected by {who}." + (f" Note: {note}" if note else "")
         )

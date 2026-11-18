@@ -15,9 +15,9 @@ def test_dcf_proposal():
     assert "CMD" in pa["requires_role"]
     assert "DIR_FIN" in pa["requires_role"]
     assert "wacc_pct" in pa["inputs"]
-    assert abs(pa["inputs"]["wacc_pct"] - 11.6556) < 1e-4
+    assert abs(pa["inputs"]["wacc_pct"] - 9.2534) < 1e-4
     assert pa["lineage"]["wacc"]["source"] == "fact_wacc_annual FY26"
-    assert abs(pa["lineage"]["market_price"]["close_inr"] - 284.65) < 1e-2
+    assert abs(pa["lineage"]["market_price"]["close_inr"] - 135.40) < 1e-2
 
 def test_dcf_proposal_stale():
     sess = MockSession()
@@ -86,7 +86,7 @@ def test_dcf_proposal_missing_market_price_refuses(monkeypatch, tmp_path):
 async def test_dcf_job_runner():
     async def mock_emit(step, msg, prog):
         pass
-    res = await dcf_job_runner("test_job_123", {"inputs": {"wacc_pct": 11.6556}}, "sess_1", mock_emit)
+    res = await dcf_job_runner("test_job_123", {"inputs": {"wacc_pct": 9.2534}}, "sess_1", mock_emit)
     assert res["contract_version"] == 3
     assert res["turn_id"] == "job:test_job_123"
     assert res["visual"]["type"] == "dcf_model"

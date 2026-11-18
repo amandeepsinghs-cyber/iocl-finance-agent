@@ -48,7 +48,7 @@ export function buildFcffStatement(spec: DcfModelSpec): StatementSpec {
   }
   rows.push(
     { line_code: 'DCF.FCFF', label: 'Free cash flow to firm (FCFF)', level: 0, kind: 'subtotal', values: byYear(fcff) },
-    { line_code: 'DCF.DF', label: 'Discount factor (end-year)', level: 1, kind: 'line', values: byYear(discount_factor) },
+    { line_code: 'DCF.DF', label: 'Discount factor (end-year, ×)', level: 1, kind: 'line', unit: 'x', values: byYear(discount_factor) },
     { line_code: 'DCF.PV_FCFF', label: 'Present value of FCFF', level: 0, kind: 'total', values: byYear(pv_fcff) },
   );
   return {
@@ -57,9 +57,12 @@ export function buildFcffStatement(spec: DcfModelSpec): StatementSpec {
     unit: '₹ crore',
     periods: years,
     show_yoy: false,
-    sections: [{ id: 'fcff_schedule', label: 'Forecast horizon (₹ crore, except discount factor)', rows }],
+    sections: [{ id: 'fcff_schedule', label: 'Forecast horizon (₹ crore, except discount factor in ×)', rows }],
     as_of: spec.as_of,
-    synthetic: spec.provenance_label === 'illustrative',
+    synthetic: false,
+    footnotes: [
+      '10-year explicit forecast anchored to verified FY26 IOCL Annual Report SSOT. Illustrative valuation, not investment advice.',
+    ],
   };
 }
 
@@ -90,7 +93,10 @@ export function buildWaccStatement(spec: DcfModelSpec): StatementSpec {
     show_yoy: false,
     sections: [{ id: 'wacc_build', label: 'Cost of capital components', rows }],
     as_of: spec.as_of,
-    synthetic: spec.provenance_label === 'illustrative',
+    synthetic: false,
+    footnotes: [
+      '10-year explicit forecast anchored to verified FY26 IOCL Annual Report SSOT. Illustrative valuation, not investment advice.',
+    ],
   };
 }
 

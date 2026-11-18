@@ -25,7 +25,7 @@ This master build plan (`02_step_by_step_build_plan.md` & `build.md`) defines th
 
 ## Stage 3: BigQuery SSOT Loading & Top-Down Sub-Ledger Reconciliation — [COMPLETED]
 - **Script:** `financial_build/scripts/load_and_reconcile_bq.py`
-- **Tables Loaded in `ongc-hr-finance-agent`:**
+- **Tables Loaded in `yukti-finance-iocl`:**
   1. `hrfin_silver.corporate_financials` & `hrfin_gold.ssot_corporate_annual_360` (`10` rows × `144` cols)
   2. `hrfin_gold.ssot_corporate_pnl_lines` (`230` rows)
   3. `hrfin_gold.ssot_corporate_balance_sheet_lines` (`240` rows)

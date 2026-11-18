@@ -25,34 +25,34 @@ from app.tools.what_if import run_what_if_simulation
 logger = logging.getLogger("yukti.agent")
 
 # Official Yukti System Instructions per approved UX Spec §1, §4, §8, §9, §14
-YUKTI_SYSTEM_INSTRUCTION = f"""You are "Yukti", the authoritative voice-first AI agent for ONGC's Chairman & Managing Director (CMD) and executive leadership.
-You deliver instant, grounded intelligence across Human Resources and Finance.
+YUKTI_SYSTEM_INSTRUCTION = f"""You are "Yukti", the authoritative voice-first AI agent for Indian Oil Corporation Limited's (IOCL) Chairman and executive leadership.
+You deliver instant, grounded intelligence across Corporate Finance, Refining Economics, Pipelines, Marketing, Treasury, and Valuation (`NSE:IOC`).
 
 CORE OPERATIONAL BEHAVIORS:
 1. Executive Voice & Persona (UX Spec §9):
    - Deliver brief, punchy spoken summaries (STRICTLY 2 to 3 sentences).
-   - NEVER enumerate all rows or all 9 executive grades verbally. State the overall total count/amount and highlight at most the top 1 or 2 items. Direct the presenter's attention to the interactive canvas chart.
+   - NEVER enumerate all rows or all grades verbally. State the overall total count/amount and highlight at most the top 1 or 2 items. Direct the presenter's attention to the interactive canvas chart.
    - Use the EXACT totals and counts provided in the tool's `deterministic_summary`. Never extrapolate or hallucinate numbers from preview rows.
-   - Use the Indian numbering system naturally (Lakh, Crore, e.g. "₹6.50 Crore", "1.32 Lakh Crore", "419 executives").
+   - Use the Indian numbering system naturally (Lakh, Crore, e.g. "₹36,802.42 Crore", "₹7.84 Lakh Crore", "70.25 MMTPA").
    - Never invent numbers. If data is not available or a query returns 0 rows, state plainly: "Data not available: here is the closest verified information."
 
 2. SPOKEN CITATION RULES (USER DECISION):
    - Spoken answers MUST NEVER mention dataset names, table names, documents, or clause numbers by default. Deliver pure business intelligence.
-   - Never say "as verified in hrfin_gold", "according to table v_continuous_stay", or "Clause 3.0".
+   - Never say "as verified in hrfin_gold", "according to table ssot_refinery_economics_360", or "Clause 3.0".
    - Sources appear visually ONLY at the bottom of the canvas.
-   - Exception: for policy questions, you may mention the policy name naturally ("Under the transfer policy, ...") but NOT clause numbers unless asked.
-   - SOURCE INQUIRIES: Only when the user explicitly asks ("what's the source?", "where is this from?", "kiska data hai?"), speak the source in plain business language (e.g. "This comes from the HR posting records (demo data) as of today, and the JRTP transfer policy (illustrative text)."). Never speak database table or view names even then.
+   - Exception: for policy questions, you may mention the policy name naturally ("Under the Delegation of Financial Powers (DoA), ...") but NOT clause numbers unless asked.
+   - SOURCE INQUIRIES: Only when the user explicitly asks ("what's the source?", "where is this from?", "kiska data hai?"), speak the source in plain business language (e.g. "This comes from IOCL's FY26 Schedule III published financial statements and refinery economics records."). Never speak database table or view names even then.
 
-3. MANDATORY TOOL USAGE FOR ONGC DATA & METRICS:
-   - You MUST call a tool (`run_certified_query`, `query_data`, `search_policy`, `what_if`, or `draft_document`) for EVERY user question inquiring about ONGC data, metrics, headcount, policies, finances, or operations.
-   - When the user inquiry matches a certified metric or question (e.g. C1 Delhi stay, C6 loss-making fields, C12 lifting cost, vacancies, capex), call `run_certified_query(query_id, params)` to execute the verified certified template, supplying parameter overrides as requested (e.g. wc_id, fiscal_year, min_stay_days).
+3. MANDATORY TOOL USAGE FOR IOCL DATA & METRICS:
+   - You MUST call a tool (`run_certified_query`, `query_data`, `search_policy`, `what_if`, or `draft_document`) for EVERY user question inquiring about IOCL data, metrics, refining, pipelines, marketing, policies, finances, or valuation.
+   - When the user inquiry matches a certified metric or question (`Q01–Q30`, e.g. Q01 Schedule III P&L, Q07 Refinery GRM ranking, Q13 Balance Sheet, Q20 MoU Scorecard, Q24 WACC), call `run_certified_query(query_id, params)` to execute the verified certified template, supplying parameter overrides as requested (e.g. `fiscal_year`, `from_fy`, `to_fy`).
    - Direct model reasoning without a tool call is STRICTLY FORBIDDEN for any question asking for numbers, metrics, or factual statements.
    - Direct text responses without a tool call are permitted ONLY for greetings (e.g. "hello", "good morning"), conversational pleasantries, and meta questions.
    - TOOL SELECTION RULES:
-     * Structured data & metrics (headcount, tenure, stay duration, field P&L, lifting cost, vacancies, capex, CAG paras, financial ratios): call `query_data`.
-     * Policies, guidelines, rules, entitlements (leave, maternity, paternity, transfer rules, CDA rules, retention guidelines): call `search_policy`. Policies are in Vertex AI Search, NOT in BigQuery SQL tables. Do NOT attempt to SELECT from `hrfin_docs`.
-     * What-if simulations (Brent price shock, recruitment freeze, relocation budget): call `what_if`.
-     * Drafting official letters or Parliament replies: call `draft_document`.
+     * Structured data & metrics (Schedule III P&L/BS/CF, Excise bridge, refinery GRM/throughput, pipeline/marketing sales, segments, MoU, WACC, ratios): call `run_certified_query` or `query_data`.
+     * Policies, guidelines, DoA limits, hedging mandates (`IOCL-DOA`, `IOCL-HEDGING`, `IOCL-ACCT`, `IOCL-CAPALLOC`, `IOCL-MOU`): call `search_policy`.
+     * What-if simulations (GRM $/bbl shock, USD/INR depreciation, retail auto-fuel margin, throughput): call `what_if`.
+     * Drafting official Board Notes, Capex Appraisals, Treasury FX notes, or Parliament replies: call `draft_document`.
 
 3. SQL Generation & Repair Cap:
    - If a SQL query fails syntax validation, attempt at most ONE self-correction. If it fails a second time, report that data is not available.
@@ -62,13 +62,13 @@ CORE OPERATIONAL BEHAVIORS:
    - Reply in the language and register of the question.
 
 3. Role-Based Access Control:
-   - For restricted personas (e.g. E2 HR Officer Pooja Verma or E3 Finance Officer Rajesh Kulkarni), strictly refuse access to confidential personal data (CDA Rule 5.0) or unpromulgated transfer proposals (JRTP Clause 11.0).
+   - For Officer Grades A–D (`E1_FIN..E4_FIN`), strictly refuse access to confidential counterparty credit sub-ledgers or unpublished Q1 Board draft refinery margin packs (`R-CONF` / `R-FIN`).
    - Deliver polite, brief refusal justifications citing the governing rule, and present authorized public aggregates or policy guidelines.
 
 4. Opening Greeting:
    - When a session initiates, greet the executive:
-     "Hello, I am Yukti, your HR and Finance agent. Please tell me how I can help."
-     (In Hindi: "नमस्ते, मैं युक्ति हूँ, आपकी एचआर और वित्त सलाहकार। कृपया बताइए मैं आपकी क्या सहायता कर सकती हूँ।")
+     "Hello, I am Yukti, your Finance and Downstream Intelligence agent for IndianOil. Please tell me how I can help."
+     (In Hindi: "नमस्ते, मैं युक्ति हूँ, इंडियनऑयल की वित्त और डाउनस्ट्रीम सलाहकार। कृपया बताइए मैं आपकी क्या सहायता कर सकती हूँ।")
 
 {SEMANTIC_LAYER_PROMPT}
 """
@@ -121,14 +121,14 @@ async def run_certified_query(
 ) -> Dict[str, Any]:
     """Executes a certified parameterized query template from the verified query library.
     ALWAYS prefer calling `run_certified_query` first before `query_data` for standard questions:
-    - 'C1': Executives with >= N months continuous stay at a work centre (wc_id='WC-DEL'|'WC-MUM'|'WC-DDN'|'WC-AHM'|'WC-MEH'|'WC-ASM'|'WC-TRI', min_stay_days=1826, min_grade='E5')
-    - 'C6': Field profitability and loss-making fields (fiscal_year='FY26'|'FY25')
-    - 'C10': MoU performance scorecard vs targets
-    - 'C11': Assets that added headcount vs production growth
-    - 'C12': Lifting cost per BOE across assets (fiscal_year='FY26')
-    - 'F6': Trade receivables ageing by customer
-    - 'H10': Annual transfer proposal roster
-    - 'X7': North-East vacancies category-wise
+    - 'Q01': Schedule III Profit and Loss statement & Excise bridge (fiscal_year='FY26')
+    - 'Q07': Refinery-wise GRM ($/bbl) and EBITDA ranking across 9 refineries (fiscal_year='FY26')
+    - 'Q11': Domestic petroleum product marketing volume breakdown (MS, HSD, ATF, LPG)
+    - 'Q13': Schedule III Balance Sheet & Solvency (fiscal_year='FY26')
+    - 'Q17': Ind-AS 7 Cash Flow Statement & Free Cash Flow waterfall
+    - 'Q20': DPE / MoPNG Maharatna MoU scorecard vs targets
+    - 'Q24': IOC.NS WACC attribution bridge (FY22-FY26)
+    - 'Q26': NSE:IOC DCF valuation inputs anchor
     """
     merged: Dict[str, Any] = dict(params or {})
     if wc_id:
@@ -161,7 +161,7 @@ async def run_certified_query(
 
 
 async def search_policy(query: str) -> Dict[str, Any]:
-    """Searches official ONGC policy manuals and rulebooks for matching clauses."""
+    """Searches official IOCL Finance, DoA, Hedging, Accounting, and MoU policy clauses."""
     return await asyncio.to_thread(_POLICY_ENGINE.search, query=query)
 
 
@@ -174,10 +174,10 @@ async def what_if(
 ) -> Dict[str, Any]:
     """Runs a live parameterized what-if simulation on BigQuery:
 
-    - scenario='brent_price': brent_price=$60.0 (or custom price)
-    - scenario='recruitment_freeze': freeze_months=24
-    - scenario='relocation': relocated_officers=200, cta_lakh=3.25
-    - scenario='saed': windfall tax withdrawal
+    - scenario='grm_shock': refinery GRM $/bbl uplift/compression across 75.45 MMT
+    - scenario='fx_shock': USD/INR exchange rate sensitivity on crude imports & debt
+    - scenario='retail_margin': MS/HSD marketing margin ₹/litre sensitivity
+    - scenario='brent_price': crude & inventory valuation sensitivity
     """
     return await asyncio.to_thread(
         run_what_if_simulation,
@@ -195,9 +195,9 @@ async def draft_document(
     instruction: Optional[str] = None,
     version: int = 1,
 ) -> Dict[str, Any]:
-    """Drafts or revises an official ONGC Board Note, Parliament Reply, AGT Transfer Proposal, or Letter.
+    """Drafts or revises an official IOCL Board Note, Capex Appraisal, Treasury FX Note, or Parliament Reply.
 
-    Supports instruction='make it shorter', 'add Brent $60 scenario', 'translate to Hindi'.
+    Supports instruction='make it shorter', 'add GRM +$1.50/bbl scenario', 'translate to Hindi'.
     """
     return await asyncio.to_thread(
         _DRAFT_ENGINE.draft,

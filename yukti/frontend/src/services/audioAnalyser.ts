@@ -360,7 +360,7 @@ export class VoiceAudioEngine {
       return {
         ok: false,
         error: 'insecure',
-        message: `The browser blocks the microphone on ${window.location.origin}. Open Yukti at http://localhost:3200 (port-forward 3200) or over HTTPS.`,
+        message: `The browser blocks the microphone on ${window.location.origin}. Open Yukti at http://localhost:3400 (port-forward 3400) or over HTTPS.`,
       };
     }
     if (!navigator.mediaDevices?.getUserMedia) {

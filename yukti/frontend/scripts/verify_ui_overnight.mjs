@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const BASE_URL = process.env.YUKTI_URL || 'http://127.0.0.1:3200';
+const BASE_URL = process.env.YUKTI_URL || 'http://127.0.0.1:3400';
 
 async function main() {
   const browser = await chromium.launch({

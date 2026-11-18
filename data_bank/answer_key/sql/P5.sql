@@ -14,7 +14,7 @@ WITH c AS (
            r'\d*\s*Chapter 2—Personnel Policies\s*\d*', ' '),
            r'Page \d+ of \d+', ' '),
            r'\s+', ' ') AS body
-  FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+  FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
   WHERE (doc_id = 'Leave Rules' AND clause_ref = 'Clause 6.0')
      OR (doc_id = 'Leave Rules' AND clause_ref = 'Clause 7.0')
 )

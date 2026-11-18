@@ -4,7 +4,7 @@
   "language": "en",
   "persona": "E4_FIN",
   "spoken_summary": "Standalone Revenue from Operations in FY26 was 1,32,508.1 crore rupees, sourced from the local snapshot of Annual Report FY26 page 297.",
-  "display_text": "ONGC Standalone Revenue from Operations in FY26: ₹1,32,508.1 crore (AR FY26 p.297).",
+  "display_text": "IOCL Standalone Revenue from Operations in FY26: ₹8,86,224.4 crore (AR FY26).",
   "visual": {
     "type": "kpi",
     "mode": "replace",
@@ -25,7 +25,7 @@
     {
       "kind": "data",
       "object": "fact_snapshot.parquet",
-      "title": "ONGC Annual Report FY26 p.297 (Local Snapshot)"
+      "title": "IOCL Annual Report FY26 (Local Snapshot)"
     }
   ],
   "suggestions": [
@@ -48,7 +48,7 @@
   },
   "provenance": {
     "label": "local_snapshot",
-    "detail": "ONGC AR FY2025-26, Standalone P&L p.297 (served from verified local Parquet snapshot)",
+    "detail": "IOCL AR FY2025-26, Standalone P&L (served from verified local Parquet snapshot)",
     "snapshot_date": "2026-03-31",
     "components": [
       {

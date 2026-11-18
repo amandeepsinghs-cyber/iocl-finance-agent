@@ -221,7 +221,7 @@ export function ArchitectureExplorer() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/architecture/yukti_architecture.png"
-          alt="Yukti AI architecture: users, Identity-Aware Proxy, Cloud Run with web app, turn orchestrator and specialist modules, Gemini Live, Gemini 2.5 Flash, BigQuery and Yahoo Finance"
+          alt="Yukti AI architecture: IndianOil users, Identity-Aware Proxy, Cloud Run with web app, turn orchestrator and specialist modules, Gemini Live, Gemini 3 Flash, BigQuery and Yahoo Finance"
           className="block w-full"
         />
         {COMPONENTS.map((c) => (

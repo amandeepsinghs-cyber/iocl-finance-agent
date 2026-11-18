@@ -66,13 +66,13 @@ def test_email_agent_cmd():
     assert attachments[0].get_content_type() == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
 
-def test_email_agent_dir_hr():
+def test_email_agent_dir_fin():
     session = MockSessionState()
-    contract = build_email_draft("draft email to director hr", session, "DIR_HR", "T5", "en")
-    assert "CMD" in contract["chips"]
-    assert "Transfer Board" in contract["chips"]
+    contract = build_email_draft("draft email to director finance", session, "DIR_FIN", "T5", "en")
+    assert "Chairman" in contract["chips"]
+    assert "Finance Committee" in contract["chips"]
     assert contract["visual"]["email_draft"]["to"] == []
-    assert contract["display_text"] == "Who should this go to?"
+    assert contract["display_text"] == "Who should this Board Finance brief go to?"
 
 def test_email_agent_junior_fin():
     session = MockSessionState()

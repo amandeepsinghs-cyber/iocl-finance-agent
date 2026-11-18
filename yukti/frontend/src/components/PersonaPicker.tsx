@@ -20,11 +20,11 @@ export interface PersonaPickerProps {
   onClose: () => void;
 }
 
-const GROUPS: PersonaGroup[] = ['Leadership', 'HR', 'Finance'];
+const GROUPS: PersonaGroup[] = ['Leadership', 'Finance'];
 const ACCESS_NOTE: Record<string, string> = {
-  cmd: 'Everything, including named and confidential records',
-  director: 'Named records within own function; cross-function as aggregates',
-  junior: 'Own records, policies and aggregates (names hidden)',
+  cmd: 'Full access across statutory financials, downstream 360, WACC/DCF & confidential packs',
+  director: 'Full access to statutory financials, downstream 360, WACC/DCF & Board draft packs',
+  junior: 'Public statements, downstream aggregates, WACC & DCF (confidential packs require approval)',
 };
 
 export function PersonaPicker({ open, current, required = false, onPick, onClose }: PersonaPickerProps) {

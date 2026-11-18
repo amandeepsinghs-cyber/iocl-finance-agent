@@ -141,7 +141,7 @@ def test_docx_roundtrip_table_image_statement_and_email_letter(exporter: Documen
     )
     letter_doc = docx.Document(str(letter_path))
     full_text = "\n".join(p.text for p in letter_doc.paragraphs)
-    assert "Director (HR)" in full_text
+    assert "Director (Finance)" in full_text
     assert "समीक्षा अनुरोध" in full_text
     assert len(letter_doc.tables) == 1
 
@@ -157,7 +157,7 @@ def test_eml_parses_with_x_unsent_utf8_headers_and_xlsx_attachment(exporter: Doc
 
     msg = email.message_from_bytes(eml_path.read_bytes(), policy=policy.default)
     assert msg["X-Unsent"] == "1"
-    assert "Director (HR)" in msg["To"]
+    assert "Director (Finance)" in msg["To"]
     assert "समीक्षा अनुरोध" in msg["Subject"]
 
     attachments = list(msg.iter_attachments())
@@ -200,13 +200,13 @@ def test_eml_crlf_header_injection_rejected_and_html_body_escaped_and_no_temp_xl
     """S3 & S4: CR/LF in email headers raises ValueError; `<script>` in body_md is escaped in HTML; temp xlsx cleaned up."""
     with pytest.raises(ValueError, match="Invalid CR/LF"):
         exporter.export_eml(
-            email_draft={"to": ["victim@ongc.example\r\nBcc: spy@evil.example"], "subject": "Hi", "body_md": "Body"},
+            email_draft={"to": ["victim@indianoil.example\r\nBcc: spy@evil.example"], "subject": "Hi", "body_md": "Body"},
             filename="bad.eml",
         )
 
     eml_path = exporter.export_eml(
         email_draft={
-            "to": [{"name": "Director (HR)", "email": "hr@ongc.example"}],
+            "to": [{"name": "Director (Finance)", "email": "fin@indianoil.example"}],
             "subject": "Quarterly Review",
             "body_md": "Hello <script>alert('xss')</script> world",
         },

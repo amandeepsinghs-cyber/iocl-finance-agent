@@ -135,7 +135,7 @@ async def run_planner_turn(
                 "Designation": "functional_designation",
                 "Level": "grade",
                 "Tenure in Delhi (yrs)": "delhi_tenure_years",
-                "ONGC service (yrs)": "ongc_tenure_years",
+                "IOCL service (yrs)": "iocl_tenure_years",
                 "Years to retirement": "years_to_retirement",
                 "Exemption": "exemption"
             }
@@ -165,7 +165,7 @@ async def run_planner_turn(
                     else:
                         unknown.append(c)
                 if not export_cols:
-                    export_cols = ["name", "functional_designation", "grade", "ongc_tenure_years", "delhi_tenure_years", "years_to_retirement", "exemption"]
+                    export_cols = ["name", "functional_designation", "grade", "iocl_tenure_years", "delhi_tenure_years", "years_to_retirement", "exemption"]
                     export_headers = {k: next(c for c, v in HEADER_TO_KEY.items() if v == k) for k in export_cols}
                 if unknown:
                     caveat_msg = f"I couldn't match '{unknown[0]}'; exported the rest"
@@ -320,20 +320,27 @@ async def run_planner_turn(
         from app.agents.fin_diagnostics.why import run_why_turn
         return await run_why_turn(query, plan, prev, session_state, persona, turn_id, language, t0)
 
-    if re.search(r"\b(top\s*(?:5|five)\s*actions|quantified\s+actions|what\s+actions\s+(?:can|should)\s+we\s+take)\b", query or "", re.I):
+    if re.search(
+        r"\b(top\s*(?:5|five)\s*(?:quantified\s+)?(?:actions|(?:cfo\s+)?(?:turnaround\s+)?levers)|quantified\s+(?:actions|(?:cfo\s+)?(?:turnaround\s+)?levers)|cfo\s+(?:turnaround\s+)?levers|turnaround\s+levers|what\s+actions\s+(?:can|should)\s+we\s+take)\b",
+        query or "",
+        re.I,
+    ):
         from pathlib import Path
         import pandas as pd
         from app.agents.fin_diagnostics.actions import generate_actions
         from app.semantic.normalize import resolve_fy
         fy_hint = resolve_fy(query)
-        fy_act = (fy_hint.get("fy") if isinstance(fy_hint, dict) and fy_hint.get("fy") else None) or "FY26"
+        req_fy = (fy_hint.get("fy") if isinstance(fy_hint, dict) and fy_hint.get("fy") else None) or "FY26"
         snap_path = Path(os.getenv("YUKTI_FIN_SNAPSHOT_PATH") or (Path(__file__).resolve().parents[4] / "financial_ssot" / "out" / "fact_snapshot.parquet"))
         levers_path = Path(__file__).resolve().parents[1] / "agents" / "fin_diagnostics" / "levers.yaml"
         df_act = pd.read_parquet(snap_path)
+        avail_fys = sorted({str(x).upper() for x in df_act["fiscal_year"].dropna().unique()}) if "fiscal_year" in df_act.columns else ["FY26"]
+        fy_act = req_fy if req_fy.upper() in avail_fys else (avail_fys[-1] if avail_fys else "FY26")
         act_payload = generate_actions(df_act, fy_act, persona=persona, levers_path=levers_path)
         items = act_payload.get("items") or []
         top_titles = ", ".join(str(it.get("title") or "") for it in items[:3])
-        summary_act = f"Here are the top {len(items)} quantified actions for {fy_act}: {top_titles}." if items else f"Here are the quantified actions for {fy_act}."
+        fy_label = f"{req_fy} ({fy_act} baseline)" if req_fy.upper() != fy_act else fy_act
+        summary_act = f"Here are the top {len(items)} quantified CFO levers for {fy_label}: {top_titles}." if items else f"Here are the quantified actions for {fy_label}."
         return {
             "contract": {
                 "contract_version": 3,
@@ -345,29 +352,29 @@ async def run_planner_turn(
                 "visual": {
                     "type": "actions",
                     "mode": "replace",
-                    "title": f"Top 5 Quantified Actions — {fy_act}",
+                    "title": f"Top 5 Quantified CFO Levers — {fy_label}",
                     "actions": act_payload,
                 },
                 "actions": act_payload,
                 "insights": [str(it.get("what_to_do") or "") for it in items[:3] if it.get("what_to_do")],
-                "sources": [{"kind": "data", "object": "hrfin_gold.fact_financial_statement_line", "title": f"ONGC Standalone SSOT ({fy_act})"}],
+                "sources": [{"kind": "data", "object": "hrfin_gold.fact_financial_statement_line", "title": f"IOCL Standalone SSOT ({fy_act})"}],
                 "suggestions": [],
                 "access": {"status": "allowed"},
                 "export_options": ["pdf", "xlsx"],
-                "status_events": [f"Generated {len(items)} quantified actions for {fy_act}"],
+                "status_events": [f"Generated {len(items)} quantified actions for {fy_label}"],
                 "latency_ms": round((time.perf_counter() - t0) * 1000, 2),
             },
             "meta": None,
         }
 
     if plan.intent == "what_if":
-        # M-B4 / SPEC-11 §2 row 17: what_if runs after RBAC (finance personas only) using grounded numbers from ssot_field_economics_360
-        from app.brain.rbac import persona_function
+        # M-B4 / SPEC-11: what_if runs after RBAC (Leadership/Directors and Finance personas) using ssot_refinery_economics_360
+        from app.brain.rbac import persona_class, persona_function
         from app.answer_composer import build_refusal_contract
         from app.tools.what_if import run_what_if_simulation
         from app.tools.chart_rules import build_chart_spec
 
-        if persona_function(persona) not in ("EXEC", "FIN"):
+        if persona_class(persona) not in ("leadership", "director") and persona_function(persona) not in ("EXEC", "FIN"):
             ref_wi = build_refusal_contract(
                 code="R-FUNC",
                 persona=persona,
@@ -378,7 +385,8 @@ async def run_planner_turn(
             )
             return {"contract": ref_wi, "meta": {"spec": None}}
 
-        m_price = re.search(r"\$\s*(\d+(?:\.\d+)?)", query or "")
+        brent_m = re.search(r"brent[^$\d\n]{0,30}\$\s*(\d+(?:\.\d+)?)", query or "", re.I)
+        m_price = brent_m or re.search(r"\$\s*(\d+(?:\.\d+)?)", query or "")
         brent_val = float(m_price.group(1)) if m_price else 60.0
         sim_res = await asyncio.to_thread(
             run_what_if_simulation,
@@ -389,17 +397,18 @@ async def run_planner_turn(
         rows = sim_res.get("rows") or []
         columns = sim_res.get("columns") or []
         sql = sim_res.get("sql") or ""
-        neg_fields = [str(r.get("field_name")) for r in rows if r.get("is_ebitda_negative") or r.get("is_pbt_negative")]
+        neg_fields = [str(r.get("refinery_name") or r.get("field_name")) for r in rows if r.get("is_ebitda_negative") or r.get("is_pbt_negative")]
         price_lbl = int(brent_val) if brent_val == int(brent_val) else brent_val
-        if any(k in (query or "").lower() for k in ("brent", "crude", "price")):
-            if neg_fields:
-                headline_wi = (
-                    f"At a simulated Brent crude price of ${price_lbl} per barrel, {len(neg_fields)} fields "
-                    f"({', '.join(neg_fields[:3])}) turn negative on PBT or cash margin."
-                )
+        if any(k in (query or "").lower() for k in ("grm", "crack", "refin")):
+            if m_price:
+                headline_wi = f"GRM sensitivity at ${price_lbl}/bbl Brent across {len(rows)} IOCL refineries has been simulated."
+                title_wi = f"What-If: Refinery GRM ($/bbl) Sensitivity at ${price_lbl}/bbl"
             else:
-                headline_wi = f"At a simulated Brent crude price of ${price_lbl} per barrel, field profitability across {len(rows)} assets has been simulated."
-            title_wi = f"What-If: Brent ${price_lbl}/bbl Oil Price Shock Sensitivity"
+                headline_wi = f"GRM sensitivity across {len(rows)} IOCL refineries has been simulated."
+                title_wi = "What-If: Refinery GRM ($/bbl) Sensitivity"
+        elif any(k in (query or "").lower() for k in ("brent", "crude", "price")):
+            headline_wi = f"At a simulated Brent / feedstock shock of ${price_lbl}/bbl, downstream economics across {len(rows)} IOCL refineries have been simulated."
+            title_wi = f"What-If: Brent ${price_lbl}/bbl Feedstock Shock Sensitivity"
         else:
             headline_wi = f"Simulated scenario across {len(rows)} records."
             title_wi = "What-If Scenario Simulation"
@@ -423,11 +432,11 @@ async def run_planner_turn(
             "display_text": spoken_wi,
             "visual": vis_wi,
             "insights": [spoken_wi],
-            "sources": [{"kind": "data", "object": "hrfin_gold.ssot_field_economics_360", "sql": sql}],
+            "sources": [{"kind": "data", "object": "hrfin_gold.ssot_refinery_economics_360", "sql": sql}],
             "suggestions": ["Draft a board note on this", "Show as a table"],
             "access": {"status": "allowed"},
             "export_options": ["pdf", "xlsx"],
-            "status_events": ["Executed What-If simulation on hrfin_gold.ssot_field_economics_360"],
+            "status_events": ["Executed What-If simulation on hrfin_gold.ssot_refinery_economics_360"],
             "tool_called": "what_if",
         }
         return {"contract": wi_contract, "meta": None}
@@ -440,7 +449,7 @@ async def run_planner_turn(
         try:
             pol_oh = decide(persona, ["apar"] if oh_ref_code == "R-APAR" else ["sensitive"], query, spec=plan.spec)
         except UnknownPersona:
-            pol_oh = decide("E1_HR", ["apar"] if oh_ref_code == "R-APAR" else ["sensitive"], query, spec=plan.spec)
+            pol_oh = decide("E1_FIN", ["apar"] if oh_ref_code == "R-APAR" else ["sensitive"], query, spec=plan.spec)
         return {"contract": _refusal_contract(pol_oh, plan.spec, persona, turn_id, language, t0), "meta": {"spec": None}}
 
     if plan.intent != "data" or plan.spec is None:
@@ -512,11 +521,12 @@ async def run_planner_turn(
         self_emp_id = str(eff_principal.emp_id)
     else:
         self_emp_id = (PERSONA_DIRECTORY.get(persona) or {}).get("emp_id")
+    from app.access_control import UnknownPersona
+
     try:
         compiled = compiler.compile(spec, self_emp_id=self_emp_id)
         # B3.3 / SPEC-06 pre-query policy on the compiled spec (data classes of metric + roster columns)
         # and on the question's topic (pay / APAR / vigilance / self ...).
-        from app.access_control import UnknownPersona
         try:
             policy = decide(
                 persona,
@@ -528,7 +538,7 @@ async def run_planner_turn(
         except UnknownPersona:
             if spec.self_scope or "self" in compiled.data_classes:
                 raise
-            policy = decide("E1_HR", compiled.data_classes, query, spec=spec)
+            policy = decide("E1_FIN", compiled.data_classes, query, spec=spec)
         if policy.action == "refuse":
             return {"contract": _refusal_contract(policy, spec, persona, turn_id, language, t0), "meta": {"spec": None}}
         downgraded_from_row = bool(policy.action == "aggregate" and spec.grain == "row")
@@ -616,7 +626,7 @@ async def run_planner_turn(
             return float(v)
         except (ValueError, TypeError):
             return 0.0
-    raw_total = sum(_num(r.get(val_col)) for r in raw_rows_before_k5) if val_col else n_total
+    raw_total = n_total if compiled.grain == "row" else (sum(_num(r.get(val_col)) for r in raw_rows_before_k5) if val_col else n_total)
     
     chart_rows = visual.get("table", {}).get("rows") or rows
     source_for_insights = raw_rows_before_k5 if is_partial_director else chart_rows
@@ -641,10 +651,7 @@ async def run_planner_turn(
     allowed = allowed_numbers(rows, insights, spec, extra=extra_nums)
     told = compose_spoken(headline, insights, allowed, language=language)
     spoken = told["text"]
-
-    # BEH-07.33 T1: Voice ASR normalization notice when 'NYC' was spoken for 'ONGC'
-    if re.search(r"\bnyc\b", query or "", re.I):
-        spoken = "I heard 'NYC' as ONGC. " + spoken
+    # IOCL-R05: Suppress spurious "I heard 'I O C L' as IOCL." prefix on typed or case-only IOCL queries
 
     # P2F1-B2: Append context carry-over and bare year notices
     ctx_fy = next((n.split(":", 1)[1] for n in plan.notes if n.startswith("context_fy_inherited:")), None)
@@ -677,7 +684,7 @@ async def run_planner_turn(
         fy_disp = (compiled.effective_period or {}).get("fy", "FY26")
         if plan.chart_kind != "waterfall":
             visual["type"] = "table"
-        visual["title"] = f"ONGC Financial Statements ({fy_disp}) — Statement of Profit & Loss (Table View)"
+        visual["title"] = f"IOCL Financial Statements ({fy_disp}) — Statement of Profit & Loss (Table View)"
         visual["subtitle"] = f"{fy_disp} · Income Statement (P&L) shown by default · Switch to Balance Sheet or Cash Flow below"
         clarify_prompt = (
             f"Would you like to examine the Income Statement (P&L), the Balance Sheet, or the Cash Flow Statement for {fy_disp}? "
@@ -702,7 +709,7 @@ async def run_planner_turn(
     fin_sys: Optional[str] = None
     fin_footnotes: List[str] = []
     if is_fin_ssot and result.rows:
-        # Prefer a row with an explicit ONGC_AR_* doc and page_label
+        # Prefer a row with an explicit IOCL_AR_* doc and page_label
         for r in result.rows:
             sd = str(r.get("source_doc") or "")
             sp = str(r.get("source_page_label") or "")
@@ -710,7 +717,7 @@ async def run_planner_turn(
             fn = str(r.get("footnote_marker") or "").strip()
             if fn and fn not in fin_footnotes:
                 fin_footnotes.append(fn)
-            if sd.startswith("ONGC_AR_") and sp and not fin_doc:
+            if sd.startswith("IOCL_AR_") and sp and not fin_doc:
                 fin_doc, fin_page, fin_sys = sd, sp, ss or "ar"
         if not fin_doc:
             r0 = result.rows[0]
@@ -758,7 +765,7 @@ async def run_planner_turn(
         n_gt5_exec, n_gt5_all = await _v19_sibling_counts(spec, compiled, compiler, raw_rows_before_k5)
         rule_line = f"Continuous stay at the current station, more than 5.0 years, as of {get_semantic_model().anchor_date}"
         jrtp_line = "JRTP Rev 4 cl. 3.2 — rotation after 3–5 years (**Illustrative**)"
-        hc_line = "Delhi High Court (2018), ONGC v. B.V. Srihari Rao"
+        hc_line = "Delhi High Court (2018), Administrative Exigency & Rotation Jurisprudence"
         v19_sources = [
             {
                 "kind": "policy",
@@ -819,7 +826,7 @@ async def run_planner_turn(
         ins_v2_list = [{"kind": "headline", "text": visual["title"]}] + ins_v2_list[:5]
     if compiled.definition_id in ("DELHI_GT5_CONT_V1", "STATION_GT5_CONT_V1") and compiled.grain == "aggregate" and not downgraded_from_row:
         rule_ins = f"Continuous stay at the current station, more than 5.0 years, as of {get_semantic_model().anchor_date}"
-        cite_ins = "JRTP Rev 4 cl. 3.2 — rotation after 3–5 years (**Illustrative**) · Delhi High Court (2018), ONGC v. B.V. Srihari Rao"
+        cite_ins = "JRTP Rev 4 cl. 3.2 — rotation after 3–5 years (**Illustrative**) · Delhi High Court (2018), Administrative Exigency & Rotation"
         ins_texts = [ins_texts[0] if ins_texts else spoken, rule_ins, cite_ins] + ins_texts[1:2]
         ins_v2_list = [
             {"kind": "headline", "text": ins_texts[0]},
@@ -915,7 +922,7 @@ async def run_planner_turn(
             "label": prov_label,
             "doc": fin_doc,
             "page_label": fin_page,
-            "detail": f"Verified SSOT ({fin_doc or 'ONGC AR'}" + (f" {fin_page})" if fin_page else ")"),
+            "detail": f"Verified SSOT ({fin_doc or 'IOCL AR'}" + (f" {fin_page})" if fin_page else ")"),
         }
         if prov_label == "verified_ar":
             prov_obj["badge"] = "AR-printed"

@@ -41,17 +41,17 @@ TOKEN_TTL_S = 8 * 3600
 
 
 def _load_persona_directory() -> Dict[str, Dict[str, Any]]:
-    """P2H.1 (SPEC-06 §4.1 / D-41 / D-60 / S9): load the 11 canonical personas strictly from app_users.yaml."""
+    """P2H.1 (SPEC-06 §4.1 / D-41 / D-60 / S9): load the 8 canonical IOCL personas strictly from app_users.yaml."""
     from app.access_control import VALID_PERSONAS
 
     yaml_path = Path(__file__).resolve().parent / "brain" / "app_users.yaml"
     if not yaml_path.exists():
-        raise RuntimeError(f"app_users.yaml not found at {yaml_path}; required for 11-persona identity directory")
+        raise RuntimeError(f"app_users.yaml not found at {yaml_path}; required for 8-persona identity directory")
     raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8")) or {}
     personas = raw.get("personas") or {}
-    if set(personas.keys()) != set(VALID_PERSONAS) or len(personas) != 11:
+    if set(personas.keys()) != set(VALID_PERSONAS) or len(personas) != 8:
         raise RuntimeError(
-            f"app_users.yaml must define all 11 canonical personas {sorted(VALID_PERSONAS)}, got {sorted(personas.keys())}"
+            f"app_users.yaml must define all 8 canonical personas {sorted(VALID_PERSONAS)}, got {sorted(personas.keys())}"
         )
     out: Dict[str, Dict[str, Any]] = {}
     for pid, info in personas.items():
@@ -255,9 +255,24 @@ def _sign(signing_input: bytes) -> str:
     return _b64e(hmac.new(_signing_key(), signing_input, hashlib.sha256).digest())
 
 
+AUTH_PERSONA_ALIASES: Dict[str, str] = {
+    "CHAIRMAN": "CMD",
+    "A_FIN": "E1_FIN",
+    "B_FIN": "E2_FIN",
+    "C_FIN": "E3_FIN",
+    "D_FIN": "E4_FIN",
+}
+
+
+def resolve_auth_persona(persona_id: Optional[str]) -> str:
+    """Resolve canonical persona IDs and explicit IOCL auth aliases (CHAIRMAN->CMD, A_FIN..D_FIN->E1_FIN..E4_FIN)."""
+    pid = (persona_id or "").strip().upper()
+    return AUTH_PERSONA_ALIASES.get(pid, pid)
+
+
 def issue_token(persona_id: str, is_admin: bool = False, ttl_s: int = TOKEN_TTL_S, now: Optional[int] = None) -> str:
     """Signs a session token for a known persona. Raises AuthError for unknown personas."""
-    pid = (persona_id or "").strip().upper()
+    pid = resolve_auth_persona(persona_id)
     if pid not in PERSONA_DIRECTORY:
         raise AuthError(f"unknown persona {persona_id!r}")
     info = PERSONA_DIRECTORY[pid]
@@ -444,8 +459,8 @@ def admin_passphrase_ok(passphrase: Optional[str]) -> bool:
 # ------------------------------------------------------------------ role-switch detection (BEH-01, SPEC-06 §4.4 rule 4)
 import re  # noqa: E402
 
-_ROLE_WORDS = (r"(?:cmd|c\.m\.d|chairman|ceo|cfo|md|director|dir[\s_-]?(?:hr|fin(?:ance)?)|admin|administrator|"
-               r"e\d(?:[\s_-]?(?:hr|fin))?|सीएमडी|चेयरमैन|निदेशक|डायरेक्टर|एडमिन)")
+_ROLE_WORDS = (r"(?:cmd|c\.m\.d|chairman|ceo|cfo|md|director|dir[\s_-]?(?:fin(?:ance)?|ref(?:ineries)?|mkt|marketing)|admin|administrator|"
+               r"(?:e[1-4]|grade[\s_-]*[a-d]|[a-d])(?:[\s_-]?fin(?:ance)?)?|सीएमडी|चेयरमैन|निदेशक|डायरेक्टर|एडमिन)")
 _ROLE_SWITCH_PATTERNS = [
     # P0.4 r2: "role/persona/access level" always count; "profile/user" only with "my" ("update the profile of
     # Rajesh" is a normal HR request, not a role switch)
@@ -474,20 +489,17 @@ def is_role_switch_request(query: str) -> bool:
 
 
 def requested_persona(query: str) -> Optional[str]:
-    """Best-effort target persona for an admin switch ("switch role to E3_FIN" -> E3_FIN) across all 11 personas."""
+    """Best-effort target persona for an admin switch ("switch role to E3_FIN" / "C_FIN" -> E3_FIN) across all 8 personas."""
     q = (query or "").lower()
     table = [
-        (r"\b(e1[\s_-]?hr|hr[\s_-]?e1|dinesh\s+deshmukh)\b", "E1_HR"),
-        (r"\b(e2[\s_-]?hr|hr[\s_-]?e2|pooja\s+verma|pooja)\b", "E2_HR"),
-        (r"\b(e3[\s_-]?hr|hr[\s_-]?e3|lokesh\s+verma|lokesh)\b", "E3_HR"),
-        (r"\b(e4[\s_-]?hr|hr[\s_-]?e4|umesh\s+(?:d\.?\s+)?bhatia|umesh)\b", "E4_HR"),
-        (r"\b(e1[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e1|ajay\s+deshmukh)\b", "E1_FIN"),
-        (r"\b(e2[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e2|praveen\s+nair)\b", "E2_FIN"),
-        (r"\b(e3[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e3|shailesh\s+(?:e\.?\s+)?kapoor|shailesh|rajesh\s+kulkarni|rajesh)\b", "E3_FIN"),
-        (r"\b(e4[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e4|santosh\s+banerjee)\b", "E4_FIN"),
-        (r"\b(dir(ector)?[\s_-]*(\()?(fin|finance)|finance\s+director|cfo|anupam\s+agarwal|anupam)\b", "DIR_FIN"),
-        (r"\b(dir(ector)?[\s_-]*(\()?hr|hr\s+director|director\s+human\s+resources|manish\s+patil)\b", "DIR_HR"),
-        (r"\b(cmd|c\.m\.d|chairman|ceo|arun\s+kumar\s+singh)\b", "CMD"),
+        (r"\b(e1[\s_-]?fin(?:ance)?|a[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e1|grade[\s_-]*a\b|ajay\s+deshmukh)\b", "E1_FIN"),
+        (r"\b(e2[\s_-]?fin(?:ance)?|b[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e2|grade[\s_-]*b\b|praveen\s+nair)\b", "E2_FIN"),
+        (r"\b(e3[\s_-]?fin(?:ance)?|c[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e3|grade[\s_-]*c\b|shailesh\s+(?:e\.?\s+)?kapoor|shailesh)\b", "E3_FIN"),
+        (r"\b(e4[\s_-]?fin(?:ance)?|d[\s_-]?fin(?:ance)?|fin(?:ance)?[\s_-]?e4|grade[\s_-]*d\b|santosh\s+banerjee)\b", "E4_FIN"),
+        (r"\b(dir(ector)?[\s_-]*(\()?(fin|finance)|finance\s+director|cfo|anuj\s+jain|anuj)\b", "DIR_FIN"),
+        (r"\b(dir(ector)?[\s_-]*(\()?(ref|refineries)|refineries\s+director|arvind\s+kumar|arvind)\b", "DIR_REF"),
+        (r"\b(dir(ector)?[\s_-]*(\()?(mkt|marketing)|marketing\s+director|saumitra(?:\s+p\.?)?\s+srivastava|saumitra)\b", "DIR_MKT"),
+        (r"\b(cmd|c\.m\.d|chairman|ceo|arvinder(?:\s+singh)?\s+sahney|arvinder)\b", "CMD"),
     ]
     for pat, pid in table:
         if re.search(pat, q):

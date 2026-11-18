@@ -67,7 +67,7 @@ def test_large_roster_419_rows():
             "grade": "E5",
             "discipline": "Production",
             "work_centre": "Delhi HQ",
-            "ongc_tenure_years": 15.2,
+            "iocl_tenure_years": 15.2,
             "station_tenure_years": 5.5,
             "years_to_retirement": 10.0,
             "retiring_within_3yr": False,

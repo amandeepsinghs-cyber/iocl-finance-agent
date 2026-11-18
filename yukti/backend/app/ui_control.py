@@ -1,7 +1,7 @@
 """Shared UI-control vocabulary and validator for Yukti AI (Voice + Text agents).
 
-Ported directly from Urvi AI Agent (`wellpulse/backend/app/agent/ui_control.py`) and
-adapted for ONGC's HR & Finance Command Center ("Yukti AI").
+Ported from Urvi AI Agent and adapted for IndianOil's Finance & Downstream
+Command Center ("Yukti AI").
 
 Gives both the Gemini Live voice session (`live_session.py`) and the text/REST
 turn runner (`turn_runner.py`) a single, allow-listed `ui_control(action, value)`
@@ -26,57 +26,56 @@ UI_ACTIONS: Dict[str, Tuple[str, ...]] = {
     ),
     "open_screen": (
         "home",
-        "delhi_tenure",
-        "field_profitability",
+        "pnl_fy26",
+        "refinery_grm",
         "mou_scorecard",
-        "lifting_cost",
-        "ne_vacancies",
-        "brent_what_if",
-        "recruitment_freeze",
-        "jrtp_policy",
+        "fuel_and_loss",
+        "marketing_volumes",
+        "grm_what_if",
+        "doa_policy",
         "board_note",
     ),
     "focus_location": (
         "Delhi",
         "Mumbai",
-        "Dehradun",
-        "Ahmedabad",
-        "Mehsana",
-        "Ankleshwar",
-        "Cambay",
-        "Assam",
-        "Jorhat",
-        "Tripura",
-        "Rajahmundry",
-        "Cauvery",
+        "Noida",
+        "Faridabad",
+        "Chennai",
+        "Panipat",
+        "Paradip",
+        "Koyali",
+        "Mathura",
+        "Haldia",
+        "Barauni",
+        "Bongaigaon",
+        "Guwahati",
+        "Digboi",
         "ALL",
     ),
     "grade_filter": ("ALL", "E5_PLUS", "E7_PLUS"),
-    "breakdown": ("grade", "discipline"),
+    "breakdown": ("refinery", "product", "pipeline", "subsidiary", "segment"),
     "persona": (
-        "CMD", "DIR_HR", "DIR_FIN",
-        "E1_HR", "E2_HR", "E3_HR", "E4_HR",
+        "CMD", "DIR_FIN", "DIR_REF", "DIR_MKT",
         "E1_FIN", "E2_FIN", "E3_FIN", "E4_FIN",
     ),
     "language": ("en", "hi", "hi-en"),
     "panel": ("expand", "dock", "minimise", "close", "open_history"),
     "export": ("pdf", "xlsx", "docx", "sheets", "docs"),
     "history": ("back", "forward"),
-    # 26-Oct: Brent / WTI price line on top of a fiscal-year chart (revenue, PAT...); "off" removes it
-    "overlay": ("brent", "wti", "inr", "off"),
+    # 26-Oct + IOCL: Brent / WTI / INR / GRM / IOC.NS overlay on fiscal-year charts; "off" removes it
+    "overlay": ("brent", "wti", "inr", "grm", "iocl", "off"),
 }
 
 # Canonical queries triggered when the user says "open <screen>" or focuses a location/filter
 SCREEN_CANONICAL_QUERIES: Dict[str, str] = {
-    "delhi_tenure": "How many executives have been posted in Delhi for 5 years or more? Break down by grade and discipline.",
-    "field_profitability": "Which fields or assets were the most profitable and which made losses in FY26?",
-    "mou_scorecard": "How are we tracking against our MoU targets with MoPNG/DPE for this year?",
-    "lifting_cost": "Compare lifting cost per BOE across Western Offshore, Gujarat, and Assam for FY26.",
-    "ne_vacancies": "What is the current executive vacancy position across North-East sector work centres?",
-    "brent_what_if": "What is the impact on ONGC revenue and PAT if Brent crude drops to $60 per barrel?",
-    "recruitment_freeze": "Simulate the impact of a 2-year executive recruitment freeze on headcount and retirements.",
-    "jrtp_policy": "What are the station tenure norms and transfer rules under the Job Rotation and Transfer Policy (JRTP)?",
-    "board_note": "Draft a Board Note on turnaround strategy for loss-making marginal fields in FY26.",
+    "pnl_fy26": "Show the Schedule III Profit and Loss statement of IOCL for FY26.",
+    "refinery_grm": "Rank all 9 IOCL refineries by Gross Refining Margin ($/bbl) and EBITDA in FY26.",
+    "mou_scorecard": "Show IOCL's Maharatna MoU Scorecard parameters, targets, actual achievement, and composite score for FY26.",
+    "fuel_and_loss": "Compare Fuel & Loss % and Distillate Yield % across all 9 IOCL refineries in FY26.",
+    "marketing_volumes": "Break down IOCL marketing sales volume (MMT), market share %, and gross margin across product categories in FY26.",
+    "grm_what_if": "What is the EBITDA and PAT sensitivity across IOCL refineries if GRM increases by $1.50/bbl?",
+    "doa_policy": "What is the Director (Finance) financial delegation ceiling for revenue and capital expenditure under IOCL DoA?",
+    "board_note": "Draft a Board Note summarizing IOCL's FY26 refining economics, borrowings reduction, and Panipat P-25 capex priorities.",
 }
 
 # Forgiving synonyms so the LLM (or deterministic parser) doesn't have to hit exact tokens.
@@ -93,6 +92,13 @@ _ALIASES: Dict[Tuple[str, str], Tuple[str, str]] = {
     ("overlay", "currency"): ("overlay", "inr"),
     ("overlay", "exchange_rate"): ("overlay", "inr"),
     ("overlay", "fx"): ("overlay", "inr"),
+    ("overlay", "singapore_grm"): ("overlay", "grm"),
+    ("overlay", "sg_grm"): ("overlay", "grm"),
+    ("overlay", "refining_margin"): ("overlay", "grm"),
+    ("overlay", "ioc"): ("overlay", "iocl"),
+    ("overlay", "ioc.ns"): ("overlay", "iocl"),
+    ("overlay", "indianoil"): ("overlay", "iocl"),
+    ("overlay", "share_price"): ("overlay", "iocl"),
     ("overlay", "none"): ("overlay", "off"),
     ("overlay", "remove"): ("overlay", "off"),
     ("overlay", "hide"): ("overlay", "off"),
@@ -117,16 +123,18 @@ _ALIASES: Dict[Tuple[str, str], Tuple[str, str]] = {
     ("set_chart_kind", "gauge"): ("chart_kind", "gauge"),
     ("set_chart_kind", "funnel"): ("chart_kind", "funnel"),
     ("set_persona", "cmd"): ("persona", "CMD"),
-    ("set_persona", "dir_hr"): ("persona", "DIR_HR"),
+    ("set_persona", "chairman"): ("persona", "CMD"),
     ("set_persona", "dir_fin"): ("persona", "DIR_FIN"),
-    ("set_persona", "e1_hr"): ("persona", "E1_HR"),
-    ("set_persona", "e2_hr"): ("persona", "E2_HR"),
-    ("set_persona", "e3_hr"): ("persona", "E3_HR"),
-    ("set_persona", "e4_hr"): ("persona", "E4_HR"),
+    ("set_persona", "dir_ref"): ("persona", "DIR_REF"),
+    ("set_persona", "dir_mkt"): ("persona", "DIR_MKT"),
     ("set_persona", "e1_fin"): ("persona", "E1_FIN"),
     ("set_persona", "e2_fin"): ("persona", "E2_FIN"),
     ("set_persona", "e3_fin"): ("persona", "E3_FIN"),
     ("set_persona", "e4_fin"): ("persona", "E4_FIN"),
+    ("set_persona", "a_fin"): ("persona", "E1_FIN"),
+    ("set_persona", "b_fin"): ("persona", "E2_FIN"),
+    ("set_persona", "c_fin"): ("persona", "E3_FIN"),
+    ("set_persona", "d_fin"): ("persona", "E4_FIN"),
     ("set_language", "en"): ("language", "en"),
     ("set_language", "hi"): ("language", "hi"),
     ("set_language", "hi-en"): ("language", "hi-en"),
@@ -150,20 +158,21 @@ _ALIASES: Dict[Tuple[str, str], Tuple[str, str]] = {
     ("open_screen", "orb"): ("open_screen", "home"),
     ("open_screen", "greeting"): ("open_screen", "home"),
     ("open_screen", "clear"): ("open_screen", "home"),
-    ("open_screen", "tenure"): ("open_screen", "delhi_tenure"),
-    ("open_screen", "delhi"): ("open_screen", "delhi_tenure"),
-    ("open_screen", "profitability"): ("open_screen", "field_profitability"),
-    ("open_screen", "losses"): ("open_screen", "field_profitability"),
-    ("open_screen", "loss_fields"): ("open_screen", "field_profitability"),
-    ("open_screen", "pnl"): ("open_screen", "field_profitability"),
+    ("open_screen", "pnl"): ("open_screen", "pnl_fy26"),
+    ("open_screen", "profit_and_loss"): ("open_screen", "pnl_fy26"),
+    ("open_screen", "grm"): ("open_screen", "refinery_grm"),
+    ("open_screen", "refineries"): ("open_screen", "refinery_grm"),
+    ("open_screen", "profitability"): ("open_screen", "refinery_grm"),
     ("open_screen", "mou"): ("open_screen", "mou_scorecard"),
     ("open_screen", "scorecard"): ("open_screen", "mou_scorecard"),
-    ("open_screen", "lifting"): ("open_screen", "lifting_cost"),
-    ("open_screen", "vacancies"): ("open_screen", "ne_vacancies"),
-    ("open_screen", "brent"): ("open_screen", "brent_what_if"),
-    ("open_screen", "what_if"): ("open_screen", "brent_what_if"),
-    ("open_screen", "policy"): ("open_screen", "jrtp_policy"),
-    ("open_screen", "jrtp"): ("open_screen", "jrtp_policy"),
+    ("open_screen", "fuel_loss"): ("open_screen", "fuel_and_loss"),
+    ("open_screen", "yield"): ("open_screen", "fuel_and_loss"),
+    ("open_screen", "marketing"): ("open_screen", "marketing_volumes"),
+    ("open_screen", "sales"): ("open_screen", "marketing_volumes"),
+    ("open_screen", "brent"): ("open_screen", "grm_what_if"),
+    ("open_screen", "what_if"): ("open_screen", "grm_what_if"),
+    ("open_screen", "policy"): ("open_screen", "doa_policy"),
+    ("open_screen", "doa"): ("open_screen", "doa_policy"),
     # Panel aliases
     ("panel", "fullscreen"): ("panel", "expand"),
     ("panel", "full_screen"): ("panel", "expand"),
@@ -176,19 +185,25 @@ _ALIASES: Dict[Tuple[str, str], Tuple[str, str]] = {
     # Persona aliases
     ("persona", "chairman"): ("persona", "CMD"),
     ("persona", "ceo"): ("persona", "CMD"),
-    ("persona", "arun"): ("persona", "CMD"),
-    ("persona", "director_hr"): ("persona", "DIR_HR"),
-    ("persona", "hr_director"): ("persona", "DIR_HR"),
-    ("persona", "manish"): ("persona", "DIR_HR"),
+    ("persona", "arvinder"): ("persona", "CMD"),
     ("persona", "director_finance"): ("persona", "DIR_FIN"),
     ("persona", "finance_director"): ("persona", "DIR_FIN"),
     ("persona", "cfo"): ("persona", "DIR_FIN"),
-    ("persona", "anupam"): ("persona", "DIR_FIN"),
-    ("persona", "pooja"): ("persona", "E2_HR"),
-    ("persona", "lokesh"): ("persona", "E3_HR"),
-    ("persona", "umesh"): ("persona", "E4_HR"),
+    ("persona", "anuj"): ("persona", "DIR_FIN"),
+    ("persona", "director_refineries"): ("persona", "DIR_REF"),
+    ("persona", "refineries_director"): ("persona", "DIR_REF"),
+    ("persona", "arvind"): ("persona", "DIR_REF"),
+    ("persona", "director_marketing"): ("persona", "DIR_MKT"),
+    ("persona", "marketing_director"): ("persona", "DIR_MKT"),
+    ("persona", "saumitra"): ("persona", "DIR_MKT"),
+    ("persona", "a_fin"): ("persona", "E1_FIN"),
+    ("persona", "b_fin"): ("persona", "E2_FIN"),
+    ("persona", "c_fin"): ("persona", "E3_FIN"),
+    ("persona", "d_fin"): ("persona", "E4_FIN"),
+    ("persona", "ajay"): ("persona", "E1_FIN"),
+    ("persona", "praveen"): ("persona", "E2_FIN"),
     ("persona", "shailesh"): ("persona", "E3_FIN"),
-    ("persona", "asha"): ("persona", "E3_FIN"),
+    ("persona", "santosh"): ("persona", "E4_FIN"),
     # Language aliases
     ("language", "english"): ("language", "en"),
     ("language", "hindi"): ("language", "hi"),
@@ -220,7 +235,7 @@ def validate(action: str, value: str = "") -> Tuple[Optional[Dict[str, str]], Op
         for key_low, canonical in _LOCATIONS.items():
             if key_low in v_raw.lower():
                 return {"action": "focus_location", "value": canonical}, None
-        return None, f"Unknown ONGC location '{value}'."
+        return None, f"Unknown IndianOil location '{value}'."
 
     if a == "persona":
         # P0.4 (BUG-06, SPEC-06 §4.4 rule 2): screen-control can never switch the persona. Identity comes from
@@ -382,8 +397,10 @@ def detect_ui_control_intent(query: str) -> Optional[Dict[str, str]]:
         return {"action": "export", "value": "xlsx"}
 
     # 5. Persona & Language
-    if any(p in q for p in ["switch role to director hr", "act as director hr", "persona director hr"]):
-        return {"action": "persona", "value": "DIR_HR"}
+    if any(p in q for p in ["switch role to director refineries", "act as director refineries", "persona director refineries"]):
+        return {"action": "persona", "value": "DIR_REF"}
+    if any(p in q for p in ["switch role to director marketing", "act as director marketing", "persona director marketing"]):
+        return {"action": "persona", "value": "DIR_MKT"}
     if any(p in q for p in ["switch role to director finance", "act as director finance", "persona director finance"]):
         return {"action": "persona", "value": "DIR_FIN"}
     if any(p in q for p in ["switch role to cmd", "act as cmd", "act as chairman", "persona cmd"]):
@@ -395,21 +412,35 @@ def detect_ui_control_intent(query: str) -> Optional[Dict[str, str]]:
     if q in ("speak in hinglish", "switch to hinglish", "hinglish mode"):
         return {"action": "language", "value": "hi-en"}
 
-    # 6. Open named screen directly by voice ("open field profitability", "open mou scorecard", "open delhi tenure")
-    if re.search(r"\b(open|show|go to|load)\b.*\b(field profitability|loss making fields)\b", q):
-        return {"action": "open_screen", "value": "field_profitability"}
-    if re.search(r"\b(open|show|go to|load)\b.*\b(mou|mou scorecard|dpe target)\b", q):
-        return {"action": "open_screen", "value": "mou_scorecard"}
-    if re.search(r"\b(open|show|go to|load)\b.*\b(delhi tenure|delhi station|station tenure)\b", q):
-        return {"action": "open_screen", "value": "delhi_tenure"}
-    if re.search(r"\b(open|show|go to|load)\b.*\b(lifting cost)\b", q):
-        return {"action": "open_screen", "value": "lifting_cost"}
-    if re.search(r"\b(open|show|go to|load)\b.*\b(north east vacanc|ne vacanc)\b", q):
-        return {"action": "open_screen", "value": "ne_vacancies"}
-    if re.search(r"\b(open|show|go to|load)\b.*\b(brent|oil price shock)\b", q):
-        return {"action": "open_screen", "value": "brent_what_if"}
-    if re.search(r"\b(open|show|go to|load)\b.*\b(jrtp|transfer policy)\b", q):
-        return {"action": "open_screen", "value": "jrtp_policy"}
+    # 6. Open named screen directly by voice ("open refinery grm", "go to mou scorecard", "load pnl")
+    # Never hijack analytical queries specifying fiscal years, chart kinds, or comparisons.
+    _is_explicit_screen_cmd = bool(
+        re.match(r"^\s*(open|go to|load)\b", q)
+        or (re.search(r"\b(screen|view|dashboard|panel)\b", q) and re.search(r"\b(open|show|go to|load)\b", q))
+    )
+    _has_analytical_modifiers = bool(
+        re.search(
+            r"\b(fy\s*\d{2}|20\d{2}|waterfall|bridge|bar|hbar|line|pie|donut|table|trend|compare|between|from|for|by|across|as a)\b",
+            q,
+        )
+    )
+    if _is_explicit_screen_cmd and not _has_analytical_modifiers:
+        if re.search(r"\b(p\s*&\s*l|pnl|profit and loss)\b", q):
+            return {"action": "open_screen", "value": "pnl_fy26"}
+        if re.search(r"\b(refinery grm|gross refining margin|refinery economics)\b", q):
+            return {"action": "open_screen", "value": "refinery_grm"}
+        if re.search(r"\b(mou|mou scorecard|dpe target)\b", q):
+            return {"action": "open_screen", "value": "mou_scorecard"}
+        if re.search(r"\b(fuel and loss|fuel & loss|distillate yield)\b", q):
+            return {"action": "open_screen", "value": "fuel_and_loss"}
+        if re.search(r"\b(marketing volume|product sales|indane|servo)\b", q):
+            return {"action": "open_screen", "value": "marketing_volumes"}
+        if re.search(r"\b(grm what if|oil price shock|sensitivity)\b", q):
+            return {"action": "open_screen", "value": "grm_what_if"}
+        if re.search(r"\b(doa|delegation|hedging policy|financial rules)\b", q):
+            return {"action": "open_screen", "value": "doa_policy"}
+        if re.search(r"\b(board note|briefing note)\b", q):
+            return {"action": "open_screen", "value": "board_note"}
 
     return None
 

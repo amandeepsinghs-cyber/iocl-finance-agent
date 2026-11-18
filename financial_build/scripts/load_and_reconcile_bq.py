@@ -4,13 +4,13 @@ Stage 3: Load 10-Year Married Financial Cube (Annual Report Schedule III + Yahoo
 into BigQuery and Reconcile All Sub-Tables Top-Down (FY17-FY26).
 
 Tables updated / created:
-1. `ongc-hr-finance-agent.hrfin_silver.corporate_financials` (10 rows, 67 columns)
-2. `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360` (10 rows, 67 columns)
-3. `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_pnl_lines` (230 rows: 23 Schedule III lines x 10 FYs)
-4. `ongc-hr-finance-agent.hrfin_gold.agg_field_pnl_summary` (530 rows: top-down reconciled to corporate FY17-FY26)
-5. `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360` (530 rows: top-down reconciled to corporate FY17-FY26)
-6. `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` (reconciled to corporate FY17-FY26)
-7. `ongc-hr-finance-agent.hrfin_silver.subsidiary_financials` (50 rows: 5 group entities x 10 FYs FY17-FY26)
+1. `yukti-finance-iocl.hrfin_silver.corporate_financials` (10 rows, 67 columns)
+2. `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360` (10 rows, 67 columns)
+3. `yukti-finance-iocl.hrfin_gold.ssot_corporate_pnl_lines` (230 rows: 23 Schedule III lines x 10 FYs)
+4. `yukti-finance-iocl.hrfin_gold.agg_field_pnl_summary` (530 rows: top-down reconciled to corporate FY17-FY26)
+5. `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360` (530 rows: top-down reconciled to corporate FY17-FY26)
+6. `yukti-finance-iocl.hrfin_silver.field_pnl_annual` (reconciled to corporate FY17-FY26)
+7. `yukti-finance-iocl.hrfin_silver.subsidiary_financials` (50 rows: 5 group entities x 10 FYs FY17-FY26)
 """
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 from google.cloud import bigquery
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 

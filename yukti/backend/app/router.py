@@ -1,6 +1,6 @@
 """Semantic Router for Yukti AI.
-Embeds user queries via Vertex AI text-embedding-004 and matches against
-precomputed embeddings for 89 certified queries in certified/library.yaml.
+Embeds user queries via Vertex AI text-embedding-005 and matches against
+precomputed embeddings for 30 IOCL certified queries in certified/library.yaml.
 Routes above threshold to run_certified_query(id, params) with parameter extraction.
 Routes below threshold to live NL->SQL generation.
 Logs every routing decision per turn.
@@ -29,10 +29,7 @@ ROUTING_THRESHOLD = 0.60
 
 # Remap refusal templates to authorized enterprise data templates for leadership
 REFUSAL_TO_DATA_MAP = {
-    "D4": "C6",  # Loss-making fields & capex
-    "D5": "C1",  # Delhi 5-year stay
-    "D2": "C1",  # Draft transfer list -> stay tenure
-    "M4": "C6",  # Loss-making fields
+    "Q29": "Q07",  # Leadership sees aggregate/unit-level refinery margin benchmarks
 }
 
 # Work-centre / field names and fiscal-year phrases are resolved by the single entity
@@ -85,10 +82,10 @@ class SemanticRouter:
             logger.warning(f"Embeddings file not found at {EMBEDDINGS_PATH}")
 
     def embed_query(self, text: str) -> Optional[List[float]]:
-        """Embeds a single query turn with Vertex AI text-embedding-004."""
+        """Embeds a single query turn with Vertex AI text-embedding-005."""
         try:
             res = self.client.models.embed_content(
-                model="text-embedding-004",
+                model="text-embedding-005",
                 contents=[text],
             )
             if res.embeddings and len(res.embeddings) > 0:
@@ -237,15 +234,9 @@ class SemanticRouter:
                 best_id = remapped_id
                 best_entry = remapped_entry
 
-        # Topic-level guards so specific leave/policy queries never false-match unrelated certified entries (e.g. P5 study leave)
+        # Topic-level guard so specific DoA/hedging/policy questions route to search_policy rather than unrelated data SQL
         q_low_guard = query.lower()
-        if best_id == "P5" and "study" not in q_low_guard:
-            best_score = 0.0
-        elif best_id == "P4" and not any(w in q_low_guard for w in ["earned", "encash", "retire", "superannuat"]):
-            best_score = 0.0
-        elif best_id == "E1" and not any(w in q_low_guard for w in ["balance", "my leave"]):
-            best_score = 0.0
-        elif any(w in q_low_guard for w in ["casual leave", "maternity leave", "paternity leave", "child care leave", "special casual", "commuted leave", "quarantine leave", "sabbatical", "compensatory off"]):
+        if any(w in q_low_guard for w in ["casual leave", "maternity leave", "paternity leave", "sabbatical"]):
             best_score = 0.0
 
         # Evaluate threshold

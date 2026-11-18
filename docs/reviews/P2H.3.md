@@ -78,7 +78,7 @@
 
 ## Evidence (reproducible)
 
-Reference SQL (BQ, `ongc-hr-finance-agent`), using `employment_status` and `continuous_from_date` (the column names as resolved in #53):
+Reference SQL (BQ, `yukti-finance-iocl`), using `employment_status` and `continuous_from_date` (the column names as resolved in #53):
 ```
 E1 35, E2 90, E3 87, E4 67, E5 57, E6 35, E7 33, E8 12, E9 3  -> 419 ; GRP-C 172, GRP-D 54 -> 645
 T1 Delhi active: E1 60,E2 132,E3 154,E4 122,E5 101,E6 59,E7 44,E8 16,E9 4,GRP-C 189,GRP-D 59,DIR 2,CMD 1 = 943

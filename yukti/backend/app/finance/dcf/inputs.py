@@ -130,7 +130,7 @@ def load_fy26_wacc_default(
 
 
 def load_fy26_market_price_default() -> Tuple[float, str, Dict[str, Any]]:
-    """Return (close_price_inr, source_label, lineage_metadata) for FY26 ONGC.NS close.
+    """Return (close_price_inr, source_label, lineage_metadata) for FY26 IOC.NS close.
 
     Raises DCFInputMissingError when both market_prices_seed.csv and fact_wacc_input.parquet
     are missing or contain no valid FY26 market price.
@@ -141,7 +141,7 @@ def load_fy26_market_price_default() -> Tuple[float, str, Dict[str, Any]]:
             for row in csv.DictReader(fh):
                 ticker = (row.get("ticker") or "").strip()
                 dt = (row.get("date") or "").strip()
-                if ticker in ("ONGC.NS", "ONGC", "") and dt.startswith("2026-03"):
+                if ticker in ("IOC.NS", "IOC", "") and dt.startswith("2026-03"):
                     if latest_row is None or dt >= (latest_row.get("date") or ""):
                         latest_row = row
         if latest_row and latest_row.get("close"):
@@ -155,7 +155,7 @@ def load_fy26_market_price_default() -> Tuple[float, str, Dict[str, Any]]:
                     px,
                     f"market_prices_seed.csv (NSE EQ close {dt})",
                     {
-                        "ticker": "ONGC.NS",
+                        "ticker": "IOC.NS",
                         "date": dt,
                         "close_inr": px,
                         "source_doc": "market_prices_seed.csv",
@@ -183,7 +183,7 @@ def load_fy26_market_price_default() -> Tuple[float, str, Dict[str, Any]]:
                     px,
                     f"market_prices_seed.csv (NSE EQ close {dt})",
                     {
-                        "ticker": "ONGC.NS",
+                        "ticker": "IOC.NS",
                         "date": dt,
                         "close_inr": px,
                         "source_doc": str(eq_row.get("source_doc") or "fact_wacc_input.parquet"),

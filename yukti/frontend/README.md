@@ -8,19 +8,19 @@
 
 ## 1. Quick Start (Live Backend + Front-End)
 
-### Step 1: Start the Backend Server (Port 8095)
+### Step 1: Start the Backend Server (Port 8195)
 ```bash
-cd "o&g agentic transformation/Oil & Gas Agent Portfolio/cloud_run_apps/HR and Finance_ONGC/yukti/backend"
+cd "o&g agentic transformation/Oil & Gas Agent Portfolio/cloud_run_apps/Yukti IOCL/yukti/backend"
 export PATH="$HOME/.local/bin:$PATH"
 
-# Run FastAPI backend on port 8095 (Track C eval sweep runs on 8080)
-PORT=8095 uv run python run.py
+# Run FastAPI backend on port 8195 (Track C eval sweep runs on 8080)
+PORT=8195 uv run python run.py
 ```
-*Health Check: `http://localhost:8095/health`*
+*Health Check: `http://localhost:8195/health`*
 
-### Step 2: Start the Front-End Client (Port 3200)
+### Step 2: Start the Front-End Client (Port 3400)
 ```bash
-cd "o&g agentic transformation/Oil & Gas Agent Portfolio/cloud_run_apps/HR and Finance_ONGC/yukti/frontend"
+cd "o&g agentic transformation/Oil & Gas Agent Portfolio/cloud_run_apps/Yukti IOCL/yukti/frontend"
 export PATH="$HOME/.local/bin:$PATH"
 
 # Development server
@@ -30,11 +30,11 @@ npm run dev
 npm run build
 npm run start
 ```
-Open **[http://localhost:3200](http://localhost:3200)** in Google Chrome.
+Open **[http://localhost:3400](http://localhost:3400)** in Google Chrome.
 
 ### Operational Modes
-- **Live ADK Mode (Default)**: Directly connects to `ws://localhost:8095/ws/live` and `http://localhost:8095/api/turn`. Live BigQuery queries, Vertex AI Live `gemini-3.8-live` audio streaming, and Leda speech synthesis.
-- **Mock Demo Mode**: Toggle via TopBar pill or open `http://localhost:3200?mock=1`. Allows reviewing all 12 Gate G5 scenarios completely offline.
+- **Live ADK Mode (Default)**: Directly connects via the single-origin proxy to `/ws/live` and `/api/turn` (proxied to `http://127.0.0.1:8195`). Live BigQuery queries, Vertex AI Live `gemini-3.8-live` audio streaming, and Leda speech synthesis.
+- **Mock Demo Mode**: Toggle via TopBar pill or open `http://localhost:3400?mock=1`. Allows reviewing all 12 Gate G5 scenarios completely offline.
 
 ### Keyboard Shortcuts
 - **Spacebar**: Advance through the 12 scripted executive scenarios
@@ -49,8 +49,8 @@ Open **[http://localhost:3200](http://localhost:3200)** in Google Chrome.
 
 Follow these steps to test the voice-first executive loop with a real microphone in Google Chrome:
 
-1. **Start Services**: Ensure the backend is running on port 8095 and frontend on port 3200.
-2. **Open Chrome**: Navigate to `http://localhost:3200`. Verify the green `🟢 Live ADK` pill is visible in the top bar.
+1. **Start Services**: Ensure the backend is running on port 8195 and frontend on port 3400.
+2. **Open Chrome**: Navigate to `http://localhost:3400`. Verify the green `🟢 Live ADK` pill is visible in the top bar.
 3. **Verify Opening State**: Confirm the canvas displays the clean opening state (*"Hello, I am Yukti. Your voice-first HR & Finance agent."*) with the 3 executive starter cards.
 4. **Grant Microphone Permission**:
    - Click the blue microphone icon in the bottom-right conversation panel (or press `M`).

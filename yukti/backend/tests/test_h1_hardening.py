@@ -45,13 +45,13 @@ from app.tools.semantic_layer import SemanticLayer
 
 
 def test_h1_2_sql_safety_hardened_allowlist():
-    sl = SemanticLayer(project_id="ongc-hr-finance-agent")
+    sl = SemanticLayer(project_id="yukti-finance-iocl")
 
     # 1. Valid queries (qualified 2-part, 3-part, CTEs, EXTRACT(... FROM ...))
     valid_queries = [
         "SELECT wc_id, COUNT(*) FROM hrfin_gold.v_continuous_stay GROUP BY 1",
-        "SELECT * FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` LIMIT 10",
-        "SELECT * FROM `ongc-hr-finance-agent`.hrfin_gold.ssot_workforce_employee LIMIT 10",
+        "SELECT * FROM `yukti-finance-iocl.hrfin_silver.employee_master` LIMIT 10",
+        "SELECT * FROM `yukti-finance-iocl`.hrfin_gold.ssot_workforce_employee LIMIT 10",
         "WITH cte AS (SELECT emp_id, doj FROM hrfin_silver.employee_master) SELECT EXTRACT(YEAR FROM doj) AS yr FROM cte",
         "SELECT name FROM hrfin_silver.employee_master WHERE name LIKE '%DROP%' -- harmless literal",
     ]
@@ -65,7 +65,7 @@ def test_h1_2_sql_safety_hardened_allowlist():
         "SELECT * FROM `other-project`.hrfin_gold.v_continuous_stay",
         "SELECT * FROM `other-project`.`hrfin_gold`.`v_continuous_stay`",
         "SELECT * FROM other_project.hrfin_gold.v_continuous_stay",
-        "SELECT * FROM `ongc-hr-finance-agent.hrfin_secret.salaries`",
+        "SELECT * FROM `yukti-finance-iocl.hrfin_secret.salaries`",
         "SELECT * FROM hrfin_raw.employee_master",
         "SELECT * FROM employee_master",  # unqualified non-CTE table
         "SELECT 1 FROM hrfin_gold.v_field_pnl; SELECT * FROM hrfin_silver.employee_master",
@@ -102,7 +102,7 @@ def test_h1_2_repaired_sql_is_revalidated_before_execution():
     with patch.object(SemanticLayer, "client", new_callable=lambda: property(lambda self: mock_client)):
         with patch("app.tools.sql_generator.get_sql_generator", return_value=mock_gen):
             res = query_data(
-                "SELECT bad_col FROM `ongc-hr-finance-agent.hrfin_gold.v_field_pnl`",
+                "SELECT bad_col FROM `yukti-finance-iocl.hrfin_gold.v_field_pnl`",
                 persona="CMD",
             )
             assert res["status"] == "error"
@@ -130,7 +130,7 @@ def test_h1_2_no_hardcoded_project_id_in_turn_runner_or_access_control():
     backend_root = Path(__file__).resolve().parent.parent
     for rel in ("app/turn_runner.py", "app/access_control.py"):
         text = (backend_root / rel).read_text(encoding="utf-8")
-        assert "ongc-hr-finance-agent" not in text, f"Found hardcoded project ID in {rel}"
+        assert "yukti-finance-iocl" not in text, f"Found hardcoded project ID in {rel}"
 
 
 # ==============================================================================
@@ -324,8 +324,8 @@ async def test_h1_1_async_no_event_loop_blocking_under_3_concurrent_sessions():
         from app.brain.compiler import QueryResult
         time.sleep(0.20)
         return QueryResult(
-            columns=["grade", "headcount"],
-            rows=[{"grade": "E4", "headcount": 120}, {"grade": "E3", "headcount": 95}],
+            columns=["refinery", "refinery_grm_usd_bbl"],
+            rows=[{"refinery": "REF-PRD", "refinery_grm_usd_bbl": 11.4}, {"refinery": "REF-PNP", "refinery_grm_usd_bbl": 10.9}],
             total_bytes=1024,
             latency_ms=200.0,
             dry_run_bytes=1024,
@@ -333,7 +333,7 @@ async def test_h1_1_async_no_event_loop_blocking_under_3_concurrent_sessions():
 
     async def fast_plan_call(prompt: str) -> Dict[str, Any]:
         await asyncio.sleep(0)
-        return {"intent": "data", "metric": "headcount", "dimensions": ["grade"]}
+        return {"intent": "data", "metric": "refinery_grm_usd_bbl", "dimensions": ["refinery"], "fy": "FY26"}
 
     from app.brain.compiler import get_compiler
     from app.brain.planner import catalog_summary, get_planner
@@ -351,9 +351,9 @@ async def test_h1_1_async_no_event_loop_blocking_under_3_concurrent_sessions():
             with patch("app.brain.compiler.Compiler._run_sync", side_effect=slow_blocking_compile_run):
                 t_start = time.perf_counter()
                 results = await asyncio.gather(
-                    runner.execute_turn_async("How many employees are in Ahmedabad?", session_id="conc-1", persona="CMD"),
-                    runner.execute_turn_async("How many employees are in Mumbai?", session_id="conc-2", persona="DIR_HR"),
-                    runner.execute_turn_async("How many employees are in Dehradun?", session_id="conc-3", persona="DIR_FIN"),
+                    runner.execute_turn_async("Compare IOCL refinery GRM across refineries in FY26", session_id="conc-1", persona="CMD"),
+                    runner.execute_turn_async("Rank IOCL refineries by GRM in FY26", session_id="conc-2", persona="DIR_REF"),
+                    runner.execute_turn_async("Show refinery-wise gross refining margin for FY26", session_id="conc-3", persona="DIR_FIN"),
                 )
                 elapsed_s = time.perf_counter() - t_start
     finally:

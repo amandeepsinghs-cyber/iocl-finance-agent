@@ -28,8 +28,8 @@ import {
   NormalizedRow,
 } from './rosterUtils';
 
-// P2H.3 (SPEC-07 §4.3): only these personas may reveal backend-hidden columns (emp_id, discipline)
-const COLUMN_PICKER_PERSONAS = new Set(['CMD', 'DIR_HR']);
+// P2H.3 (SPEC-07 §4.3): only leadership/director personas may reveal backend-hidden columns
+const COLUMN_PICKER_PERSONAS = new Set(['CMD', 'DIR_FIN', 'DIR_REF', 'DIR_MKT']);
 
 export interface RosterTableProps {
   table: TableSpec;

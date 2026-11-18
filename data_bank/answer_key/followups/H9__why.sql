@@ -6,6 +6,6 @@
 -- grievance-redressal policy, so JRTP 13.0 (transfer grievances) is the closest provision (partial GAP).
 SELECT doc_id, clause_ref, heading,
        TRIM(SUBSTR(REGEXP_EXTRACT(text, r'(?s)\n\n(.*)'), 1, 700)) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'JRTP' AND clause_ref = 'Clause 13.0'
 ORDER BY doc_id, clause_ref;

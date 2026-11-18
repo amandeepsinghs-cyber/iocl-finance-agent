@@ -2,8 +2,8 @@
   "turn_id": "turn_v2_insights_drilldowns",
   "language": "en",
   "persona": "CMD",
-  "spoken_summary": "Total executive headcount across fourteen ONGC work centres for fiscal year 2026. Mumbai Western Offshore remains the largest work centre with 6,820 executives, followed by Delhi HQ with 2,450. North-East assets including Jorhat and Sivasagar deploy 2,040 executives with localized vacancy challenges.",
-  "display_text": "FY26 executive distribution across 14 ONGC work centres [1]. Western Offshore (Mumbai) accounts for the largest deployment (6820, 29.8%), followed by Delhi Corporate HQ and Dehradun. Interactive drilldowns and category insights available.",
+  "spoken_summary": "Illustrative operating-unit distribution across fourteen enterprise centres for fiscal year 2026. Western region hub remains the largest operating hub, followed by Delhi Corporate HQ.",
+  "display_text": "Illustrative FY26 distribution across 14 enterprise work centres [1]. Western region accounts for the largest deployment (6820, 29.8%), followed by Delhi Corporate HQ. Interactive drilldowns and category insights available.",
   "contract_version": 2,
   "visual": {
     "type": "chart",
@@ -100,7 +100,7 @@
       "unit": "Executives"
     },
     {
-      "text": "Mumbai Western Offshore constitutes 29.8% of ONGC's total executive workforce with 6,820 executives.",
+      "text": "Western hub constitutes 29.8% of the illustrative enterprise sample with 6,820 staff.",
       "kind": "outlier",
       "value": 6820,
       "unit": "Executives",

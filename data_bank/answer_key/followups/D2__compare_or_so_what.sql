@@ -10,7 +10,7 @@ WITH stay AS (
         DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 AS retiring_within_3yr,
         (p.exemption_tag IS NOT NULL AND LOWER(p.exemption_tag) != 'none'
          AND (p.exemption_valid_until IS NULL OR p.exemption_valid_until >= DATE '2026-10-19')) AS has_valid_exemption
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
     LEFT JOIN posting_history p
       ON p.emp_id = v.emp_id AND p.is_current_posting = TRUE
     WHERE v.is_current_stay = TRUE

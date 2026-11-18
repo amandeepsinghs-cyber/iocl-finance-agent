@@ -10,7 +10,7 @@ WITH price_params AS (
         AVG(ongc_crude_net_realisation_usd_bbl) AS avg_realisation,
         AVG(brent_usd_bbl - ongc_crude_net_realisation_usd_bbl) AS avg_discount,
         AVG(inr_usd_fx_rate) AS avg_fx
-    FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+    FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
     WHERE fiscal_year = 'FY26'
 ),
 totals AS (
@@ -19,7 +19,7 @@ totals AS (
         SUM(pnl.ebitda_inr_cr) AS actual_ebitda,
         SUM((pnl.oil_revenue_inr_cr * ((60.0 - params.avg_discount) / params.avg_realisation) + pnl.gas_revenue_inr_cr)) AS sim_rev,
         SUM((pnl.oil_revenue_inr_cr * ((60.0 - params.avg_discount) / params.avg_realisation) + pnl.gas_revenue_inr_cr) * (1.0 - SAFE_DIVIDE(pnl.statutory_royalty_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0)) - SAFE_DIVIDE(pnl.statutory_cess_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0))) - pnl.total_opex_inr_cr) AS sim_ebitda
-    FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` pnl
+    FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual` pnl
     CROSS JOIN price_params params
     WHERE pnl.fiscal_year = 'FY26' AND LOWER(pnl.line_type) = 'field'
 ),

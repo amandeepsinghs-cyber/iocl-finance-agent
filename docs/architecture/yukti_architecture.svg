@@ -183,7 +183,7 @@
   <rect x="222" y="16" width="1022" height="588" rx="14" fill="#F0F9FF" fill-opacity="0.55" stroke="#0284C7" stroke-width="2" filter="url(#shadow-md)"/>
   <path d="M 222 30 Q 222 16 236 16 L 1230 16 Q 1244 16 1244 30 L 1244 50 L 222 50 Z" fill="#E0F2FE"/>
   <use href="#icon-google-cloud" x="236" y="21" width="24" height="24"/>
-  <text x="268" y="39" font-size="14" font-weight="700" fill="#0369A1">Google Cloud · project ongc-hr-finance-agent · asia-south1</text>
+  <text x="268" y="39" font-size="14" font-weight="700" fill="#0369A1">Google Cloud · project yukti-finance-iocl · asia-south1</text>
   <rect x="242" y="140" width="160" height="150" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow-sm)"/>
   <use href="#icon-iap" x="254" y="151" width="34" height="34"/>
   <text x="296" y="165" font-size="13.5" font-weight="700" fill="#1E293B">Identity-Aware</text>

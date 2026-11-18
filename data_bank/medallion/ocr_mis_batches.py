@@ -7,15 +7,15 @@ from google.cloud import documentai, storage
 from google.auth import default
 from google.cloud.documentai_v1.types import BatchProcessMetadata
 
-credentials, _ = default(quota_project_id="ongc-hr-finance-agent")
+credentials, _ = default(quota_project_id="yukti-finance-iocl")
 client = documentai.DocumentProcessorServiceClient(
     credentials=credentials,
     client_options={"api_endpoint": "asia-south1-documentai.googleapis.com"}
 )
 processor_name = "projects/89038075859/locations/asia-south1/processors/306037dbdbd42c8e"
 
-storage_client = storage.Client(project="ongc-hr-finance-agent", credentials=credentials)
-bucket = storage_client.bucket("ongc-hr-finance-agent-docs")
+storage_client = storage.Client(project="yukti-finance-iocl", credentials=credentials)
+bucket = storage_client.bucket("yukti-finance-iocl-docs")
 mis_blobs = list(bucket.list_blobs(prefix="scanned/mis/"))
 mis_pdfs = [b.name for b in mis_blobs if b.name.endswith(".pdf")]
 mis_pdfs.sort()
@@ -54,7 +54,7 @@ while len(completed_ops) < len(batches):
                 batch = batches[b_idx]
                 gcs_docs = [
                     documentai.GcsDocument(
-                        gcs_uri=f"gs://ongc-hr-finance-agent-docs/{p}",
+                        gcs_uri=f"gs://yukti-finance-iocl-docs/{p}",
                         mime_type="application/pdf"
                     )
                     for p in batch
@@ -64,7 +64,7 @@ while len(completed_ops) < len(batches):
                 )
                 output_config = documentai.DocumentOutputConfig(
                     gcs_output_config=documentai.DocumentOutputConfig.GcsOutputConfig(
-                        gcs_uri=f"gs://ongc-hr-finance-agent-docs/_docai_output/mis/batch_{b_idx}/"
+                        gcs_uri=f"gs://yukti-finance-iocl-docs/_docai_output/mis/batch_{b_idx}/"
                     )
                 )
                 req = documentai.BatchProcessRequest(

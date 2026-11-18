@@ -161,12 +161,12 @@ def build_pdf_context(
     qspec = c.get("query_spec") if isinstance(c.get("query_spec"), dict) else {}
 
     lang = str(c.get("language") or "en")
-    doc_title = title or vis.get("title") or (stmt.get("title") if stmt else None) or "ONGC Yukti AI Report (₹)"
+    doc_title = title or vis.get("title") or (stmt.get("title") if stmt else None) or "IOCL Yukti AI Report (₹)"
     doc_subtitle = vis.get("subtitle") or ""
 
     # Meta line fields
-    as_of = str(qspec.get("as_of") or "2026-10-19")
-    source_label = "ONGC Enterprise SSOT"
+    as_of = str(qspec.get("as_of") or "2026-03-31")
+    source_label = "IOCL Enterprise SSOT"
     basis = "verified"
     is_synthetic = False
 

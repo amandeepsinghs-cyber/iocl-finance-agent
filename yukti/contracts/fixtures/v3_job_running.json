@@ -3,8 +3,8 @@
   "turn_id": "turn-v3-job-running-001",
   "language": "en",
   "persona": "DIR_FIN",
-  "spoken_summary": "Running the ONGC Standalone DCF valuation agent now. Step 2 of 6 is in progress.",
-  "display_text": "Running ONGC Standalone DCF valuation agent (Step 2 of 6: Computing WACC & capital structure).",
+  "spoken_summary": "Running the IOCL Standalone DCF valuation agent now. Step 2 of 6 is in progress.",
+  "display_text": "Running IOCL Standalone DCF valuation agent (Step 2 of 6: Computing WACC & capital structure).",
   "visual": {
     "type": "none",
     "mode": "replace"

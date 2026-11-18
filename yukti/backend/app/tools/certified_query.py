@@ -45,11 +45,21 @@ def _get_certified_index() -> Dict[str, Dict[str, Any]]:
     return _CERTIFIED_INDEX
 
 
+_QUERY_ID_ALIASES = {
+    "C1": "Q01",
+    "C6": "Q07",
+    "C10": "Q20",
+    "C12": "Q09",
+    "F6": "Q15",
+}
+
+
 def get_certified_entry(query_id: str) -> Optional[Dict[str, Any]]:
     """Retrieves metadata for a certified query (including self_queries)."""
     index = _get_certified_index()
     cleaned = (query_id or "").strip()
-    return index.get(cleaned) or index.get(cleaned.upper())
+    resolved = _QUERY_ID_ALIASES.get(cleaned.upper(), cleaned)
+    return index.get(resolved) or index.get(resolved.upper()) or index.get(cleaned) or index.get(cleaned.upper())
 
 
 def resolve_self_emp_id(persona: Optional[str] = None, self_emp_id: Optional[str] = None) -> str:
@@ -214,8 +224,8 @@ def run_certified_query(
                 merged_params[np] = "WC-DEL"
             elif "grade" in np:
                 merged_params[np] = "E7"
-            elif "field" in np:
-                merged_params[np] = "FLD-CHP"
+            elif "field" in np or "refinery" in np:
+                merged_params[np] = "REF-PNP"
             else:
                 merged_params[np] = "default"
 

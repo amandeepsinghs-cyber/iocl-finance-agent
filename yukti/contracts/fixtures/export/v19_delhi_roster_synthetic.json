@@ -11,7 +11,7 @@
     "title": "Delhi > 5 Years Continuous Stay (Executives E1–E9)",
     "as_of": "19-Oct-2026",
     "basis": "synthetic (Illustrative)",
-    "rule_text": "JRTP Rev 4, clause 3.2: rotation after 3–5 years at a station (Illustrative — ONGC JRTP text is not public).",
+    "rule_text": "JRTP Rev 4, clause 3.2: rotation after 3–5 years at a station (Illustrative — IOCL JRTP text is not public).",
     "citations": [
       {
         "id": "JRTP-3.2",
@@ -56,7 +56,7 @@
         "name",
         "functional_designation",
         "grade",
-        "ongc_tenure_years",
+        "iocl_tenure_years",
         "delhi_tenure_years",
         "years_to_retirement",
         "exemption"
@@ -65,7 +65,7 @@
         "name": "Name",
         "functional_designation": "Designation",
         "grade": "Level",
-        "ongc_tenure_years": "ONGC service (yrs)",
+        "iocl_tenure_years": "IOCL service (yrs)",
         "delhi_tenure_years": "Tenure in Delhi (yrs)",
         "years_to_retirement": "Years to retirement",
         "exemption": "Exemption"
@@ -77,7 +77,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E1",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 7.3,
+          "iocl_tenure_years": 7.3,
           "delhi_tenure_years": 11.1,
           "years_to_retirement": 9.0,
           "exemption": "—"
@@ -88,7 +88,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E1",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 8.1,
+          "iocl_tenure_years": 8.1,
           "delhi_tenure_years": 11.0,
           "years_to_retirement": 10.0,
           "exemption": "—"
@@ -99,7 +99,7 @@
           "functional_designation": "HR Executive",
           "grade": "E1",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 8.9,
+          "iocl_tenure_years": 8.9,
           "delhi_tenure_years": 11.0,
           "years_to_retirement": 11.0,
           "exemption": "—"
@@ -110,7 +110,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E1",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 9.7,
+          "iocl_tenure_years": 9.7,
           "delhi_tenure_years": 10.9,
           "years_to_retirement": 12.0,
           "exemption": "—"
@@ -121,7 +121,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E1",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 10.5,
+          "iocl_tenure_years": 10.5,
           "delhi_tenure_years": 10.8,
           "years_to_retirement": 13.0,
           "exemption": "—"
@@ -132,7 +132,7 @@
           "functional_designation": "HR Executive",
           "grade": "E1",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 11.3,
+          "iocl_tenure_years": 11.3,
           "delhi_tenure_years": 10.7,
           "years_to_retirement": 14.0,
           "exemption": "—"
@@ -143,7 +143,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E1",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 12.1,
+          "iocl_tenure_years": 12.1,
           "delhi_tenure_years": 10.6,
           "years_to_retirement": 15.0,
           "exemption": "—"
@@ -154,7 +154,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E1",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 12.9,
+          "iocl_tenure_years": 12.9,
           "delhi_tenure_years": 10.6,
           "years_to_retirement": 16.0,
           "exemption": "—"
@@ -165,7 +165,7 @@
           "functional_designation": "HR Executive",
           "grade": "E2",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 13.7,
+          "iocl_tenure_years": 13.7,
           "delhi_tenure_years": 10.5,
           "years_to_retirement": 17.0,
           "exemption": "—"
@@ -176,7 +176,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E2",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 14.5,
+          "iocl_tenure_years": 14.5,
           "delhi_tenure_years": 10.4,
           "years_to_retirement": 18.0,
           "exemption": "—"
@@ -187,7 +187,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E2",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 15.3,
+          "iocl_tenure_years": 15.3,
           "delhi_tenure_years": 10.3,
           "years_to_retirement": 19.0,
           "exemption": "—"
@@ -198,7 +198,7 @@
           "functional_designation": "HR Executive",
           "grade": "E2",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 16.1,
+          "iocl_tenure_years": 16.1,
           "delhi_tenure_years": 10.2,
           "years_to_retirement": 8.0,
           "exemption": "—"
@@ -209,7 +209,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E2",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 16.9,
+          "iocl_tenure_years": 16.9,
           "delhi_tenure_years": 10.2,
           "years_to_retirement": 9.0,
           "exemption": "—"
@@ -220,7 +220,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E2",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 17.7,
+          "iocl_tenure_years": 17.7,
           "delhi_tenure_years": 10.1,
           "years_to_retirement": 10.0,
           "exemption": "—"
@@ -231,7 +231,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E2",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 18.5,
+          "iocl_tenure_years": 18.5,
           "delhi_tenure_years": 10.0,
           "years_to_retirement": 1.5,
           "exemption": "pre_retirement"
@@ -242,7 +242,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E2",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 19.3,
+          "iocl_tenure_years": 19.3,
           "delhi_tenure_years": 9.9,
           "years_to_retirement": 12.0,
           "exemption": "—"
@@ -253,7 +253,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E2",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 20.1,
+          "iocl_tenure_years": 20.1,
           "delhi_tenure_years": 9.8,
           "years_to_retirement": 13.0,
           "exemption": "—"
@@ -264,7 +264,7 @@
           "functional_designation": "HR Executive",
           "grade": "E2",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 6.5,
+          "iocl_tenure_years": 6.5,
           "delhi_tenure_years": 9.8,
           "years_to_retirement": 14.0,
           "exemption": "—"
@@ -275,7 +275,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E2",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 7.3,
+          "iocl_tenure_years": 7.3,
           "delhi_tenure_years": 9.7,
           "years_to_retirement": 15.0,
           "exemption": "—"
@@ -286,7 +286,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E2",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 8.1,
+          "iocl_tenure_years": 8.1,
           "delhi_tenure_years": 9.6,
           "years_to_retirement": 16.0,
           "exemption": "—"
@@ -297,7 +297,7 @@
           "functional_designation": "HR Executive",
           "grade": "E3",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 8.9,
+          "iocl_tenure_years": 8.9,
           "delhi_tenure_years": 9.5,
           "years_to_retirement": 17.0,
           "exemption": "—"
@@ -308,7 +308,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 9.7,
+          "iocl_tenure_years": 9.7,
           "delhi_tenure_years": 9.4,
           "years_to_retirement": 18.0,
           "exemption": "medical"
@@ -319,7 +319,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 10.5,
+          "iocl_tenure_years": 10.5,
           "delhi_tenure_years": 9.4,
           "years_to_retirement": 19.0,
           "exemption": "—"
@@ -330,7 +330,7 @@
           "functional_designation": "HR Executive",
           "grade": "E3",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 11.3,
+          "iocl_tenure_years": 11.3,
           "delhi_tenure_years": 9.3,
           "years_to_retirement": 8.0,
           "exemption": "—"
@@ -341,7 +341,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E3",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 12.1,
+          "iocl_tenure_years": 12.1,
           "delhi_tenure_years": 9.2,
           "years_to_retirement": 9.0,
           "exemption": "—"
@@ -352,7 +352,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 12.9,
+          "iocl_tenure_years": 12.9,
           "delhi_tenure_years": 9.1,
           "years_to_retirement": 10.0,
           "exemption": "—"
@@ -363,7 +363,7 @@
           "functional_designation": "HR Executive",
           "grade": "E3",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 13.7,
+          "iocl_tenure_years": 13.7,
           "delhi_tenure_years": 9.0,
           "years_to_retirement": 11.0,
           "exemption": "—"
@@ -374,7 +374,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 14.5,
+          "iocl_tenure_years": 14.5,
           "delhi_tenure_years": 9.0,
           "years_to_retirement": 12.0,
           "exemption": "—"
@@ -385,7 +385,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 15.3,
+          "iocl_tenure_years": 15.3,
           "delhi_tenure_years": 8.9,
           "years_to_retirement": 13.0,
           "exemption": "—"
@@ -396,7 +396,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E3",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 16.1,
+          "iocl_tenure_years": 16.1,
           "delhi_tenure_years": 8.8,
           "years_to_retirement": 1.5,
           "exemption": "pre_retirement"
@@ -407,7 +407,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 16.9,
+          "iocl_tenure_years": 16.9,
           "delhi_tenure_years": 8.7,
           "years_to_retirement": 15.0,
           "exemption": "—"
@@ -418,7 +418,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 17.7,
+          "iocl_tenure_years": 17.7,
           "delhi_tenure_years": 8.6,
           "years_to_retirement": 16.0,
           "exemption": "—"
@@ -429,7 +429,7 @@
           "functional_designation": "HR Executive",
           "grade": "E3",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 18.5,
+          "iocl_tenure_years": 18.5,
           "delhi_tenure_years": 8.6,
           "years_to_retirement": 17.0,
           "exemption": "—"
@@ -440,7 +440,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E3",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 19.3,
+          "iocl_tenure_years": 19.3,
           "delhi_tenure_years": 8.5,
           "years_to_retirement": 18.0,
           "exemption": "—"
@@ -451,7 +451,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E4",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 20.1,
+          "iocl_tenure_years": 20.1,
           "delhi_tenure_years": 8.4,
           "years_to_retirement": 19.0,
           "exemption": "—"
@@ -462,7 +462,7 @@
           "functional_designation": "HR Executive",
           "grade": "E4",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 6.5,
+          "iocl_tenure_years": 6.5,
           "delhi_tenure_years": 8.3,
           "years_to_retirement": 8.0,
           "exemption": "—"
@@ -473,7 +473,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E4",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 7.3,
+          "iocl_tenure_years": 7.3,
           "delhi_tenure_years": 8.2,
           "years_to_retirement": 9.0,
           "exemption": "—"
@@ -484,7 +484,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E4",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 8.1,
+          "iocl_tenure_years": 8.1,
           "delhi_tenure_years": 8.2,
           "years_to_retirement": 10.0,
           "exemption": "—"
@@ -495,7 +495,7 @@
           "functional_designation": "HR Executive",
           "grade": "E4",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 8.9,
+          "iocl_tenure_years": 8.9,
           "delhi_tenure_years": 8.1,
           "years_to_retirement": 11.0,
           "exemption": "—"
@@ -506,7 +506,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E4",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 9.7,
+          "iocl_tenure_years": 9.7,
           "delhi_tenure_years": 8.0,
           "years_to_retirement": 12.0,
           "exemption": "—"
@@ -517,7 +517,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E4",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 10.5,
+          "iocl_tenure_years": 10.5,
           "delhi_tenure_years": 7.9,
           "years_to_retirement": 13.0,
           "exemption": "—"
@@ -528,7 +528,7 @@
           "functional_designation": "HR Executive",
           "grade": "E4",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 11.3,
+          "iocl_tenure_years": 11.3,
           "delhi_tenure_years": 7.8,
           "years_to_retirement": 14.0,
           "exemption": "—"
@@ -539,7 +539,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E4",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 12.1,
+          "iocl_tenure_years": 12.1,
           "delhi_tenure_years": 7.8,
           "years_to_retirement": 15.0,
           "exemption": "—"
@@ -550,7 +550,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E4",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 12.9,
+          "iocl_tenure_years": 12.9,
           "delhi_tenure_years": 7.7,
           "years_to_retirement": 16.0,
           "exemption": "medical"
@@ -561,7 +561,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E5",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 13.7,
+          "iocl_tenure_years": 13.7,
           "delhi_tenure_years": 7.6,
           "years_to_retirement": 1.5,
           "exemption": "pre_retirement"
@@ -572,7 +572,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E5",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 14.5,
+          "iocl_tenure_years": 14.5,
           "delhi_tenure_years": 7.5,
           "years_to_retirement": 18.0,
           "exemption": "—"
@@ -583,7 +583,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E5",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 15.3,
+          "iocl_tenure_years": 15.3,
           "delhi_tenure_years": 7.4,
           "years_to_retirement": 19.0,
           "exemption": "—"
@@ -594,7 +594,7 @@
           "functional_designation": "HR Executive",
           "grade": "E5",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 16.1,
+          "iocl_tenure_years": 16.1,
           "delhi_tenure_years": 7.4,
           "years_to_retirement": 8.0,
           "exemption": "—"
@@ -605,7 +605,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E5",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 16.9,
+          "iocl_tenure_years": 16.9,
           "delhi_tenure_years": 7.3,
           "years_to_retirement": 9.0,
           "exemption": "—"
@@ -616,7 +616,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E5",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 17.7,
+          "iocl_tenure_years": 17.7,
           "delhi_tenure_years": 7.2,
           "years_to_retirement": 10.0,
           "exemption": "—"
@@ -627,7 +627,7 @@
           "functional_designation": "HR Executive",
           "grade": "E5",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 18.5,
+          "iocl_tenure_years": 18.5,
           "delhi_tenure_years": 7.1,
           "years_to_retirement": 11.0,
           "exemption": "—"
@@ -638,7 +638,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E5",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 19.3,
+          "iocl_tenure_years": 19.3,
           "delhi_tenure_years": 7.0,
           "years_to_retirement": 12.0,
           "exemption": "—"
@@ -649,7 +649,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E6",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 20.1,
+          "iocl_tenure_years": 20.1,
           "delhi_tenure_years": 7.0,
           "years_to_retirement": 13.0,
           "exemption": "—"
@@ -660,7 +660,7 @@
           "functional_designation": "HR Executive",
           "grade": "E6",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 6.5,
+          "iocl_tenure_years": 6.5,
           "delhi_tenure_years": 6.9,
           "years_to_retirement": 14.0,
           "exemption": "—"
@@ -671,7 +671,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E6",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 7.3,
+          "iocl_tenure_years": 7.3,
           "delhi_tenure_years": 6.8,
           "years_to_retirement": 15.0,
           "exemption": "—"
@@ -682,7 +682,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E6",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 8.1,
+          "iocl_tenure_years": 8.1,
           "delhi_tenure_years": 6.7,
           "years_to_retirement": 16.0,
           "exemption": "—"
@@ -693,7 +693,7 @@
           "functional_designation": "HR Executive",
           "grade": "E6",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 8.9,
+          "iocl_tenure_years": 8.9,
           "delhi_tenure_years": 6.6,
           "years_to_retirement": 17.0,
           "exemption": "—"
@@ -704,7 +704,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E7",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 9.7,
+          "iocl_tenure_years": 9.7,
           "delhi_tenure_years": 6.6,
           "years_to_retirement": 18.0,
           "exemption": "—"
@@ -715,7 +715,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E7",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 10.5,
+          "iocl_tenure_years": 10.5,
           "delhi_tenure_years": 6.5,
           "years_to_retirement": 19.0,
           "exemption": "—"
@@ -726,7 +726,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E7",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 11.3,
+          "iocl_tenure_years": 11.3,
           "delhi_tenure_years": 6.4,
           "years_to_retirement": 1.5,
           "exemption": "pre_retirement"
@@ -737,7 +737,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E8",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 12.1,
+          "iocl_tenure_years": 12.1,
           "delhi_tenure_years": 6.3,
           "years_to_retirement": 9.0,
           "exemption": "—"
@@ -748,7 +748,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E8",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 12.9,
+          "iocl_tenure_years": 12.9,
           "delhi_tenure_years": 6.2,
           "years_to_retirement": 10.0,
           "exemption": "—"
@@ -759,7 +759,7 @@
           "functional_designation": "HR Executive",
           "grade": "E8",
           "discipline": "DISC-HR",
-          "ongc_tenure_years": 13.7,
+          "iocl_tenure_years": 13.7,
           "delhi_tenure_years": 6.2,
           "years_to_retirement": 11.0,
           "exemption": "—"
@@ -770,7 +770,7 @@
           "functional_designation": "Production Engineer",
           "grade": "E9",
           "discipline": "DISC-PRD",
-          "ongc_tenure_years": 14.5,
+          "iocl_tenure_years": 14.5,
           "delhi_tenure_years": 6.1,
           "years_to_retirement": 12.0,
           "exemption": "—"
@@ -781,7 +781,7 @@
           "functional_designation": "Finance Officer",
           "grade": "E9",
           "discipline": "DISC-FIN",
-          "ongc_tenure_years": 15.3,
+          "iocl_tenure_years": 15.3,
           "delhi_tenure_years": 6.0,
           "years_to_retirement": 13.0,
           "exemption": "—"

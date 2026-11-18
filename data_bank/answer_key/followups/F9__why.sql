@@ -11,7 +11,7 @@ SELECT
     clause_ref,
     SUBSTR(heading, 1, 120) AS heading,
     REGEXP_EXTRACT(REGEXP_REPLACE(SUBSTR(text, STRPOS(LOWER(text), 'quarterly details of foreign exchange'), 220), r'\s+', ' '), r'^(.*?if material\.)') AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE STRPOS(LOWER(text), 'quarterly details of foreign exchange') > 0
 ORDER BY doc_id, clause_ref
 LIMIT 5;

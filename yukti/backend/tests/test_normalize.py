@@ -18,7 +18,7 @@ from app.semantic.normalize import (
 )
 
 CASES_RESOLVE_FY = [
-    ("What was ONGC's profit last year?", None, {"fy": "FY26"}),
+    ("What was IOCL's profit last year?", None, {"fy": "FY26"}),
     ("previous financial year revenue", None, {"fy": "FY26"}),
     ("pichle saal ka profit", None, {"fy": "FY26"}),
     ("How are we tracking against MoU targets this year?", None, {"fy": "FY27", "ytd": True}),
@@ -165,7 +165,7 @@ def test_categorical_normalizer_case_10_alias():
 
 def test_categorical_normalizer_case_11_backticks_and_project():
     sql = (
-        "SELECT 1 FROM `ongc-hr-finance-agent.hrfin_gold.ssot_workforce_employee` "
+        "SELECT 1 FROM `yukti-finance-iocl.hrfin_gold.ssot_workforce_employee` "
         "WHERE employment_status = 'active'"
     )
     res = normalize_categorical_filters(sql, CAT)

@@ -14,12 +14,12 @@ def wipe_runner():
     set_active_principal(None)
 
 def test_toolset_isolation():
-    set_active_principal(Principal(emp_id="EMP-CMD", persona="CMD", function="HR", grade="CMD", display_name="CMD", designation="CMD"))
+    set_active_principal(Principal(emp_id="EMP-CMD", persona="CMD", function="EXEC", grade="CMD", display_name="CMD", designation="CMD"))
     trun_cmd = get_agent_turn_runner()
     tools_cmd = [t.__name__ for t in trun_cmd.agent.tools]
     assert "query_data" in tools_cmd
 
-    set_active_principal(Principal(emp_id="EMP-E2", persona="E2_HR", function="HR", grade="E2", display_name="E2_HR", designation="E2"))
+    set_active_principal(Principal(emp_id="EMP-100152", persona="E2_FIN", function="FIN", grade="B", display_name="E2_FIN", designation="Finance Officer"))
     trun_e2 = get_agent_turn_runner()
     tools_e2 = [t.__name__ for t in trun_e2.agent.tools]
     assert "query_data" not in tools_e2
@@ -51,7 +51,7 @@ def test_http_runner_isolation_orders():
     from app.turn_runner import _GLOBAL_RUNNERS
     client = TestClient(app)
     
-    # 1: CMD then E2_HR
+    # 1: CMD then E2_FIN
     _GLOBAL_RUNNERS.clear()
     with patch("app.turn_runner.AgentTurnRunner._execute_turn_inner", new_callable=AsyncMock) as mock_inner:
         mock_inner.return_value = {
@@ -62,15 +62,15 @@ def test_http_runner_isolation_orders():
         r1 = client.post("/api/turn", json={"query": "hello"}, headers={"Authorization": f"Bearer {issue_token('CMD')}"})
         assert r1.status_code == 200
         
-        mock_inner.return_value["persona"] = "E2_HR"
-        r2 = client.post("/api/turn", json={"query": "hello"}, headers={"Authorization": f"Bearer {issue_token('E2_HR')}"})
+        mock_inner.return_value["persona"] = "E2_FIN"
+        r2 = client.post("/api/turn", json={"query": "hello"}, headers={"Authorization": f"Bearer {issue_token('E2_FIN')}"})
         assert r2.status_code == 200
         
     assert "CMD" in _GLOBAL_RUNNERS
-    assert "E2_HR" in _GLOBAL_RUNNERS
+    assert "E2_FIN" in _GLOBAL_RUNNERS
     
     cmd_tools = [t.__name__ for t in _GLOBAL_RUNNERS["CMD"].agent.tools]
-    e2_tools = [t.__name__ for t in _GLOBAL_RUNNERS["E2_HR"].agent.tools]
+    e2_tools = [t.__name__ for t in _GLOBAL_RUNNERS["E2_FIN"].agent.tools]
     
     assert "query_data" in cmd_tools
     assert "query_data" not in e2_tools

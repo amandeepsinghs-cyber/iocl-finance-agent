@@ -10,7 +10,7 @@ WITH stay AS (
            v.continuous_from_date, v.continuous_stay_months,
            IF(LOWER(IFNULL(p.exemption_tag, 'none')) IN ('none', ''), NULL, p.exemption_tag) AS exemption_tag,
            p.exemption_valid_until
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
     JOIN dim_grade g ON g.grade_id = v.grade_id
     JOIN employee_master e ON e.emp_id = v.emp_id
     LEFT JOIN posting_history p ON p.emp_id = v.emp_id AND p.is_current_posting

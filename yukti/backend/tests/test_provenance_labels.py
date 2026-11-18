@@ -2,7 +2,7 @@
 
 Offline: BigQuery is forced to fail (the compiler's `_run_sync` raises RefreshError), so the compiler serves the
 financial_build JSON snapshot. Each answer must say so: status.source == "local_snapshot", no SQL, a caveat that
-contains "local snapshot", provenance.label == "local_snapshot", and no "Audited", "Yahoo", "ONGC.NS" or
+contains "local snapshot", provenance.label == "local_snapshot", and no "Audited", "Yahoo", "IOC.NS" or
 "Compiled" text anywhere in the user-visible contract.
 """
 
@@ -26,14 +26,14 @@ from app.brain.query_spec import Period, QuerySpec  # noqa: E402
 from app.session_memory import get_session_manager  # noqa: E402
 
 BRAIN = Path(__file__).resolve().parent.parent / "app" / "brain"
-FALSE_LABELS = re.compile(r"Audited|Yahoo|ONGC\.NS|Compiled\b|dry-run")
+FALSE_LABELS = re.compile(r"Audited|Yahoo|IOC\.NS|Compiled\b|dry-run")
 
 
 def _visible_text(contract):
     """Every label a user can see (text, visual chrome, insights, sources, caveat, status events).
 
     Table row cells are data, not labels: the financial_build snapshot's own line names (e.g.
-    "X. Consolidated Group PAT (ONGC.NS)") are replaced with AR-verified lines in P1 (SPEC-01), not here.
+    "X. Consolidated Group PAT (IOC.NS)") are replaced with AR-verified lines in P1 (SPEC-01), not here.
     """
     vis = dict(contract.get("visual") or {})
     if isinstance(vis.get("table"), dict):
@@ -100,7 +100,7 @@ def test_real_bigquery_path_keeps_sql_and_source(monkeypatch):
 
 def test_no_false_label_strings_in_compiler_and_presenter():
     """Acceptance grep: 0 user-facing hits in compiler.py / presenter.py (comments are allowed)."""
-    out = subprocess.run(["grep", "-nE", r"Audited|Yahoo|ONGC\.NS", str(BRAIN / "compiler.py"), str(BRAIN / "presenter.py")],
+    out = subprocess.run(["grep", "-nE", r"Audited|Yahoo|IOC\.NS", str(BRAIN / "compiler.py"), str(BRAIN / "presenter.py")],
                          capture_output=True, text=True).stdout
     code_hits = [ln for ln in out.splitlines() if not ln.split(":", 2)[2].lstrip().startswith("#")]
     assert code_hits == [], code_hits
@@ -137,7 +137,7 @@ def test_no_audited_claim_in_user_facing_strings(rel):
 
 def test_cached_contracts_have_no_audited_claim():
     p = BRAIN.parent.parent / "certified" / "answer_cache_warmup.json"
-    assert not re.search(r"\baudited\b|Yahoo|ONGC\.NS", p.read_text(encoding="utf-8"), re.I)
+    assert not re.search(r"\baudited\b|Yahoo", p.read_text(encoding="utf-8"), re.I)
 
 
 def test_insight_context_does_not_claim_annual_report_source():

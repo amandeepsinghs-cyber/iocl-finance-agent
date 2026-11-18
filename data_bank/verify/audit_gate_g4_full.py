@@ -32,7 +32,7 @@ import pandas as pd
 import yaml
 
 DATA_BANK_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "asia-south1"
 SEARCH_LOCATION = "global"
 SEARCH_DATA_STORE = "hrfin-doc-search-store"

@@ -175,15 +175,15 @@
   <rect width="1520" height="620" fill="url(#bg-grid)"/>
   <rect x="20" y="140" width="178" height="150" rx="10" fill="#FFFFFF" stroke="#64748B" stroke-width="2" filter="url(#shadow-sm)"/>
   <use href="#icon-user" x="32" y="151" width="32" height="32"/>
-  <text x="74" y="165" font-size="13.5" font-weight="700" fill="#1E293B">ONGC users</text>
+  <text x="74" y="165" font-size="13.5" font-weight="700" fill="#1E293B">IndianOil users</text>
   <text x="74" y="182" font-size="11" font-weight="600" fill="#475569">Browser, voice or text</text>
-  <text x="34" y="208" font-size="11.2" fill="#475569">• CMD, Directors</text>
-  <text x="34" y="228" font-size="11.2" fill="#475569">• HR &amp; Finance staff</text>
+  <text x="34" y="208" font-size="11.2" fill="#475569">• Chairman, Directors</text>
+  <text x="34" y="228" font-size="11.2" fill="#475569">• Finance &amp; Refining staff</text>
   <text x="34" y="248" font-size="11.2" fill="#475569">• Role picked at sign-in</text>
   <rect x="222" y="16" width="1022" height="588" rx="14" fill="#F0F9FF" fill-opacity="0.55" stroke="#0284C7" stroke-width="2" filter="url(#shadow-md)"/>
   <path d="M 222 30 Q 222 16 236 16 L 1230 16 Q 1244 16 1244 30 L 1244 50 L 222 50 Z" fill="#E0F2FE"/>
   <use href="#icon-google-cloud" x="236" y="21" width="24" height="24"/>
-  <text x="268" y="39" font-size="14" font-weight="700" fill="#0369A1">Google Cloud · project ongc-hr-finance-agent · asia-south1</text>
+  <text x="268" y="39" font-size="14" font-weight="700" fill="#0369A1">Google Cloud · project yukti-finance-iocl · asia-south1</text>
   <rect x="242" y="140" width="160" height="150" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow-sm)"/>
   <use href="#icon-iap" x="254" y="151" width="34" height="34"/>
   <text x="296" y="165" font-size="13.5" font-weight="700" fill="#1E293B">Identity-Aware</text>
@@ -227,8 +227,8 @@
   <text x="986" y="168" font-size="11.2" fill="#475569">• Certified query → SQL compiler</text>
   <text x="986" y="188" font-size="11.2" fill="#475569">• DCF engine and follow-ups</text>
   <text x="986" y="208" font-size="11.2" fill="#475569">• Revenue drivers, product mix</text>
-  <text x="986" y="228" font-size="11.2" fill="#475569">• Finance diagnostics bridge</text>
-  <text x="986" y="248" font-size="11.2" fill="#475569">• HR transfers, email drafts</text>
+  <text x="986" y="228" font-size="11.2" fill="#475569">• Refinery GRM &amp; throughput</text>
+  <text x="986" y="248" font-size="11.2" fill="#475569">• Finance diagnostics bridge</text>
   <text x="986" y="268" font-size="11.2" fill="#475569">• Exports and background jobs</text>
   <rect x="442" y="370" width="232" height="190" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow-sm)"/>
   <use href="#icon-gemini" x="454" y="381" width="32" height="32"/>
@@ -240,7 +240,7 @@
   <text x="456" y="498" font-size="11.2" fill="#475569">• Server-side turn detection</text>
   <rect x="704" y="370" width="238" height="190" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow-sm)"/>
   <use href="#icon-gemini-platform" x="716" y="381" width="32" height="32"/>
-  <text x="758" y="395" font-size="13.5" font-weight="700" fill="#1E293B">Gemini 2.5 Flash</text>
+  <text x="758" y="395" font-size="13.5" font-weight="700" fill="#1E293B">Gemini 3 Flash</text>
   <text x="758" y="412" font-size="11" font-weight="600" fill="#1D4ED8">Gemini platform</text>
   <text x="718" y="438" font-size="11.2" fill="#475569">• Plans question → query spec</text>
   <text x="718" y="458" font-size="11.2" fill="#475569">• Number-checked explanations</text>
@@ -249,10 +249,10 @@
   <rect x="972" y="370" width="236" height="190" rx="10" fill="#FFFFFF" stroke="#2563EB" stroke-width="2" filter="url(#shadow-sm)"/>
   <use href="#icon-bigquery" x="984" y="381" width="32" height="32"/>
   <text x="1026" y="395" font-size="13.5" font-weight="700" fill="#1E293B">BigQuery</text>
-  <text x="1026" y="412" font-size="11" font-weight="600" fill="#1D4ED8">ONGC single source of truth</text>
-  <text x="986" y="438" font-size="11.2" fill="#475569">• HR roster, postings, pay</text>
-  <text x="986" y="458" font-size="11.2" fill="#475569">• 10-year statements, levies</text>
-  <text x="986" y="478" font-size="11.2" fill="#475569">• WACC and DCF inputs</text>
+  <text x="1026" y="412" font-size="11" font-weight="600" fill="#1D4ED8">IndianOil single source of truth</text>
+  <text x="986" y="438" font-size="11.2" fill="#475569">• 9 Refineries, GRM &amp; sales</text>
+  <text x="986" y="458" font-size="11.2" fill="#475569">• 10-year statements, excise</text>
+  <text x="986" y="478" font-size="11.2" fill="#475569">• WACC, DCF &amp; AR vector RAG</text>
   <text x="986" y="498" font-size="11.2" fill="#475569">• Certified v3 datasets</text>
   <rect x="1268" y="84" width="236" height="246" rx="14" fill="#FFFBEB" fill-opacity="0.65" stroke="#F59E0B" stroke-width="2" stroke-dasharray="8 5" filter="url(#shadow-md)"/>
   <path d="M 1268 98 Q 1268 84 1282 84 L 1490 84 Q 1504 84 1504 98 L 1504 114 L 1268 114 Z" fill="#FEF3C7"/>

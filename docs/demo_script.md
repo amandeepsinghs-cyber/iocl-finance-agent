@@ -6,20 +6,20 @@
 
 ## 0. Live URLs & Pre-Flight Verification
 
-- **Local Single-Origin Preview (Voice + UI + API):** [http://localhost:3300](http://localhost:3300)
-- **Design System & Chart Showcase:** [http://localhost:3300/design-system](http://localhost:3300/design-system)
-- **Backend FastAPI Health Check:** [http://localhost:8095/health](http://localhost:8095/health)
+- **Local Single-Origin Preview (Voice + UI + API):** [http://localhost:3400](http://localhost:3400)
+- **Design System & Chart Showcase:** [http://localhost:3400/design-system](http://localhost:3400/design-system)
+- **Backend FastAPI Health Check:** [http://localhost:8195/health](http://localhost:8195/health)
 
 ```bash
 # Quick health + planner smoke check
-curl -s http://127.0.0.1:3300/health
+curl -s http://127.0.0.1:3400/health
 ```
 
 ---
 
 ## Act 1: Executive Home, AI Aura & Borderless Aurora Wave Voice Orb (`U1`, `U3`, `U4`)
 
-1. **Open [http://localhost:3300](http://localhost:3300)** in Light theme (default executive document mode) and toggle Dark theme in the TopBar to show 100% token parity.
+1. **Open [http://localhost:3400](http://localhost:3400)** in Light theme (default executive document mode) and toggle Dark theme in the TopBar to show 100% token parity.
 2. **Point out the TopBar (`3.5rem` single row):**
    - Active Persona selector (`CMD`, `Director (HR)`, `Director (Finance)`, `E2 (HR)`, `E3 (Finance)`).
    - Language selector (`English`, `हिंदी`, `Hinglish`).

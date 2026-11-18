@@ -1,8 +1,7 @@
 /**
  * Shared UI-command vocabulary + client-side event bus + instant command parser for Yukti AI.
  *
- * Ported directly from Urvi AI Agent (`wellpulse/frontend/src/agent/uiCommands.ts`)
- * and tailored to ONGC's HR & Finance Command Center ("Yukti AI").
+ * Adapted for IndianOil's Finance & Downstream Command Center ("Yukti AI").
  *
  * Dual-layer voice/text platform control:
  *   Layer A — `parseUiCommands(text)`: Instant 0ms browser-side execution for plain
@@ -26,42 +25,43 @@ export const UI_ACTIONS = {
   ] as const,
   open_screen: [
     'home',
-    'delhi_tenure',
-    'field_profitability',
+    'pnl_fy26',
+    'refinery_grm',
     'mou_scorecard',
-    'lifting_cost',
-    'ne_vacancies',
-    'brent_what_if',
-    'recruitment_freeze',
-    'jrtp_policy',
+    'fuel_and_loss',
+    'marketing_volumes',
+    'grm_what_if',
+    'doa_policy',
     'board_note',
   ] as const,
   focus_location: [
     'Delhi',
     'Mumbai',
-    'Dehradun',
-    'Ahmedabad',
-    'Mehsana',
-    'Ankleshwar',
-    'Cambay',
-    'Assam',
-    'Jorhat',
-    'Tripura',
-    'Rajahmundry',
-    'Cauvery',
+    'Noida',
+    'Faridabad',
+    'Chennai',
+    'Panipat',
+    'Paradip',
+    'Koyali',
+    'Mathura',
+    'Haldia',
+    'Barauni',
+    'Bongaigaon',
+    'Guwahati',
+    'Digboi',
     'ALL',
   ] as const,
   grade_filter: ['ALL', 'E5_PLUS', 'E7_PLUS'] as const,
-  breakdown: ['grade', 'discipline'] as const,
-  persona: ['CMD', 'DIR_HR', 'DIR_FIN', 'E1_HR', 'E2_HR', 'E3_HR', 'E4_HR', 'E1_FIN', 'E2_FIN', 'E3_FIN', 'E4_FIN'] as const,
+  breakdown: ['refinery', 'product', 'pipeline', 'subsidiary', 'segment'] as const,
+  persona: ['CMD', 'DIR_FIN', 'DIR_REF', 'DIR_MKT', 'E1_FIN', 'E2_FIN', 'E3_FIN', 'E4_FIN'] as const,
   language: ['en', 'hi', 'hi-en'] as const,
   panel: ['expand', 'dock', 'minimise', 'close', 'open_history'] as const,
   // P4.7 (SPEC-10 §4.8): all formats; 'auto' = pick by the visual on screen. A ':default' suffix (e.g.
   // 'png:default') means no format word was given, so the card states which default it used.
   export: ['xlsx', 'csv', 'pdf', 'png', 'svg', 'docx', 'eml', 'sheets', 'docs', 'auto'] as const,
   history: ['back', 'forward'] as const,
-  // 26-Oct: Brent / WTI price line on top of a fiscal-year chart (revenue, PAT…); 'off' removes it
-  overlay: ['brent', 'wti', 'inr', 'off'] as const,
+  // 26-Oct + IOCL: Brent / WTI / INR / GRM / IOC.NS overlays on fiscal-year charts; 'off' removes it
+  overlay: ['brent', 'wti', 'inr', 'grm', 'iocl', 'off'] as const,
 } as const;
 
 export type UiAction = keyof typeof UI_ACTIONS;
@@ -135,7 +135,11 @@ export function labelOf(cmd: UiCommand): string {
         ? 'Overlay removed'
         : cmd.value === 'inr'
           ? 'Overlay → rupee per dollar'
-          : `Overlay → ${cmd.value === 'wti' ? 'WTI' : 'Brent'} oil price`;
+          : cmd.value === 'grm'
+            ? 'Overlay → Singapore GRM'
+            : cmd.value === 'iocl'
+              ? 'Overlay → IOC.NS share price'
+              : `Overlay → ${cmd.value === 'wti' ? 'WTI' : 'Brent'} oil price`;
   }
 }
 
@@ -148,7 +152,7 @@ export function isSmallTalk(text: string): boolean {
     .trim();
   if (!s) return true;
   if (
-    /\b(delhi|mumbai|dehradun|assam|mehsana|ankleshwar|cambay|jorhat|tripura|cauvery|rajahmundry|champang|executive|tenure|grade|discipline|profit|loss|mou|target|brent|lifting|vacancy|vacancies|policy|jrtp|leave|board|salary|payroll|csr|capex|retire|superannuat|table|chart|bar|donut|dark|light|export|pdf|excel)\b/.test(
+    /\b(delhi|mumbai|noida|faridabad|chennai|panipat|paradip|koyali|gujarat|mathura|haldia|barauni|bongaigaon|guwahati|digboi|cpcl|indane|servo|grm|throughput|excise|profit|loss|mou|target|brent|wacc|dcf|inventory|debt|policy|doa|hedging|board|csr|capex|table|chart|bar|donut|dark|light|export|pdf|excel)\b/.test(
       s,
     )
   ) {
@@ -385,15 +389,16 @@ function matchClause(raw: string): UiCommand | null {
  * If any clause is a data question or screen navigation requiring backend data,
  * return `null` so it goes through the agent.
  */
-/** 26-Oct: "overlay Brent", "show the WTI price on top", "add oil price to the chart", "remove oil price". */
+/** 26-Oct + IOCL: "overlay Brent", "overlay Singapore GRM", "show the WTI price on top", "remove overlay". */
 export function detectOilOverlay(text: string): UiCommand | null {
   const q = text.toLowerCase();
-  const oil = /\b(brent|wti|west texas|oil price|oil prices|crude price|crude prices|crude oil price|oil|rupee|dollar rate|exchange rate|usd ?inr|inr|currency|forex)\b/;
+  const oil = /\b(brent|wti|west texas|singapore grm|sg grm|grm|crack spread|oil price|oil prices|crude price|crude prices|crude oil price|oil|rupee|dollar rate|exchange rate|usd ?inr|inr|currency|forex)\b/;
   if (!oil.test(q)) return null;
   if (/\b(remove|hide|clear|drop|turn off|without)\b/.test(q)) return { action: 'overlay', value: 'off' };
   const verb = /\b(overlay|superimpose|super impose)\b/.test(q);
   const placed = /\b(add|show|plot|put|include|bring|compare)\b/.test(q) && /\b(on top|over it|overlay|alongside|on the (same )?(chart|graph|plot)|to the (chart|graph|plot)|with (the )?(revenue|chart|graph|plot)|as well|too)\b/.test(q);
   if (!verb && !placed) return null;
+  if (/\b(singapore grm|sg grm|grm|crack spread)\b/.test(q)) return { action: 'overlay', value: 'grm' };
   if (/\b(rupee|dollar rate|exchange rate|usd ?inr|inr|currency|forex)\b/.test(q) && !/\b(brent|wti|crude|oil)\b/.test(q)) return { action: 'overlay', value: 'inr' };
   return { action: 'overlay', value: /\b(wti|west texas)\b/.test(q) ? 'wti' : 'brent' };
 }

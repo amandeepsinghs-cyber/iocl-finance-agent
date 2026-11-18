@@ -27,7 +27,7 @@ export function routeQueryToFixture(
   if (wantsNames && currentPersona === 'DIR_FIN') { const r = v2('v2_roster_partial_dirfin'); if (r) return r; }
   if (wantsNames && /(all.?india|8 years|eight years|2,?000|everyone)/.test(q)) { const r = v2('v2_roster_2000'); if (r) return r; }
   if (wantsNames && /delhi/.test(q)) { const r = v2('v2_roster_419'); if (r) return r; }
-  if ((currentPersona === 'CMD' || currentPersona === 'DIR_HR') && /(compare|\bvs\b|versus)/.test(q) && /delhi/.test(q) && /mumbai/.test(q)) { const r = v2('v2_compare_delhi_mumbai'); if (r) return r; }
+  if ((currentPersona === 'CMD' || currentPersona === 'DIR_FIN' || currentPersona === 'DIR_REF' || currentPersona === 'DIR_MKT') && /(compare|\bvs\b|versus)/.test(q) && /delhi/.test(q) && /mumbai/.test(q)) { const r = v2('v2_compare_delhi_mumbai'); if (r) return r; }
   if (/headcount by work cent(re|er)|work cent(re|er) headcount/.test(q)) { const r = v2('v2_insights_drilldowns'); if (r) return r; }
   if (/profit and loss|p&l|p & l/.test(q)) { const r = v2('v2_finance_pnl'); if (r) return r; }
 
@@ -67,8 +67,17 @@ export function routeQueryToFixture(
     return { fixture: f, contract: f.data };
   }
 
-  // Map
-  if (q.includes('map') || q.includes('geographic') || q.includes('all-india') || q.includes('work centres') || q.includes('footprint') || q.includes('where')) {
+  // Map & IndianOil Refineries
+  if (
+    q.includes('map') ||
+    q.includes('geographic') ||
+    q.includes('all-india') ||
+    q.includes('work centres') ||
+    q.includes('footprint') ||
+    q.includes('refiner') ||
+    q.includes('throughput') ||
+    q.includes('where')
+  ) {
     const f = FIXTURES.find(x => x.id === 'map_headcount')!;
     return { fixture: f, contract: f.data };
   }

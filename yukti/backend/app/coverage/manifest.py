@@ -78,10 +78,10 @@ class CoverageManifest(BaseModel):
         return (
             "Verified Data Coverage Manifest: "
             "Standalone & Consolidated Financial Statements (Balance Sheet, Profit & Loss, Cash Flow, Ratios) "
-            "available for FY17–FY26 (including FY24 / 2023-24) from ONGC Annual Reports & NSE/BSE XBRL; "
-            "10-Year Summary Highlights FY13–FY26; WACC & Diagnostics FY17–FY26; "
-            "Field & Basin Economics FY17–FY26 (28 fields, 7 basins); "
-            "Employee-360 Roster as of 2026-03-31 (30,782 active employees, synthetic/illustrative)."
+            "available for FY17–FY26 (including FY24 / 2023-24) from IndianOil (IOCL) Annual Reports & NSE/BSE XBRL; "
+            "10-Year Summary Highlights FY17–FY26; WACC & Diagnostics FY17–FY26; "
+            "Refinery & Downstream Economics FY17–FY26 (9 standalone refineries, marketing sales, pipelines & petrochemicals); "
+            "Finance & Corporate Cadre Governance Roster (synthetic/illustrative)."
         )
 
 

@@ -6,7 +6,7 @@ import re
 from google.cloud import bigquery, discoveryengine_v1 as discoveryengine
 from google.auth import default
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION_BQ = "asia-south1"
 SEARCH_LOCATION = "global"
 SEARCH_DATA_STORE = "hrfin-doc-search-store"

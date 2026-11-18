@@ -26,14 +26,14 @@ _HR_STARTERS = [
     "What is the transfer policy for station tenure?",
 ]
 _FIN_STARTERS = [
-    "Show ONGC's P&L statement for FY26",
-    "Which fields were the most profitable in FY26?",
-    "How are we tracking against our MoU targets this year?",
+    "Show IOCL's P&L statement for FY26",
+    "Rank all IOCL refineries by GRM and EBITDA in FY26",
+    "How is IOCL tracking against its FY26 MoU targets?",
 ]
 _CMD_STARTERS = [
-    "How many executives have been posted in Delhi for 5 years or more?",
-    "Which fields or assets were the most profitable and which made losses in FY26?",
-    "How are we tracking against our MoU targets with MoPNG/DPE for this year?",
+    "Show IOCL's Schedule III Profit and Loss statement for FY26",
+    "Rank all IOCL refineries by GRM ($/bbl) and EBITDA in FY26",
+    "How is IOCL tracking against its MoPNG/DPE Maharatna MoU targets?",
 ]
 
 
@@ -41,25 +41,21 @@ def starters_for(persona: str) -> List[str]:
     p = (persona or "").upper()
     if p == "CMD":
         return list(_CMD_STARTERS)
-    if "FIN" in p:
-        return list(_FIN_STARTERS)
-    return list(_HR_STARTERS)
+    return list(_FIN_STARTERS)
 
 
 def _scope_for(persona: str) -> str:
     p = (persona or "").upper()
     if p == "CMD":
-        return "HR and Finance across ONGC (people, postings, pay, P&L, balance sheet, field economics, MoU targets, policies)"
-    if "FIN" in p:
-        return "Finance (P&L, balance sheet, cash flow, field economics, MoU targets) and finance policies"
-    return "HR (headcount, postings and transfers, tenure, leave, pay and benefits) and HR policies"
+        return "Corporate Finance & Downstream Operations across IOCL (Schedule III P&L, Balance Sheet, Cash Flow, Refinery GRM, Pipelines, Marketing, MoU targets, NSE:IOC DCF, and DoA/Hedging policies)"
+    return "IOCL Finance & Downstream Operations (Schedule III P&L, Balance Sheet, Cash Flow, Refinery GRM, Pipelines, Marketing, WACC, MoU targets, and Finance/DoA policies)"
 
 
-_SYSTEM = """You are Yukti, the voice-first HR & Finance agent for ONGC (Oil and Natural Gas Corporation Limited).
+_SYSTEM = """You are Yukti, the voice-first Finance & Downstream Intelligence agent for Indian Oil Corporation Limited (IOCL).
 Reply to the user's message in 1-3 short, warm, professional sentences (Indian boardroom register).
 Rules:
 - Reply in the language named below ("Reply language"). Never any other language.
-- Never state numbers, figures, names of employees, or facts about ONGC data. You have no data in this reply.
+- Never state numbers, figures, names of employees, or facts about IOCL data. You have no data in this reply.
 - For greetings: greet back briefly and offer help.
 - For "what can you do" / help: say in one or two sentences what you can help with, using the scope given.
 - If the message is a data or policy question you could not answer, say you couldn't fetch that just now and ask the

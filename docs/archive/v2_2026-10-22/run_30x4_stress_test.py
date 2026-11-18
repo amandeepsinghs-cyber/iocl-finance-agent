@@ -511,7 +511,7 @@ def run_suite() -> None:
         "# Curated 30-Scenario × 4-Turn (120 Total Turns) Financial & HR Intelligence Verification Catalog",
         "",
         f"- **Execution Status:** `{passed_turns} / {total_turns}` Conversational Turns Verified (`{summary['pass_rate_pct']}%` Pass Rate)",
-        f"- **Total Runtime:** `{total_elapsed}s` against live Gemini 2.5 Flash Planner + BigQuery SSOT (`ongc-hr-finance-agent`) + Hybrid Context & Vector RAG (`ssot_financial_line_context` & `financial_notes_chunks`)",
+        f"- **Total Runtime:** `{total_elapsed}s` against live Gemini 2.5 Flash Planner + BigQuery SSOT (`yukti-finance-iocl`) + Hybrid Context & Vector RAG (`ssot_financial_line_context` & `financial_notes_chunks`)",
         "- **Visual Governance Verified:** Table-First (`visual.type = \"table\"`) for all Financial Statements (P&L, Balance Sheet, Cash Flow, Ratios); Waterfall Chart (`chart.kind = \"waterfall\"`) on explicit demand.",
         "",
         "---",

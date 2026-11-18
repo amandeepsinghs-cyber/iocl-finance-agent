@@ -10,7 +10,7 @@ SELECT
     clause_ref,
     heading,
     TRIM(REGEXP_EXTRACT(text, r'(?is)(.{0,200}contract.{0,400})')) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE (doc_id = 'J-14' AND STARTS_WITH(clause_ref, '4 of that Act'))
    OR (doc_id = 'J-17' AND clause_ref = 'Part 5')
    OR (doc_id = 'P2-17' AND clause_ref = 'Part 2')

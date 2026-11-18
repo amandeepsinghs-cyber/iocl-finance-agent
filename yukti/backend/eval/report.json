@@ -1,7 +1,7 @@
 {
   "summary": {
     "timestamp": "2026-10-20T09:54:57.580081+00:00",
-    "target_project": "ongc-hr-finance-agent",
+    "target_project": "yukti-finance-iocl",
     "text_model": "gemini-2.5-flash",
     "total_sweep_elapsed_seconds": 0.0,
     "estimated_gemini_cost_usd": 0.1623,
@@ -2095,7 +2095,7 @@
         "val_agent": "5 rows",
         "val_key": "14 rows (The largest production and maintenance engineering)",
         "tool_called": "query_data",
-        "generated_sql": "SELECT\n    t2.name AS field_asset,\n    SUM(t1.vacancy_count) AS total_vacancies\n  FROM\n    `ongc-hr-finance-agent.hrfin_silver.sanctioned_posts` AS t1\n    INNER JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` AS t2 ON t1.wc_id = t2.wc_id\n  WHERE t1.fiscal_year IN ('FY26', '2026') AND t1.discipline_id IN (\n    SELECT\n        discipline_id\n      FROM\n        `ongc-hr-finance-agent.hrfin_silver.dim_discipline`\n      WHERE LOWER(name) LIKE '%production%' OR LOWER(name) LIKE '%maintenance%' OR LOWER(name) LIKE '%engineering%'\n  ) AND t2.hard_station_cat IN ('B', 'C')\n  GROUP BY 1\nORDER BY total_vacancies DESC\nLIMIT 5",
+        "generated_sql": "SELECT\n    t2.name AS field_asset,\n    SUM(t1.vacancy_count) AS total_vacancies\n  FROM\n    `yukti-finance-iocl.hrfin_silver.sanctioned_posts` AS t1\n    INNER JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` AS t2 ON t1.wc_id = t2.wc_id\n  WHERE t1.fiscal_year IN ('FY26', '2026') AND t1.discipline_id IN (\n    SELECT\n        discipline_id\n      FROM\n        `yukti-finance-iocl.hrfin_silver.dim_discipline`\n      WHERE LOWER(name) LIKE '%production%' OR LOWER(name) LIKE '%maintenance%' OR LOWER(name) LIKE '%engineering%'\n  ) AND t2.hard_station_cat IN ('B', 'C')\n  GROUP BY 1\nORDER BY total_vacancies DESC\nLIMIT 5",
         "spoken_summary": "A total of 231 matching records were identified. Largest groups: Neelam & Heera Asset 66, Bassein & Satellite Asset 58, ",
         "latency_ms": 12834.4
       },

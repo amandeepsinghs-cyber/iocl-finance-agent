@@ -128,7 +128,7 @@ def run_dcf(assumptions: DCFAssumptions, fixture=None) -> Dict[str, Any]:
                 "source": f"{w_src} (as_of={w_meta.get('as_of_date', '2026-03-31')}, method={w_meta.get('method_version', 'wacc-v1')})",
             },
             {
-                "item": f"Market Price ONGC.NS (₹{m_val:.2f})",
+                "item": f"Market Price IOC.NS (₹{m_val:.2f})",
                 "source": f"{m_src} ({m_meta.get('source_url') or m_meta.get('source_doc', 'market_prices_seed.csv')})",
             },
         ]

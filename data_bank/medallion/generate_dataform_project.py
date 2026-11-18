@@ -30,7 +30,7 @@ def setup_directories():
 
 def write_workflow_settings():
     settings = """dataformCoreVersion: 3.0.24
-defaultProject: ongc-hr-finance-agent
+defaultProject: yukti-finance-iocl
 defaultLocation: asia-south1
 defaultDataset: hrfin_silver
 defaultAssertionDataset: hrfin_silver
@@ -41,7 +41,7 @@ defaultAssertionDataset: hrfin_silver
 
 def write_credentials():
     creds = {
-        "projectId": "ongc-hr-finance-agent",
+        "projectId": "yukti-finance-iocl",
         "location": "asia-south1"
     }
     with open(DF_DIR / ".df-credentials.json", "w", encoding="utf-8") as f:
@@ -77,7 +77,7 @@ const bronzeTables = """ + json.dumps(bronze_tables, indent=2) + """;
 
 bronzeTables.forEach(tableName => {
   declare({
-    database: "ongc-hr-finance-agent",
+    database: "yukti-finance-iocl",
     schema: "hrfin_bronze",
     name: tableName,
   });
@@ -88,7 +88,7 @@ const refDims = """ + json.dumps(ref_dims, indent=2) + """;
 
 refDims.forEach(tableName => {
   declare({
-    database: "ongc-hr-finance-agent",
+    database: "yukti-finance-iocl",
     schema: "hrfin_silver",
     name: tableName,
   });
@@ -101,7 +101,7 @@ const hrfinRefDims = [
 
 hrfinRefDims.forEach(tableName => {
   declare({
-    database: "ongc-hr-finance-agent",
+    database: "yukti-finance-iocl",
     schema: "hrfin_ref",
     name: tableName,
   });

@@ -111,7 +111,9 @@ export function StatementTable({ statement, onWhy }: StatementTableProps) {
                       </th>
                       {periods.map((p) => (
                         <td key={p} className="yk-statement__num text-right" data-testid="statement-cell">
-                          {fmtAccounting(r.values?.[p], unit)}
+                          {r.unit === 'x' || r.line_code === 'DCF.DF'
+                            ? (typeof r.values?.[p] === 'number' && Number.isFinite(r.values[p]) ? `${Number(r.values[p]).toFixed(2)}x` : '—')
+                            : fmtAccounting(r.values?.[p], unit)}
                         </td>
                       ))}
                       {showYoy && (

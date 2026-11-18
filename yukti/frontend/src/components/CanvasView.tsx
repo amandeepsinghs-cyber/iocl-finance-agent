@@ -41,35 +41,41 @@ const FEED_V2 = process.env.NEXT_PUBLIC_FEED_V2 !== '0';
 
 type Starter = { icon: React.ComponentType<{ className?: string }>; tag: string; title: string; q: string };
 
-// U4.5: persona-specific suggestions (HR · HR · Finance · Policy). E-level personas get aggregate/self-service asks (D-11).
+// U4.5: IOCL Finance & Downstream persona starters. Grades A–D get public statement / aggregate / WACC / DCF asks.
 const STARTERS: Record<string, Starter[]> = {
   CMD: [
-    { icon: Users, tag: 'People · Transfers', title: 'Delhi HQ: executives posted 5+ years', q: 'How many executives have been posted in Delhi for 5 years or more?' },
-    { icon: TrendingUp, tag: 'Finance · FY26', title: 'Most profitable and loss-making fields', q: 'Which fields or assets were the most profitable and which made losses in FY26?' },
-    { icon: Target, tag: 'Performance · DPE', title: 'MoU target scorecard', q: 'How are we tracking against our MoU targets with MoPNG/DPE for this year?' },
-    { icon: Scale, tag: 'Policy', title: 'Station tenure and rotation rules', q: 'What is the minimum tenure at a station, and the maximum cumulative stay in one city?' },
-  ],
-  DIR_HR: [
-    { icon: Users, tag: 'People · Transfers', title: 'Delhi HQ: 5+ year postings', q: 'How many executives have been posted in Delhi for 5 years or more?' },
-    { icon: Target, tag: 'People · Succession', title: 'E7+ retiring in 3 years without a successor', q: 'How many E7+ officers retire in the next 3 years, and which roles have no ready successor?' },
-    { icon: TrendingUp, tag: 'Finance · People cost', title: 'Payroll and overtime by work centre', q: 'What is the FY26 payroll and overtime cost by work centre?' },
-    { icon: Scale, tag: 'Policy', title: 'Transfer policy for long-stay officers', q: 'What does the transfer policy say about officers posted 5 years or more?' },
+    { icon: TrendingUp, tag: 'Finance · 10-Yr P&L', title: '10-year Gross vs Net Revenue & PAT', q: 'Show 10-year Gross vs Net-of-Excise revenue, EBITDA, and PAT from FY17 to FY26' },
+    { icon: Activity, tag: 'Refineries · GRM', title: 'Refinery GRM & fuel-loss 360', q: 'Compare FY26 throughput, capacity utilisation, and GRM across all 9 IndianOil refineries' },
+    { icon: BarChart3, tag: 'Valuation · NSE:IOC', title: 'Live NSE:IOC DCF valuation', q: 'Run a discounted cash flow valuation for IndianOil (NSE:IOC) using FY26 WACC' },
+    { icon: Target, tag: 'Performance · MoU', title: 'MoU scorecard FY26', q: 'How is IndianOil tracking against MoPNG MoU scorecard targets in FY26?' },
   ],
   DIR_FIN: [
-    { icon: TrendingUp, tag: 'Finance · FY26', title: 'Most profitable and loss-making fields', q: 'Which fields or assets were the most profitable and which made losses in FY26?' },
-    { icon: BarChart3, tag: 'Finance · Capex', title: 'Under-invested fields vs reserves', q: 'Where have we invested the most capex in the last 5 years, and which fields are under-invested relative to their reserves?' },
-    { icon: Target, tag: 'Performance · DPE', title: 'MoU target scorecard', q: 'How are we tracking against our MoU targets with MoPNG/DPE for this year?' },
-    { icon: Scale, tag: 'Receivables', title: 'Receivables ageing by customer', q: 'How old are receivables from oil marketing companies and gas buyers, by customer?' },
+    { icon: TrendingUp, tag: 'Finance · Variance', title: 'FY24→FY25→FY26 PAT bridge', q: 'Explain the PAT bridge across FY24, FY25, and FY26 with GRM and Brent/FX drivers' },
+    { icon: BarChart3, tag: 'Valuation · NSE:IOC', title: 'Live NSE:IOC DCF & WACC', q: 'Run a discounted cash flow valuation for IndianOil and show FY17–FY26 WACC build-up' },
+    { icon: Scale, tag: 'Capital · Sub-ledgers', title: 'Counterparty credit & working capital', q: 'Show working capital, inventory days, and top CFO value-creation levers for FY26' },
+    { icon: Target, tag: 'Governance · DoA', title: 'Delegation of Authority & Board pack', q: 'Summarise IndianOil Finance & DoA governance rules and draft Board CFO highlights' },
   ],
-  E2_HR: [
-    { icon: Scale, tag: 'Policy', title: 'My leave entitlements', q: 'What leave am I entitled to under the ONGC leave rules?' },
-    { icon: Scale, tag: 'Policy', title: 'Station tenure norms', q: 'What is the minimum tenure at a station, and the maximum cumulative stay in one city?' },
-    { icon: Users, tag: 'People · Aggregate', title: 'Headcount by work centre', q: 'What is the headcount by work centre?' },
-    { icon: TrendingUp, tag: 'Finance · Public', title: 'ONGC FY26 revenue and profit', q: 'What were ONGC revenue and profit in FY26?' },
+  DIR_REF: [
+    { icon: Activity, tag: 'Refineries · 360', title: '9 refineries throughput & GRM', q: 'Compare FY26 throughput, utilisation %, fuel & loss %, and GRM across all 9 refineries' },
+    { icon: TrendingUp, tag: 'Macro · GRM Bridge', title: 'Brent, GRM & INR sensitivity', q: 'What is the impact on IndianOil EBITDA and PAT if GRM drops by $2/bbl or INR depreciates?' },
+    { icon: BarChart3, tag: 'Refineries · Capex', title: 'Panipat, Paradip & Gujarat expansion', q: 'Show refining segment EBITDA and capex deployment for FY26' },
+    { icon: Target, tag: 'Performance · MoU', title: 'Refinery energy & distillate yield', q: 'How is IndianOil tracking on distillate yield and energy intensity MoU targets?' },
+  ],
+  DIR_MKT: [
+    { icon: BarChart3, tag: 'Marketing · Volumes', title: 'MS, HSD, ATF & Indane LPG mix', q: 'Show FY26 marketing product mix across MS, HSD, ATF, and Indane LPG' },
+    { icon: TrendingUp, tag: 'Pipelines · Throughput', title: 'Cross-country pipeline throughput', q: 'Summarise FY26 cross-country pipeline throughput and operating margin' },
+    { icon: Activity, tag: 'Margins · OMC', title: 'Excise duty & marketing margin impact', q: 'Compare Gross vs Net-of-Excise revenue and marketing under-recovery dynamics in FY25–FY26' },
+    { icon: Target, tag: 'Performance · MoU', title: 'Retail network & LPG targets', q: 'How is Marketing division tracking against FY26 MoU milestones?' },
+  ],
+  E2_FIN: [
+    { icon: TrendingUp, tag: 'Finance · Public', title: '10-year Schedule III Revenue & PAT', q: 'Show 10-year Gross vs Net-of-Excise revenue and PAT from FY17 to FY26' },
+    { icon: Activity, tag: 'Refineries · Aggregate', title: 'Refinery GRM & throughput 360', q: 'Compare FY26 throughput and GRM across all 9 IndianOil refineries' },
+    { icon: BarChart3, tag: 'Valuation · NSE:IOC', title: 'Live NSE:IOC DCF & WACC', q: 'Run a discounted cash flow valuation for IndianOil (NSE:IOC)' },
+    { icon: Scale, tag: 'Policy · Public', title: 'Finance & DoA policy summary', q: 'What are the key Finance and Delegation of Authority guidelines?' },
   ],
 };
-// P2H.2: E1–E4 in HR and Finance share the junior starters (aggregate / self-service asks, D-11)
-for (const id of ['E1_HR', 'E3_HR', 'E4_HR', 'E1_FIN', 'E2_FIN', 'E3_FIN', 'E4_FIN']) STARTERS[id] = STARTERS.E2_HR;
+// IOCL Officer Grades A–D (E1_FIN..E4_FIN) share the public statutory / aggregate / WACC / DCF starters
+for (const id of ['E1_FIN', 'E3_FIN', 'E4_FIN']) STARTERS[id] = STARTERS.E2_FIN;
 
 const ADDRESS: Record<string, string> = Object.fromEntries(PERSONA_DIRECTORY.map((p) => [p.id, p.address]));
 
@@ -135,7 +141,7 @@ const Greeting: React.FC<{
         <h1 className="mt-6 text-display font-display text-[var(--ink)]">
           {name ? `${hello}, ${name}` : hello}
         </h1>
-        <p className="mt-2 text-body text-[var(--ink-2)]">I&apos;m Yukti, your HR &amp; Finance agent. Ask by voice or type below.</p>
+        <p className="mt-2 text-body text-[var(--ink-2)]">I&apos;m Yukti, IndianOil&apos;s Finance &amp; Downstream intelligence partner. Ask by voice or type below.</p>
 
         {liveInterimText ? (
           <p className="mt-5 text-body text-[var(--ink-2)] max-w-[44rem] animate-pulse">&ldquo;{liveInterimText}&rdquo;</p>

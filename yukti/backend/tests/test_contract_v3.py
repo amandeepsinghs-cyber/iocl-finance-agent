@@ -62,7 +62,7 @@ def test_v1_and_v2_backward_compatibility() -> None:
         "language": "en",
         "persona": "CMD",
         "spoken_summary": "Total active headcount is 25,642.",
-        "display_text": "ONGC Active Headcount: 25,642.",
+        "display_text": "IOCL Standalone Revenue: ₹8,86,224.41 Cr.",
         "visual": {"type": "kpi", "mode": "replace", "kpis": [{"label": "Headcount", "value": 25642}]},
         "insights": ["Headcount is stable."],
         "sources": [{"kind": "data", "object": "v_emp_current"}],
@@ -93,19 +93,16 @@ def test_v1_and_v2_backward_compatibility() -> None:
     "persona",
     [
         "CMD",
-        "DIR_HR",
         "DIR_FIN",
-        "E1_HR",
-        "E2_HR",
-        "E3_HR",
-        "E4_HR",
+        "DIR_REF",
+        "DIR_MKT",
         "E1_FIN",
         "E2_FIN",
         "E3_FIN",
         "E4_FIN",
     ],
 )
-def test_all_11_personas_validate(persona: str) -> None:
+def test_all_8_personas_validate(persona: str) -> None:
     assert persona in _VALID_PERSONAS
     validator = get_contract_validator()
     payload = json.loads((FIXTURES_DIR / "v3_provenance_local_snapshot.json").read_text(encoding="utf-8"))

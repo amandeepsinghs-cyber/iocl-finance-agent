@@ -4,105 +4,101 @@ import { ChartSpec, KpiTile, TableSpec } from '@/contracts/answerContract';
 
 export const KPI_SAMPLES: KpiTile[] = [
   {
-    label: 'Active Employees',
-    value: 23117,
-    unit: '',
-  },
-  {
-    label: 'FY26 Revenue',
-    value: 132508,
+    label: 'FY26 Standalone Revenue',
+    value: 867647,
     unit: '₹ Cr',
-    delta: '+12.4% vs FY25',
   },
   {
-    label: 'Vacancy Rate · ▼1.2 pts vs FY25',
-    value: 8.5,
-    unit: '%',
-    delta: '-1.2 pts vs FY25',
+    label: 'FY26 Standalone PAT',
+    value: 36803,
+    unit: '₹ Cr',
+    delta: '+184% vs FY25',
+  },
+  {
+    label: 'FY26 Gross Refining Margin',
+    value: 8.45,
+    unit: '$/bbl',
+    delta: '+3.65 $/bbl vs FY25',
   },
 ];
 
 /* ------------------------------------------------------------------ Table Sample */
 
 export const TABLE_SAMPLE: TableSpec = {
-  columns: ['name', 'grade', 'discipline', 'ongc_tenure_yrs', 'delhi_tenure_yrs', 'retiring_le_3y'],
+  columns: ['refinery', 'state', 'capacity_mmtpa', 'throughput_mmt', 'utilization_pct', 'grm_usd_bbl'],
   rows: [
-    { name: 'Rajesh Kumar Sharma', grade: 'E6', discipline: 'Production', ongc_tenure_yrs: 24, delhi_tenure_yrs: 7, retiring_le_3y: false },
-    { name: 'Amit Verma', grade: 'E5', discipline: 'Drilling', ongc_tenure_yrs: 18, delhi_tenure_yrs: 5, retiring_le_3y: false },
-    { name: 'Sunita Deshmukh', grade: 'E7', discipline: 'Geophysics', ongc_tenure_yrs: 28, delhi_tenure_yrs: 6, retiring_le_3y: true },
-    { name: 'Vikramaditya Singh', grade: 'E4', discipline: 'Geology', ongc_tenure_yrs: 12, delhi_tenure_yrs: 5, retiring_le_3y: false },
-    { name: 'Priya Natarajan', grade: 'E3', discipline: 'Finance & Accounts', ongc_tenure_yrs: 9, delhi_tenure_yrs: 3, retiring_le_3y: false },
-    { name: 'Sanjay Bhattacharya', grade: 'E8', discipline: 'Mechanical', ongc_tenure_yrs: 31, delhi_tenure_yrs: 8, retiring_le_3y: true },
-    { name: 'Neha Aggarwal', grade: 'E2', discipline: 'Human Resources', ongc_tenure_yrs: 5, delhi_tenure_yrs: 5, retiring_le_3y: false },
-    { name: 'Manpreet Singh Gill', grade: 'E7', discipline: 'Chemistry', ongc_tenure_yrs: 27, delhi_tenure_yrs: 4, retiring_le_3y: false },
+    { refinery: 'Paradip', state: 'Odisha', capacity_mmtpa: 15.0, throughput_mmt: 15.82, utilization_pct: 105.5, grm_usd_bbl: 9.2 },
+    { refinery: 'Panipat', state: 'Haryana', capacity_mmtpa: 15.0, throughput_mmt: 15.41, utilization_pct: 102.7, grm_usd_bbl: 8.8 },
+    { refinery: 'Koyali', state: 'Gujarat', capacity_mmtpa: 13.7, throughput_mmt: 15.18, utilization_pct: 110.8, grm_usd_bbl: 8.9 },
+    { refinery: 'Mathura', state: 'Uttar Pradesh', capacity_mmtpa: 8.0, throughput_mmt: 9.15, utilization_pct: 114.4, grm_usd_bbl: 8.4 },
+    { refinery: 'Haldia', state: 'West Bengal', capacity_mmtpa: 8.0, throughput_mmt: 8.42, utilization_pct: 105.3, grm_usd_bbl: 7.9 },
+    { refinery: 'Barauni', state: 'Bihar', capacity_mmtpa: 6.0, throughput_mmt: 6.51, utilization_pct: 108.5, grm_usd_bbl: 7.6 },
+    { refinery: 'Bongaigaon', state: 'Assam', capacity_mmtpa: 2.7, throughput_mmt: 2.84, utilization_pct: 105.2, grm_usd_bbl: 8.1 },
+    { refinery: 'Guwahati & Digboi', state: 'Assam', capacity_mmtpa: 1.85, throughput_mmt: 2.12, utilization_pct: 114.6, grm_usd_bbl: 7.8 },
   ],
 };
 
 /* ------------------------------------------------------------------ Reference Chart 1: Bar */
-// Headcount by work centre (8 rows)
+// Throughput by refinery (8 rows)
 
 export const BAR_SPEC: ChartSpec = {
   kind: 'bar',
-  category: 'work_centre',
-  value: 'headcount',
-  unit: 'Executives',
+  category: 'refinery',
+  value: 'throughput_mmt',
+  unit: 'MMT',
   data: [
-    { work_centre: 'Delhi HQ', headcount: 419 },
-    { work_centre: 'Mumbai Offshore', headcount: 1850 },
-    { work_centre: 'Ankleshwar', headcount: 1240 },
-    { work_centre: 'Mehsana', headcount: 1120 },
-    { work_centre: 'Assam Asset', headcount: 980 },
-    { work_centre: 'Rajahmundry', headcount: 740 },
-    { work_centre: 'Karaikal', headcount: 560 },
-    { work_centre: 'Tripura Asset', headcount: 430 },
+    { refinery: 'Paradip', throughput_mmt: 15.82 },
+    { refinery: 'Panipat', throughput_mmt: 15.41 },
+    { refinery: 'Koyali', throughput_mmt: 15.18 },
+    { refinery: 'Mathura', throughput_mmt: 9.15 },
+    { refinery: 'Haldia', throughput_mmt: 8.42 },
+    { refinery: 'Barauni', throughput_mmt: 6.51 },
+    { refinery: 'Bongaigaon', throughput_mmt: 2.84 },
+    { refinery: 'Guwahati', throughput_mmt: 1.38 },
   ],
 };
 
 /* ------------------------------------------------------------------ Reference Chart 2: H-Bar */
-// FY26 PBT by field (10 rows, including 2 negative values, unit ₹ Cr)
+// Segment & business line EBIT contribution (illustrative sample, unit ₹ Cr)
 
 export const HBAR_SPEC: ChartSpec = {
   kind: 'hbar',
-  category: 'field',
-  value: 'pbt_cr',
+  category: 'division',
+  value: 'ebit_cr',
   unit: '₹ Cr',
   data: [
-    { field: 'Mumbai High', pbt_cr: 8420 },
-    { field: 'Bassein', pbt_cr: 4150 },
-    { field: 'Gandhar', pbt_cr: 2890 },
-    { field: 'Ravva', pbt_cr: 1640 },
-    { field: 'KG-DWN-98/2', pbt_cr: 1210 },
-    { field: 'Neelam', pbt_cr: 890 },
-    { field: 'Heera', pbt_cr: 540 },
-    { field: 'Mehsana Onshore', pbt_cr: 320 },
-    { field: 'Cauvery Onshore', pbt_cr: -180 },
-    { field: 'Assam Shelf', pbt_cr: -450 },
+    { division: 'Petroleum Products', ebit_cr: 48620 },
+    { division: 'Pipelines Network', ebit_cr: 7450 },
+    { division: 'Natural Gas Marketing', ebit_cr: 1890 },
+    { division: 'Explosives & Cryogenics', ebit_cr: 640 },
+    { division: 'Overseas Exploration', ebit_cr: 410 },
+    { division: 'Alternative Energy', ebit_cr: 215 },
+    { division: 'Petrochemicals (Cycle Low)', ebit_cr: -620 },
+    { division: 'Green Hydrogen Pilot', ebit_cr: -185 },
   ],
 };
 
 /* ------------------------------------------------------------------ Reference Chart 3: Donut */
-// Executives by grade E1–E9 (from c1_donut_by_grade.json)
+// Downstream sales volume mix by product category (MMT)
 
 export const DONUT_SPEC: ChartSpec = {
   kind: 'donut',
-  category: 'grade',
-  value: 'count',
-  unit: 'Executives',
+  category: 'product',
+  value: 'volume_mmt',
+  unit: 'MMT',
   data: [
-    { grade: 'E1', count: 35 },
-    { grade: 'E2', count: 90 },
-    { grade: 'E3', count: 87 },
-    { grade: 'E4', count: 67 },
-    { grade: 'E5', count: 57 },
-    { grade: 'E6', count: 35 },
-    { grade: 'E7', count: 33 },
-    { grade: 'E8', count: 12 },
-    { grade: 'E9', count: 3 },
+    { product: 'HSD (Diesel)', volume_mmt: 41.2 },
+    { product: 'MS (Petrol)', volume_mmt: 17.8 },
+    { product: 'LPG (Indane)', volume_mmt: 15.4 },
+    { product: 'ATF (Aviation)', volume_mmt: 4.9 },
+    { product: 'Naphtha', volume_mmt: 4.1 },
+    { product: 'Petrochemicals', volume_mmt: 3.3 },
+    { product: 'FO / Bitumen / Lubes', volume_mmt: 6.8 },
   ],
 };
 
 /* ------------------------------------------------------------------ Reference Chart 4: Line */
-// Revenue FY17–FY26 (unit ₹ Cr)
+// IOCL Standalone Revenue FY17–FY26 (₹ Cr)
 
 export const LINE_SPEC: ChartSpec = {
   kind: 'line',
@@ -110,77 +106,77 @@ export const LINE_SPEC: ChartSpec = {
   value: 'revenue_cr',
   unit: '₹ Cr',
   data: [
-    { fiscal_year: 'FY17', revenue_cr: 77908 },
-    { fiscal_year: 'FY18', revenue_cr: 85004 },
-    { fiscal_year: 'FY19', revenue_cr: 109655 },
-    { fiscal_year: 'FY20', revenue_cr: 96214 },
-    { fiscal_year: 'FY21', revenue_cr: 68141 },
-    { fiscal_year: 'FY22', revenue_cr: 110345 },
-    { fiscal_year: 'FY23', revenue_cr: 155517 },
-    { fiscal_year: 'FY24', revenue_cr: 138402 },
-    { fiscal_year: 'FY25', revenue_cr: 142100 },
-    { fiscal_year: 'FY26', revenue_cr: 148500 },
+    { fiscal_year: 'FY17', revenue_cr: 445443 },
+    { fiscal_year: 'FY18', revenue_cr: 506428 },
+    { fiscal_year: 'FY19', revenue_cr: 605924 },
+    { fiscal_year: 'FY20', revenue_cr: 566950 },
+    { fiscal_year: 'FY21', revenue_cr: 514890 },
+    { fiscal_year: 'FY22', revenue_cr: 728460 },
+    { fiscal_year: 'FY23', revenue_cr: 934953 },
+    { fiscal_year: 'FY24', revenue_cr: 866345 },
+    { fiscal_year: 'FY25', revenue_cr: 845513 },
+    { fiscal_year: 'FY26', revenue_cr: 867647 },
   ],
 };
 
 /* ------------------------------------------------------------------ Reference Chart 5: Histogram */
-// Employee age values (≥ 120 raw numbers between 22 and 60)
+// Refinery daily utilisation observations (%)
 
-const RAW_AGES: number[] = [
-  22, 23, 23, 24, 24, 25, 25, 25, 26, 26, 27, 27, 27, 28, 28, 28, 29, 29, 29, 30,
-  30, 30, 31, 31, 31, 32, 32, 32, 33, 33, 33, 34, 34, 34, 34, 35, 35, 35, 35, 36,
-  36, 36, 36, 37, 37, 37, 37, 38, 38, 38, 38, 39, 39, 39, 39, 40, 40, 40, 40, 41,
-  41, 41, 41, 42, 42, 42, 42, 43, 43, 43, 44, 44, 44, 45, 45, 45, 45, 46, 46, 46,
-  47, 47, 47, 48, 48, 48, 49, 49, 49, 50, 50, 50, 50, 51, 51, 51, 52, 52, 52, 53,
-  53, 53, 54, 54, 54, 55, 55, 55, 56, 56, 56, 57, 57, 57, 58, 58, 58, 59, 59, 60,
-  60, 24, 28, 32, 35, 38, 42, 45, 48, 52, 55, 58,
+const RAW_UTIL_PCT: number[] = [
+  84, 86, 88, 90, 91, 92, 93, 94, 95, 95, 96, 96, 97, 97, 98, 98, 99, 99, 99, 100,
+  100, 100, 101, 101, 101, 102, 102, 102, 103, 103, 103, 104, 104, 104, 104, 105, 105, 105, 105, 106,
+  106, 106, 106, 107, 107, 107, 107, 108, 108, 108, 108, 109, 109, 109, 109, 110, 110, 110, 110, 111,
+  111, 111, 111, 112, 112, 112, 112, 113, 113, 113, 114, 114, 114, 105, 106, 107, 108, 109, 110, 104,
+  103, 102, 101, 100, 99, 98, 97, 96, 95, 94, 93, 92, 91, 102, 103, 104, 105, 106, 107, 108,
+  105, 106, 107, 108, 109, 110, 104, 105, 106, 107, 108, 103, 102, 101, 100, 99, 104, 105, 106, 107,
+  108, 96, 98, 100, 102, 104, 106, 108, 110, 112, 101, 103,
 ];
 
 export const HISTOGRAM_SPEC: ChartSpec = {
   kind: 'histogram',
-  value: 'age',
-  unit: 'Years',
-  data: RAW_AGES.map((age) => ({ age })),
+  value: 'utilisation_pct',
+  unit: '%',
+  data: RAW_UTIL_PCT.map((utilisation_pct) => ({ utilisation_pct })),
 };
 
 /* ------------------------------------------------------------------ Reference Chart 6: Treemap */
-// Capex by asset (8 rows)
+// Refining nameplate capacity by unit (MMTPA)
 
 export const TREEMAP_SPEC: ChartSpec = {
   kind: 'treemap',
-  category: 'asset',
-  value: 'capex_cr',
-  unit: '₹ Cr',
+  category: 'refinery',
+  value: 'capacity_mmtpa',
+  unit: 'MMTPA',
   data: [
-    { asset: 'Mumbai High', capex_cr: 14200 },
-    { asset: 'Bassein & Satellite', capex_cr: 8650 },
-    { asset: 'KG-DWN-98/2', capex_cr: 9800 },
-    { asset: 'Neelam & Heera', capex_cr: 5120 },
-    { asset: 'Assam Asset', capex_cr: 4200 },
-    { asset: 'Cambay Basin', capex_cr: 3450 },
-    { asset: 'Cauvery Asset', capex_cr: 2750 },
-    { asset: 'Tripura Asset', capex_cr: 1850 },
+    { refinery: 'Paradip', capacity_mmtpa: 15.0 },
+    { refinery: 'Panipat', capacity_mmtpa: 15.0 },
+    { refinery: 'Koyali', capacity_mmtpa: 13.7 },
+    { refinery: 'Mathura', capacity_mmtpa: 8.0 },
+    { refinery: 'Haldia', capacity_mmtpa: 8.0 },
+    { refinery: 'Barauni', capacity_mmtpa: 6.0 },
+    { refinery: 'Bongaigaon', capacity_mmtpa: 2.7 },
+    { refinery: 'Guwahati & Digboi', capacity_mmtpa: 1.85 },
   ],
 };
 
 /* ------------------------------------------------------------------ Reference Chart 7: Ranked H-Bar */
-// Non-diverging ranked hbar: Headcount by discipline (9 positive rows, with "Others (6)" as largest value)
+// Refinery capacity & petrochemical integration ranked index
 
 export const RANKED_SPEC: ChartSpec = {
   kind: 'hbar',
-  category: 'discipline',
-  value: 'headcount',
-  unit: 'Executives',
+  category: 'unit',
+  value: 'throughput_mmt',
+  unit: 'MMT',
   sort: 'desc',
   data: [
-    { discipline: 'Production', headcount: 1850 },
-    { discipline: 'Drilling', headcount: 1620 },
-    { discipline: 'Mechanical', headcount: 1410 },
-    { discipline: 'Geology', headcount: 1180 },
-    { discipline: 'Geophysics', headcount: 950 },
-    { discipline: 'Finance & Accounts', headcount: 820 },
-    { discipline: 'Human Resources', headcount: 690 },
-    { discipline: 'Chemistry', headcount: 530 },
-    { discipline: 'Others (6)', headcount: 2400 },
+    { unit: 'Paradip Refinery', throughput_mmt: 15.82 },
+    { unit: 'Panipat Refinery', throughput_mmt: 15.41 },
+    { unit: 'Koyali Refinery', throughput_mmt: 15.18 },
+    { unit: 'Mathura Refinery', throughput_mmt: 9.15 },
+    { unit: 'Haldia Refinery', throughput_mmt: 8.42 },
+    { unit: 'Barauni Refinery', throughput_mmt: 6.51 },
+    { unit: 'Bongaigaon Refinery', throughput_mmt: 2.84 },
+    { unit: 'Guwahati Refinery', throughput_mmt: 1.38 },
+    { unit: 'Digboi Refinery', throughput_mmt: 0.74 },
   ],
 };

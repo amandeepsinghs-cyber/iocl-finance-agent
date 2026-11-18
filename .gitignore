@@ -3,9 +3,12 @@ node_modules/
 .next/
 out/
 !financial_ssot/out/
+financial_ssot/out/*_embeddings.jsonl
 !financial_ssot/out/fact_snapshot.parquet
 !financial_ssot/out/fact_wacc_annual.parquet
 !financial_ssot/out/fact_wacc_input.parquet
+!financial_ssot/out/fact_retail_fuel_prices.parquet
+!financial_ssot/out/fact_fuel_price_buildup.parquet
 .venv/
 venv/
 __pycache__/
@@ -27,7 +30,7 @@ dataform/node_modules/
 .df-credentials.json
 service-account*.json
 
-# --- Heavy generated data (regenerate via data_bank/generators; backed up in gs://ongc-hr-finance-agent-landing) ---
+# --- Heavy generated data (regenerate via data_bank/generators; backed up in gs://yukti-finance-iocl-landing) ---
 data_bank/landing/**
 !data_bank/landing/**/
 !data_bank/landing/**/*.yaml

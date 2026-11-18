@@ -139,6 +139,14 @@ async def create_job(req: CreateJobRequest, request: Request):
 
     pa = session.pending_actions.get(req.proposed_action_id)
     if not pa:
+        store = get_job_store()
+        for existing in store.list_jobs(session.session_id):
+            if (
+                existing.get("proposed_action_id") == req.proposed_action_id
+                and existing.get("status") not in ("failed", "cancelled", "expired")
+            ):
+                _assert_job_owner(existing, principal, session_id=session.session_id)
+                return {"job": existing}
         raise HTTPException(status_code=410, detail="Proposal not found or expired")
 
     if _is_expired(pa.get("expires_at")):
@@ -168,6 +176,7 @@ async def create_job(req: CreateJobRequest, request: Request):
         pa_to_run["owner_persona"] = server_persona
         pa_to_run["owner_emp_id"] = principal.emp_id
         job = await executor.submit_job(pa_to_run, session.session_id)
+        session.pending_actions.pop(req.proposed_action_id, None)
         return {"job": job}
     except ValueError as e:
         raise HTTPException(status_code=429, detail=str(e))

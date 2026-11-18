@@ -13,7 +13,7 @@ SELECT
     COUNT(DISTINCT IF(v.has_breached_cluster_10yr_cap AND DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25, v.emp_id, NULL)) AS non_exempt_to_rotate,
     COUNT(DISTINCT v.emp_id) - COUNT(DISTINCT IF(v.has_breached_cluster_10yr_cap AND DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25, v.emp_id, NULL)) AS executives_after_rotation,
     ROUND(-100 * COUNT(DISTINCT IF(v.has_breached_cluster_10yr_cap AND DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25, v.emp_id, NULL)) / COUNT(DISTINCT v.emp_id), 1) AS net_change_pct
-FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure` v
+FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure` v
 JOIN dim_grade g ON g.grade_id = v.current_grade_id
 WHERE v.is_currently_in_cluster AND LOWER(g.cadre) = 'executive'
 GROUP BY v.cluster_name, v.cluster_id

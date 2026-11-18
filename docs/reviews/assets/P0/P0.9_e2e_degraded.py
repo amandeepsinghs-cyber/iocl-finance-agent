@@ -33,7 +33,7 @@ async def main():
         "table_rows": len(rows), "chart_points": len(chart_rows),
         "numbers_in_text": nums,
         "status_events": c.get("status_events"),
-        "leaks": [m for m in ("Reauthentication", "RefreshError", "Traceback", "invalid.json", "ongc-hr-finance-agent",
+        "leaks": [m for m in ("Reauthentication", "RefreshError", "Traceback", "invalid.json", "yukti-finance-iocl",
                               "DefaultCredentialsError") if m in json.dumps({k: c.get(k) for k in ("display_text", "spoken_summary", "insights", "visual")}, ensure_ascii=False)],
     }, ensure_ascii=False, indent=1))
 

@@ -72,12 +72,12 @@
   "email_draft": {
     "from": {
       "name": "Arun Mehra, Chairman & Managing Director",
-      "email": "cmd@ongc.example"
+      "email": "chairman@indianoil.example"
     },
     "to": [
       {
-        "name": "Director (HR)",
-        "email": "director.hr@ongc.example"
+        "name": "Director (Finance)",
+        "email": "director.finance@indianoil.example"
       }
     ],
     "cc": [],

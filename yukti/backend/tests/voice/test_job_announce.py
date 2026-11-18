@@ -92,7 +92,7 @@ def test_spec03_regex_table_en_hinglish_devanagari():
     }
 
     # Unrelated question stays None
-    assert detect_confirm_intent("what is ONGC revenue in FY26?") is None
+    assert detect_confirm_intent("what is IOCL revenue in FY26?") is None
 
 
 @pytest.mark.asyncio
@@ -112,7 +112,7 @@ async def test_voice_confirm_starts_job_and_announces_verbatim_zero_duplicate_bu
         "id": pa_id,
         "agent": "dcf_agent",
         "agent_version": "dcf-v1.0.0",
-        "summary": "Run 10-year standalone + SOTP DCF valuation for ONGC.",
+        "summary": "Run 10-year standalone + SOTP DCF valuation for IOCL.",
         "est_seconds": 8,
         "requires_role": ["CMD", "DIR_FIN"],
         "inputs": {"wacc_pct": 10.5, "terminal_g_pct": 3.0, "brent_usd": 75.0},

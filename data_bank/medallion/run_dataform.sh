@@ -8,7 +8,7 @@ DF_DIR="$BASE_DIR/medallion/dataform"
 
 echo "=========================================================="
 echo " Starting ONGC Dataform Medallion Pipeline (Silver & Gold)"
-echo " Project: ongc-hr-finance-agent | Location: asia-south1"
+echo " Project: yukti-finance-iocl | Location: asia-south1"
 echo "=========================================================="
 
 export PATH="$HOME/.local/bin:$PATH"

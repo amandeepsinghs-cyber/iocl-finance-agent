@@ -8,7 +8,7 @@
 WITH lc AS (
   SELECT SAFE_CAST(REGEXP_EXTRACT(REGEXP_REPLACE(text, r'\s+', ' '),
                    r'483rd.*?Executives up to E-6 level (\d+)') AS INT64) AS local_conveyance_per_day_inr
-  FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+  FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
   WHERE doc_id = 'P1-16' AND clause_ref = 'Part 19'
 ),
 cl AS (

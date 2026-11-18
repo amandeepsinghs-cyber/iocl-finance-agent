@@ -143,7 +143,7 @@ def test_rupee_benchmark_and_overlay():
 @pytest.mark.parametrize("q", [
     "I see that the oil price is decreasing, even then the revenue is not decreasing. Why not?",
     "Why did revenue hold up while oil prices fell?",
-    "Explain why ONGC revenue didn't fall despite lower Brent",
+    "Explain why IOCL revenue didn't fall despite lower Brent",
 ])
 def test_detect_revenue_drivers(q):
     assert rd.detect_revenue_drivers(q) == {"kind": "drivers", "years": 5}
@@ -180,12 +180,12 @@ def test_drivers_contract_math(monkeypatch):
     monkeypatch.setattr(rd, "get_oil_prices", lambda b: {"fy_series": [{"fy": k, "avg": v, "provisional": False} for k, v in fx[b].items()]})
     c = rd.build_drivers_contract({"years": 5}, "CMD", "t", "en", 0.0)
     assert "From FY23 to FY26, Brent fell 27% in dollars" in c["spoken_summary"]
-    assert "revenue fell only 15%" in c["spoken_summary"] and "rupee weakened 10%" in c["spoken_summary"]
+    assert "revenue moved −15%" in c["spoken_summary"] and "rupee weakened 10%" in c["spoken_summary"]
     data = c["visual"]["chart"]["data"]
-    assert data[0]["ongc_revenue"] == 100.0 and data[-1]["rupees_per_dollar"] == round(88.37 / 74.51 * 100, 1)
+    assert data[0]["iocl_revenue"] == 100.0 and data[-1]["rupees_per_dollar"] == round(88.37 / 74.51 * 100, 1)
     assert any("₹11,054 cr in FY23 vs ₹63 cr in FY26" in i for i in c["insights"])
     m = rd.build_mix_contract({"years": 5}, "CMD", "t", "en", 0.0)
-    assert m["visual"]["chart"]["kind"] == "stacked_bar" and "natural gas grew from 11% to 27%" in m["spoken_summary"]
+    assert m["visual"]["chart"]["kind"] == "stacked_bar" and "petrochemicals moved from 11.3% to 27.4%" in m["spoken_summary"]
 
 
 def test_indian_grouping():
@@ -221,7 +221,7 @@ def _sess(latest=True):
 
 @pytest.mark.parametrize("q,intent,extra", [
     ("What are the drivers of the valuation?", "drivers", None),
-    ("Why is ONGC overvalued?", "explain", "bridge"),
+    ("Why is IOCL overvalued?", "explain", "bridge"),
     ("How much of the value comes from terminal value?", "explain", "terminal"),
     ("What is the WACC made of?", "explain", "wacc"),
     ("what if WACC is 12%", "whatif", {"wacc_pct": 12.0}),
@@ -248,7 +248,7 @@ def test_dcf_followup_needs_a_dcf_and_leaves_other_topics():
 
 def test_dcf_drivers_answer_uses_engine_numbers():
     c = fu.answer_drivers(fu.facts_from_visual(_VIS), "t", "CMD", "en", 0.0)
-    assert c["visual"]["type"] == "tornado" and c["visual"]["tornado"]["bars"][0]["driver"] == "Production trend"
+    assert c["visual"]["type"] == "tornado" and c["visual"]["tornado"]["bars"][0]["driver"] == "Refining & marketing volume trend"
     assert "₹685 to ₹17 per share" in c["spoken_summary"] and "33% of enterprise value" in c["spoken_summary"]
 
 
@@ -274,7 +274,7 @@ def test_dcf_whatif_reruns_engine(monkeypatch):
     d = fu.detect_dcf_followup("What if Brent is $60?", _sess())
     c = fu.answer_dcf_followup(d, "What if Brent is $60?", "CMD", "t", "en", 0.0)
     assert calls["o"] == {"brent_usd": 60.0}
-    assert "from ₹233 to ₹107 per share" in c["spoken_summary"] and c["visual"]["type"] == "kpi"
+    assert "from ₹233 to ₹107 per share" in c["spoken_summary"] and c["visual"]["type"] == "dcf_model"
 
 
 def test_whatif_rejects_growth_above_wacc():

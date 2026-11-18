@@ -5,7 +5,7 @@ import { ClauseSpec } from '@/contracts/answerContract';
 import { Copy, Check, ShieldCheck, Scale, ChevronDown, ChevronRight, FileText, Info } from 'lucide-react';
 
 // P0.7 (BUG-31, D-35): clauses are "Illustrative" unless the backend explicitly marks them "real".
-const ILLUSTRATIVE_TOOLTIP = "Synthetic clause for demo; ONGC's text is not public.";
+const ILLUSTRATIVE_TOOLTIP = "Illustrative policy clause for IOCL demo; internal rulebook text is not public.";
 
 interface ClauseRendererProps {
   clause: ClauseSpec;
@@ -46,11 +46,11 @@ export const ClauseRenderer: React.FC<ClauseRendererProps> = ({ clause, isDark =
             <Scale className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-xs uppercase font-bold tracking-wider text-ongc-maroon">
-              {clause.doc_id || 'ONGC Policy Manual'}
+            <div className="text-xs uppercase font-bold tracking-wider text-accent">
+              {clause.doc_id || 'IOCL Finance Policy'}
             </div>
             <h3 className="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {clause.doc_title || clause.doc_id || 'ONGC policy clause'}
+              {clause.doc_title || clause.doc_id || 'IOCL policy clause'}
             </h3>
           </div>
         </div>
@@ -139,7 +139,7 @@ export const ClauseRenderer: React.FC<ClauseRendererProps> = ({ clause, isDark =
             <ShieldCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <div>
               <span className="font-semibold text-zinc-800 dark:text-zinc-200">Legal Authority: </span>
-              This clause has statutory force across all ONGC business units and cadres under {clause.doc_id || 'ONGC Corporate Policy'} governance.
+              This clause applies across IndianOil refineries, pipelines, marketing and finance divisions under {clause.doc_id || 'IOCL Finance & Governance Policy'} governance.
             </div>
           </div>
         )}

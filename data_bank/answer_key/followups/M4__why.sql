@@ -9,6 +9,6 @@ SELECT
     clause_ref,
     heading,
     REGEXP_EXTRACT(text, r'\n\n([\s\S]*?) \(\d+\.1\)') AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'BDP summary' AND clause_ref = 'Clause 8.0'
 ORDER BY clause_ref;

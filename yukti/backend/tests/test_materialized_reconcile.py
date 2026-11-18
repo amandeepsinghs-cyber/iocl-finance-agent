@@ -1,214 +1,120 @@
-"""BigQuery Reconciliation Test for Materialized Summary Tables in hrfin_gold.
-Verifies exact mathematical alignment against underlying views and silver tables:
-(a) agg_headcount_tenure: Delhi WC-DEL >=60m executives = 419 total / 17 exempt / 402 due
-(b) agg_field_pnl: FY26 Champang PBT = v_field_pnl value, and FY26 field sums match
-(c) agg_lifting_cost: company FY26 lifting cost/boe equals v_lifting_cost (within +-0.5%)
-(d) agg_vacancies: totals equal sanctioned_posts sums per FY
+"""BigQuery Reconciliation Test for IOCL Downstream 360 & Finance Gold Tables in yukti-finance-iocl.
+
+Verifies exact mathematical alignment across BigQuery gold tables/views:
+(a) ssot_refinery_economics_360 vs v_refinery_pnl_v3 (9 refineries, 75.451 MMT throughput, weighted GRM $10.85/bbl in FY26)
+(b) fact_financial_statement_line vs v_fin_trend_latest & zero unresolved conflicts (FY26 Rev Ops 886,224.41 Cr, PAT 36,802.42 Cr)
+(c) fact_marketing_sales & fact_segment reconciliation in FY26 (105.117 MMT marketing sales)
+(d) fact_wacc_annual (9.2534% FY26) & fact_mou_scorecard (12 KPIs x 2 FYs = 24 rows)
 """
 
 from decimal import Decimal
-import os
 from pathlib import Path
 import sys
 from google.cloud import bigquery
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from app.config import BQ_GOLD_DATASET, BQ_SILVER_DATASET, JOB_LABELS
-
-PROJECT_ID = "ongc-hr-finance-agent"
-LOCATION = "asia-south1"
+from app.config import BQ_GOLD_DATASET, BQ_LOCATION, GCP_PROJECT, JOB_LABELS
 
 
 @pytest.fixture(scope="module")
 def bq_client():
     return bigquery.Client(
-        project=PROJECT_ID,
-        location=LOCATION,
+        project=GCP_PROJECT,
+        location=BQ_LOCATION,
         default_query_job_config=bigquery.QueryJobConfig(labels=JOB_LABELS),
     )
 
 
-def test_reconcile_headcount_tenure(bq_client):
-    """(a) agg_headcount_tenure: Delhi WC-DEL >=60 months executives = 419 / 17 / 401 due (1 valid tag), reconciling to frozen answer key."""
-    sql_agg = f"""
-    SELECT
-        SUM(total_executives) as total,
-        SUM(exempt_retiring_3yr) as exempt,
-        SUM(exempt_valid_tag) as exempt_tag,
-        SUM(non_exempt_due_transfer) as non_exempt
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.agg_headcount_tenure_summary`
-    WHERE wc_id = 'WC-DEL' AND continuous_stay_months >= 60 AND grade_id LIKE 'E%';
-    """
-    row_agg = list(bq_client.query(sql_agg).result())[0]
-
-    assert row_agg["total"] == 419, f"Expected 419 total, got {row_agg['total']}"
-    assert row_agg["exempt"] == 17, f"Expected 17 exempt retiring, got {row_agg['exempt']}"
-    assert row_agg["exempt_tag"] == 1, f"Expected 1 exempt tag, got {row_agg['exempt_tag']}"
-    assert row_agg["non_exempt"] == 401, f"Expected 401 non-exempt due, got {row_agg['non_exempt']}"
-
-
-def test_reconcile_field_pnl(bq_client):
-    """(b) Field economics FY rollup (`v_field_economics_fy` in `_v3`, or legacy `agg_field_pnl_summary` in v2)
-    reconciles with `ssot_field_economics_360` and FY26 `PL.REV_OPS` (`132,508.14` Cr).
-    """
-    if BQ_GOLD_DATASET.endswith("_v3"):
-        sql_null_months = f"""
-        SELECT COUNTIF(month_start IS NULL) AS null_months
-        FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.ssot_field_economics_360`
-        """
-        null_months = list(bq_client.query(sql_null_months).result())[0]["null_months"]
-        assert null_months == 0, f"Expected 0 null month_start rows in {BQ_GOLD_DATASET}.ssot_field_economics_360, got {null_months}"
-
-        sql_champang_fy = f"""
-        SELECT ROUND(field_pbt_cr, 2) AS pbt_cr
-        FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.v_field_economics_fy`
-        WHERE fiscal_year = 'FY26' AND object_name = 'Champang'
-        """
-        pbt_fy = list(bq_client.query(sql_champang_fy).result())[0]["pbt_cr"]
-
-        sql_champang_ssot = f"""
-        SELECT ROUND(SUM(pbt_contrib) / 10.0, 2) AS pbt_cr
-        FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.ssot_field_economics_360`
-        WHERE fiscal_year = 'FY26' AND object_name = 'Champang'
-        """
-        pbt_ssot = list(bq_client.query(sql_champang_ssot).result())[0]["pbt_cr"]
-        assert pbt_fy == Decimal("30.75")
-        assert pbt_fy == pbt_ssot
-
-        sql_sums_fy = f"""
-        SELECT
-            COUNTIF(object_type = 'field') AS field_count,
-            ROUND(SUM(field_revenue_cr), 2) AS sum_rev,
-            ROUND(SUM(field_ebitda_cr), 2) AS sum_ebitda,
-            ROUND(SUM(field_pbt_cr), 2) AS sum_pbt
-        FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.v_field_economics_fy`
-        WHERE fiscal_year = 'FY26'
-        """
-        sums_fy = list(bq_client.query(sql_sums_fy).result())[0]
-
-        sql_sums_ssot = f"""
-        SELECT
-            COUNT(DISTINCT IF(object_type = 'field', object_id, NULL)) AS field_count,
-            ROUND(SUM(revenue_from_operations) / 10.0, 2) AS sum_rev,
-            ROUND(SUM(ebitda) / 10.0, 2) AS sum_ebitda,
-            ROUND(SUM(pbt_contrib) / 10.0, 2) AS sum_pbt
-        FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.ssot_field_economics_360`
-        WHERE fiscal_year = 'FY26'
-        """
-        sums_ssot = list(bq_client.query(sql_sums_ssot).result())[0]
-
-        assert sums_fy["field_count"] == 53
-        assert sums_fy["field_count"] == sums_ssot["field_count"]
-        assert sums_fy["sum_rev"] == Decimal("132508.14")
-        assert sums_fy["sum_rev"] == sums_ssot["sum_rev"]
-        assert sums_fy["sum_ebitda"] == sums_ssot["sum_ebitda"]
-        assert sums_fy["sum_pbt"] == sums_ssot["sum_pbt"]
-        return
-
-    # Check Champang (legacy v2 dataset)
-    sql_champang_agg = f"""
-    SELECT recomputed_pbt_inr_cr
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.agg_field_pnl_summary`
-    WHERE fiscal_year = 'FY26' AND field_name = 'Champang';
-    """
-    pbt_agg = list(bq_client.query(sql_champang_agg).result())[0]["recomputed_pbt_inr_cr"]
-
-    sql_champang_ssot = f"""
-    SELECT recomputed_pbt_inr_cr
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.ssot_field_economics_360`
-    WHERE fiscal_year = 'FY26' AND field_name = 'Champang';
-    """
-    pbt_ssot = list(bq_client.query(sql_champang_ssot).result())[0]["recomputed_pbt_inr_cr"]
-
-    assert pbt_agg == Decimal("-183.27")
-    assert pbt_agg == pbt_ssot
-
-    # Check FY26 field sums against ssot_field_economics_360
-    sql_sums_agg = f"""
-    SELECT
-        COUNT(*) as field_count,
-        ROUND(SUM(recomputed_gross_revenue_inr_cr), 2) as sum_rev,
-        ROUND(SUM(recomputed_ebitda_inr_cr), 2) as sum_ebitda,
-        ROUND(SUM(recomputed_pbt_inr_cr), 2) as sum_pbt
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.agg_field_pnl_summary`
-    WHERE fiscal_year = 'FY26';
-    """
-    sums_agg = list(bq_client.query(sql_sums_agg).result())[0]
-
-    sql_sums_ssot = f"""
-    SELECT
-        COUNT(*) as field_count,
-        ROUND(SUM(recomputed_gross_revenue_inr_cr), 2) as sum_rev,
-        ROUND(SUM(recomputed_ebitda_inr_cr), 2) as sum_ebitda,
-        ROUND(SUM(recomputed_pbt_inr_cr), 2) as sum_pbt
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.ssot_field_economics_360`
-    WHERE fiscal_year = 'FY26' AND field_id IS NOT NULL;
-    """
-    sums_ssot = list(bq_client.query(sql_sums_ssot).result())[0]
-
-    assert sums_agg["field_count"] == 53
-    assert sums_agg["sum_rev"] == sums_ssot["sum_rev"]
-    assert sums_agg["sum_ebitda"] == sums_ssot["sum_ebitda"]
-    assert sums_agg["sum_pbt"] == sums_ssot["sum_pbt"]
-
-
-def test_reconcile_lifting_cost(bq_client):
-    """(c) agg_lifting_cost: company FY26 lifting cost/boe equals v_lifting_cost (within +-0.5%)."""
-    sql_agg = f"""
-    SELECT
-        ROUND(SUM(total_opex_inr_cr * 10000000.0) / NULLIF(SUM(total_production_boe), 0), 2) as lifting_cost_inr_boe,
-        ROUND(SUM(total_opex_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) as lifting_cost_usd_boe
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.agg_lifting_cost_summary`
-    WHERE fiscal_year = 'FY26';
-    """
-    res_agg = list(bq_client.query(sql_agg).result())[0]
-
+def test_reconcile_refinery_economics(bq_client):
+    """(a) 9 standalone refineries in FY26: 75.451 MMT throughput, $10.85/bbl weighted GRM, exact SSOT/view match."""
     sql_view = f"""
     SELECT
-        ROUND(SUM(total_opex_inr_cr * 10000000.0) / NULLIF(SUM(total_production_boe), 0), 2) as lifting_cost_inr_boe,
-        ROUND(SUM(total_opex_inr_cr * 10000000.0 / 88.33) / NULLIF(SUM(total_production_boe), 0), 2) as lifting_cost_usd_boe
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.v_lifting_cost`
+        COUNT(*) AS n_refineries,
+        ROUND(SUM(throughput_mmt), 3) AS sum_throughput_mmt,
+        ROUND(SUM(grm_usd_bbl * throughput_mmt) / NULLIF(SUM(throughput_mmt), 0), 2) AS weighted_grm,
+        ROUND(SUM(ebitda_inr_cr), 2) AS sum_ebitda_cr,
+        ROUND(SUM(pbt_inr_cr), 2) AS sum_pbt_cr
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.v_refinery_pnl_v3`
+    WHERE fiscal_year = 'FY26' AND is_refinery = TRUE;
+    """
+    sql_ssot = f"""
+    SELECT
+        COUNT(*) AS n_refineries,
+        ROUND(SUM(throughput_mmt), 3) AS sum_throughput_mmt,
+        ROUND(SUM(grm_usd_bbl * throughput_mmt) / NULLIF(SUM(throughput_mmt), 0), 2) AS weighted_grm,
+        ROUND(SUM(ebitda_inr_cr), 2) AS sum_ebitda_cr,
+        ROUND(SUM(pbt_inr_cr), 2) AS sum_pbt_cr
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.ssot_refinery_economics_360`
+    WHERE fiscal_year = 'FY26' AND is_refinery = TRUE;
+    """
+    r_view = dict(list(bq_client.query(sql_view).result())[0])
+    r_ssot = dict(list(bq_client.query(sql_ssot).result())[0])
+
+    assert r_view == r_ssot
+    assert r_view["n_refineries"] == 9
+    assert float(r_view["sum_throughput_mmt"]) == pytest.approx(75.451, abs=0.01)
+    assert float(r_view["weighted_grm"]) == pytest.approx(10.85, abs=0.05)
+
+
+def test_reconcile_financial_statements_and_zero_conflicts(bq_client):
+    """(b) FY26 P&L & Balance Sheet in v_fin_trend_latest tie with 0 unresolved SSOT conflicts."""
+    sql_conflicts = f"""
+    SELECT COUNTIF(LOWER(COALESCE(status, '')) != 'resolved') AS open_conflicts
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.fact_financial_line_conflict`;
+    """
+    open_conflicts = list(bq_client.query(sql_conflicts).result())[0]["open_conflicts"]
+    assert open_conflicts == 0
+
+    sql_trend = f"""
+    SELECT
+        MAX(IF(line_code = 'PL.REV_OPS', ROUND(COALESCE(value_inr_cr, value), 2), NULL)) AS rev_ops_cr,
+        MAX(IF(line_code = 'PL.PAT', ROUND(COALESCE(value_inr_cr, value), 2), NULL)) AS pat_cr,
+        MAX(IF(line_code = 'BS.TOTAL_ASSETS', ROUND(COALESCE(value_inr_cr, value), 2), NULL)) AS total_assets_cr,
+        MAX(IF(line_code = 'BS.TOTAL_EQ_LIAB', ROUND(COALESCE(value_inr_cr, value), 2), NULL)) AS total_eq_liab_cr
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.v_fin_trend_latest`
+    WHERE scope = 'standalone' AND fiscal_year = 'FY26';
+    """
+    r = dict(list(bq_client.query(sql_trend).result())[0])
+    assert Decimal(str(r["rev_ops_cr"])) == Decimal("886224.41")
+    assert Decimal(str(r["pat_cr"])) == Decimal("36802.42")
+    assert r["total_assets_cr"] == r["total_eq_liab_cr"]
+
+
+def test_reconcile_marketing_and_segments(bq_client):
+    """(c) FY26 marketing sales across products and standalone Ind AS 108 segments match SSOT."""
+    sql_mkt = f"""
+    SELECT ROUND(SUM(sales_volume_mmt), 3) AS total_mmt
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.fact_marketing_sales`
     WHERE fiscal_year = 'FY26';
     """
-    res_view = list(bq_client.query(sql_view).result())[0]
+    mkt_mmt = float(list(bq_client.query(sql_mkt).result())[0]["total_mmt"])
+    assert mkt_mmt == pytest.approx(105.117, abs=0.05)
 
-    inr_diff_pct = abs(float(res_agg["lifting_cost_inr_boe"]) - float(res_view["lifting_cost_inr_boe"])) / float(res_view["lifting_cost_inr_boe"])
-    usd_diff_pct = abs(float(res_agg["lifting_cost_usd_boe"]) - float(res_view["lifting_cost_usd_boe"])) / float(res_view["lifting_cost_usd_boe"])
-
-    assert inr_diff_pct <= 0.005, f"INR diff pct {inr_diff_pct} exceeds 0.5%"
-    assert usd_diff_pct <= 0.005, f"USD diff pct {usd_diff_pct} exceeds 0.5%"
-
-
-def test_reconcile_vacancies(bq_client):
-    """(d) agg_vacancies: totals equal sanctioned_posts sums per FY."""
-    sql_agg = f"""
-    SELECT
-        fiscal_year,
-        SUM(total_sanctioned) as sum_sanctioned,
-        SUM(total_in_position) as sum_in_position,
-        SUM(total_vacancies) as sum_vacancies
-    FROM `{PROJECT_ID}.{BQ_GOLD_DATASET}.agg_vacancies_summary`
-    GROUP BY fiscal_year
-    ORDER BY fiscal_year DESC;
+    sql_seg = f"""
+    SELECT COUNT(DISTINCT segment_code) AS n_segments, ROUND(SUM(value_inr_cr), 2) AS total_seg_rev
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.fact_segment`
+    WHERE fiscal_year = 'FY26' AND scope = 'standalone' AND metric = 'segment_revenue';
     """
-    rows_agg = {r["fiscal_year"]: dict(r) for r in bq_client.query(sql_agg).result()}
+    r_seg = dict(list(bq_client.query(sql_seg).result())[0])
+    assert r_seg["n_segments"] >= 3
+    assert float(r_seg["total_seg_rev"]) > 0
 
-    sql_base = f"""
-    SELECT
-        fiscal_year,
-        SUM(sanctioned_strength) as sum_sanctioned,
-        SUM(in_position_strength) as sum_in_position,
-        SUM(vacancy_count) as sum_vacancies
-    FROM `{PROJECT_ID}.{BQ_SILVER_DATASET}.sanctioned_posts`
-    GROUP BY fiscal_year
-    ORDER BY fiscal_year DESC;
+
+def test_reconcile_wacc_and_mou_scorecard(bq_client):
+    """(d) FY26 WACC equals 9.2534% and MoU Scorecard holds 12 parameters x 2 FYs (24 rows)."""
+    sql_wacc = f"""
+    SELECT ROUND(wacc_pct, 4) AS wacc_pct
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.fact_wacc_annual`
+    WHERE fiscal_year = 'FY26' AND verified = TRUE;
     """
-    rows_base = {r["fiscal_year"]: dict(r) for r in bq_client.query(sql_base).result()}
+    wacc = float(list(bq_client.query(sql_wacc).result())[0]["wacc_pct"])
+    assert wacc == pytest.approx(9.2534, abs=1e-4)
 
-    for fy, base in rows_base.items():
-        assert fy in rows_agg
-        agg = rows_agg[fy]
-        assert agg["sum_sanctioned"] == base["sum_sanctioned"]
-        assert agg["sum_in_position"] == base["sum_in_position"]
-        assert agg["sum_vacancies"] == base["sum_vacancies"]
+    sql_mou = f"""
+    SELECT COUNT(*) AS n_rows, COUNT(DISTINCT parameter_id) AS n_params
+    FROM `{GCP_PROJECT}.{BQ_GOLD_DATASET}.fact_mou_scorecard`;
+    """
+    r_mou = dict(list(bq_client.query(sql_mou).result())[0])
+    assert r_mou["n_params"] == 12
+    assert r_mou["n_rows"] == 24

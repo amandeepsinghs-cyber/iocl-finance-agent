@@ -14,7 +14,7 @@
 
 WITH overdue AS (
     SELECT v.wc_id, v.emp_id
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
     WHERE v.is_current_stay = TRUE
       AND v.grade_id LIKE 'E%'
       AND v.continuous_stay_months >= 60

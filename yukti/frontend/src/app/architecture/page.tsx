@@ -14,17 +14,17 @@ export const metadata: Metadata = {
 const AI_ROLES: { part: string; kind: string; decides: string; numbers: string }[] = [
   { part: 'Gemini Live', kind: 'AI agent — the only one', decides: 'Listens and speaks; decides when to call Yukti’s tools (ask_yukti, ui_control, control_screen)', numbers: 'Never — it reads out what the tools return' },
   { part: 'Turn orchestrator', kind: 'Code', decides: 'Which specialist handles the question, in a fixed order', numbers: 'No' },
-  { part: 'Specialist modules', kind: 'Code, listed in an agent registry', decides: 'DCF valuation, finance diagnostics, HR transfers, exports, analyst queries', numbers: 'Yes — computed in code' },
-  { part: 'Gemini 2.5 Flash', kind: 'AI, called like a function', decides: 'Turns a question into a structured query plan; writes the explanation', numbers: 'No — every figure it mentions is checked against the data' },
-  { part: 'BigQuery', kind: 'Data', decides: 'ONGC HR and finance records, certified v3 datasets', numbers: 'Yes — the source of truth' },
-  { part: 'Yahoo Finance', kind: 'External data', decides: 'Brent, WTI and the rupee against the dollar', numbers: 'Yes — cached daily history' },
+  { part: 'Specialist modules', kind: 'Code, listed in an agent registry', decides: 'NSE:IOC DCF valuation, CFO finance diagnostics, exports, analyst queries', numbers: 'Yes — computed in code' },
+  { part: 'Gemini 3 Flash', kind: 'AI, called like a function', decides: 'Turns a question into a structured query plan; writes the explanation', numbers: 'No — every figure it mentions is checked against the data' },
+  { part: 'BigQuery', kind: 'Data + Vector RAG', decides: 'IndianOil 10-yr financials, Downstream 360 (9 refineries, marketing, pipelines), 8,437 AR chunks', numbers: 'Yes — the source of truth' },
+  { part: 'Yahoo Finance', kind: 'External data', decides: 'Brent, WTI, Singapore GRM, USD/INR and IOC.NS prices', numbers: 'Yes — cached daily history' },
 ];
 
 const FLOW: { step: string; detail: string }[] = [
   { step: 'You ask', detail: 'By voice or text. Your signed role travels with every question.' },
   { step: 'Gemini Live hands over', detail: 'It does not answer from memory; it calls ask_yukti with your question.' },
   { step: 'The orchestrator routes', detail: 'Down a fixed ladder of about 15 checks — control, access check, simple intents, specialists, then the AI planner — the first match answers. See “Inside the orchestrator” above.' },
-  { step: 'Numbers are computed', detail: 'Gemini 2.5 Flash writes a query plan, code compiles it to certified SQL, BigQuery returns the figures. DCF and market numbers come from their engines.' },
+  { step: 'Numbers are computed', detail: 'Gemini 3 Flash writes a query plan, code compiles it to certified SQL, BigQuery returns the figures. DCF and market numbers come from their engines.' },
   { step: 'The answer is checked', detail: 'Role-based masking is applied, and any number in the explanation that is not in the data is rejected.' },
   { step: 'You see and hear it', detail: 'Charts, tables and KPI cards appear on screen; Gemini Live reads the grounded answer aloud.' },
 ];
@@ -48,10 +48,10 @@ export default function ArchitecturePage() {
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/ongc_logo.png" alt="ONGC" className="w-12 h-12 rounded-[var(--radius-sm)] object-cover" />
+            <img src="/brand/iocl_logo.png" alt="IndianOil" className="w-12 h-12 rounded-[var(--radius-sm)] object-cover" />
             <div>
               <div className="font-display font-bold text-[1.4rem] text-[var(--brand-red)] leading-none">How Yukti works</div>
-              <div className="text-[0.85rem] text-[var(--ink-3)] mt-1">Yukti AI Agent · HR and Finance · architecture</div>
+              <div className="text-[0.85rem] text-[var(--ink-3)] mt-1">Yukti AI Agent · IndianOil Finance &amp; Downstream · architecture</div>
             </div>
           </div>
           <Link href="/" className="text-[0.85rem] font-semibold text-[var(--accent-deep)] hover:underline">
@@ -126,9 +126,9 @@ export default function ArchitecturePage() {
           <div className="rounded-[var(--radius-md)] border border-[var(--hairline)] bg-[var(--card)] p-4">
             <div className="font-semibold text-[var(--ink)]">Today: one agent, specialist modules</div>
             <p className="text-[0.88rem] mt-1">
-              The specialists — DCF valuation, finance diagnostics, HR transfers, document export and the analyst — are listed in an
+              The specialists — NSE:IOC DCF valuation, CFO finance diagnostics, document export and the analyst — are listed in an
               agent registry with their triggers, allowed roles and confirmation rules. Each one runs code, not its own language
-              model. That keeps every answer repeatable and auditable.
+              model. That keeps every answer repeatable and verifiable.
             </p>
           </div>
           <div className="rounded-[var(--radius-md)] border border-[var(--hairline)] bg-[var(--card)] p-4">
@@ -150,13 +150,13 @@ export default function ArchitecturePage() {
 
         <H2>Platform</H2>
         <p className="text-[0.92rem]">
-          Google Cloud project <code>ongc-hr-finance-agent</code>, region asia-south1. One Cloud Run service runs the Next.js web
+          Google Cloud project <code>yukti-finance-iocl</code>, region asia-south1. One Cloud Run service runs the Next.js web
           app and the FastAPI backend in a single container, behind Identity-Aware Proxy. Releases are built with Cloud Build,
           rolled out with no traffic first, then switched over, with one-step rollback.
         </p>
 
         <div className="mt-12 pt-4 border-t border-[var(--hairline)] text-[0.78rem] text-[var(--ink-3)]">
-          Yukti AI · ONGC HR and Finance · architecture as of 27 October 2026
+          Yukti AI · IndianOil Finance &amp; Downstream Intelligence · architecture as of 16 November 2026
         </div>
       </div>
     </main>

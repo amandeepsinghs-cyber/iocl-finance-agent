@@ -108,7 +108,7 @@ def test_v19_roster_xlsx_formats_widths_autofilter_and_definition_sheet(exporter
         "Name",
         "Designation",
         "Level",
-        "ONGC service (yrs)",
+        "IOCL service (yrs)",
         "Tenure in Delhi (yrs)",
         "Years to retirement",
         "Exemption",

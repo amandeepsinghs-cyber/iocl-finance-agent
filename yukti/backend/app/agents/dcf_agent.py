@@ -44,6 +44,10 @@ def build_dcf_assumptions_from_inputs(job_id: str, inputs: Dict[str, Any]) -> DC
                 source=orig_field.source,
                 edited_by_user=True,
             )
+    if "grm_usd_bbl" in inputs and inputs["grm_usd_bbl"] is not None:
+        updates["grm_usd_bbl"] = float(inputs["grm_usd_bbl"])
+    if "refining_throughput_mmt" in inputs and inputs["refining_throughput_mmt"] is not None:
+        updates["refining_throughput_mmt"] = float(inputs["refining_throughput_mmt"])
     return base.model_copy(update=updates)
 
 
@@ -92,7 +96,7 @@ async def dcf_job_runner(
     if not os.path.exists(EXPORTS_DIR):
         os.makedirs(EXPORTS_DIR)
 
-    xlsx_path = os.path.join(EXPORTS_DIR, f"ONGC_DCF_{job_id}.xlsx")
+    xlsx_path = os.path.join(EXPORTS_DIR, f"IOCL_DCF_{job_id}.xlsx")
     write_dcf_xlsx(res, xlsx_path)
 
     await emit_progress("publish", "Publishing results", 1.0)
@@ -105,7 +109,7 @@ async def dcf_job_runner(
 
     summary = (
         f"The DCF valuation is ready (illustrative valuation). Intrinsic value is ₹{iv:.2f} per share against "
-        f"a market price of ₹{px:.2f} (NSE close {mkt_date}), so the model suggests ONGC is {verdict} "
+        f"a market price of ₹{px:.2f} (NSE:IOC close {mkt_date}), so the model suggests IndianOil is {verdict} "
         f"by {abs(upside):.1f}%. Illustrative valuation, not investment advice."
     )
 
@@ -118,13 +122,13 @@ async def dcf_job_runner(
         "visual": {
             "type": "dcf_model",
             "mode": "replace",
-            "title": "ONGC Standalone DCF Valuation (Illustrative)",
+            "title": "IndianOil (NSE:IOC) Standalone DCF Valuation (Illustrative)",
             "dcf_model": build_dcf_model_spec(res, asm),
         },
         "access": {"status": "allowed"},
         "sources": [
-            {"kind": "data", "object": "hrfin_gold.fact_wacc_annual", "title": "ONGC WACC SSOT FY26"},
-            {"kind": "data", "object": "market_prices_seed.csv", "title": f"NSE Bhavcopy ONGC.NS ({mkt_date})"},
+            {"kind": "data", "object": "hrfin_gold.fact_wacc_annual", "title": "IOCL WACC SSOT FY26"},
+            {"kind": "data", "object": "market_prices_seed.csv", "title": f"NSE Bhavcopy IOC.NS ({mkt_date})"},
         ],
         "provenance": {
             "label": "illustrative",
@@ -136,7 +140,7 @@ async def dcf_job_runner(
             {
                 "export_id": job_id,
                 "kind": "xlsx",
-                "filename": f"ONGC_DCF_{job_id}.xlsx",
+                "filename": f"IOCL_DCF_{job_id}.xlsx",
             }
         ],
     }

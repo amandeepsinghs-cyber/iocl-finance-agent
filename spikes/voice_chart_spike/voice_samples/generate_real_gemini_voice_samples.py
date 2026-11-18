@@ -15,7 +15,7 @@ VOICE_DIR = Path(__file__).parent
 OUTPUT_DIR = VOICE_DIR / "real_gemini_voices"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or "ongc-hr-finance-agent"
+PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or "yukti-finance-iocl"
 LOCATION = os.getenv("TARGET_LOCATION") or "us-central1"
 
 C1_ENGLISH_PROMPT = (

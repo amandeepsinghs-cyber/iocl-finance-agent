@@ -1,12 +1,9 @@
 persona_id,emp_id,display_name,grade,function,discipline_id,wc_id,work_centre,functional_designation,tier,is_admin,synthetic,has_pay_fy26,has_leave_el,has_posting,has_apar,ok_pay,ok_leave,ok_posting,ok_apar,pay_fy26_months,leave_el_rows,leave_cl_rows,leave_hpl_rows,posting_rows,apar_rows
-CMD,EMP-000001,Arun Kumar Singh,CMD,EXEC,DISC-PRD,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Chairman & CEO,cmd,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
-DIR_HR,EMP-000002,Manish Patil,DIR,HR,DISC-HR,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Director (Human Resources),director,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
-DIR_FIN,EMP-000003,Anupam Agarwal,DIR,FIN,DISC-FIN,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Director (Finance),director,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
-E1_HR,EMP-100151,Dinesh Deshmukh,E1,HR,DISC-HR,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),HR Officer (E1),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,3,5
-E2_HR,EMP-102451,Pooja Verma,E2,HR,DISC-HR,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),HR Executive (E2),junior,False,True,True,True,True,True,True,True,True,True,12,1,0,0,1,5
-E3_HR,EMP-100144,Lokesh Verma,E3,HR,DISC-HR,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Senior HR Executive (E3),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,9,5
-E4_HR,EMP-100178,Umesh D. Bhatia,E4,HR,DISC-HR,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Dy. Manager HR (E4),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
-E1_FIN,EMP-100150,Ajay Deshmukh,E1,FIN,DISC-FIN,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Accounts Officer (E1),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,3,5
-E2_FIN,EMP-100152,Praveen Nair,E2,FIN,DISC-FIN,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Finance Executive (E2),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,8,5
-E3_FIN,EMP-100146,Shailesh E. Kapoor,E3,FIN,DISC-FIN,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Finance Officer (E3),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,8,5
-E4_FIN,EMP-100145,Santosh Banerjee,E4,FIN,DISC-FIN,WC-DEL,Corporate HQ Delhi (Deendayal Urja Bhawan),Dy. Manager Finance (E4),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,6,5
+CMD,EMP-000001,Arvinder Singh Sahney,CMD,EXEC,DISC-PRD,WC-DEL,"IndianOil Bhavan, Scope Complex, New Delhi","Chairman, IndianOil",cmd,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
+DIR_FIN,EMP-000003,Anuj Jain,DIR,FIN,DISC-FIN,WC-DEL,"IndianOil Bhavan, Scope Complex, New Delhi",Director (Finance) & CFO,director,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
+DIR_REF,EMP-000002,Arvind Kumar,DIR,OPS,DISC-REF,WC-DEL,"IndianOil Bhavan, Scope Complex, New Delhi",Director (Refineries),director,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
+DIR_MKT,EMP-000004,Saumitra P. Srivastava,DIR,MKT,DISC-MKT,WC-MUM,"IndianOil Bhavan, Bandra-Kurla Complex, Mumbai",Director (Marketing),director,False,True,True,True,True,True,True,True,True,True,12,8,8,4,5,5
+E1_FIN,EMP-100150,Ajay Deshmukh,A,FIN,DISC-FIN,WC-DEL,"IndianOil Bhavan, Scope Complex, New Delhi",Accounts Officer (Grade A),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,3,5
+E2_FIN,EMP-100152,Praveen Nair,B,FIN,DISC-FIN,WC-MUM,"IndianOil Bhavan, Bandra-Kurla Complex, Mumbai",Finance Officer — Pricing & Excise (Grade B),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,8,5
+E3_FIN,EMP-100146,Shailesh E. Kapoor,C,FIN,DISC-FIN,WC-DEL,"IndianOil Bhavan, Scope Complex, New Delhi",Manager Finance — Crude & Forex (Grade C),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,8,5
+E4_FIN,EMP-100145,Santosh Banerjee,D,FIN,DISC-FIN,WC-PNP,Panipat Refinery & Petrochemical Complex,Sr. Manager Finance — Refinery Costing (Grade D),junior,False,True,True,True,True,True,True,True,True,True,12,8,8,4,6,5

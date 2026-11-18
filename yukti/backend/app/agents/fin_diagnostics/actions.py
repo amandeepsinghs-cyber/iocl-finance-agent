@@ -17,19 +17,29 @@ from .expr import ExprError, evaluate, _prev_fy, _get_5yr_window
 
 
 LEVER_VAR_ALIASES: Dict[str, List[str]] = {
-    "OPEX.EXCH_LOSS": ["OPEX.EXCH_LOSS", "PL.EXCHANGE_LOSS_10YR", "PL.EXCHANGE_LOSS", "EXP.EXCHANGE_LOSS"],
-    "OPEX.PROVISIONS": ["OPEX.PROVISIONS", "PL.PROVISIONS_WRITEOFF", "PL.PROVISIONS"],
-    "EXPL.WELLS": ["EXPL.WELLS", "PL.EXPL_WELL"],
-    "PL.OPEX": ["PL.OPEX", "PL.OPEX_10YR", "EXP.OPERATING"],
-    "RATIO.DEBTOR_DAYS": ["RATIO.DEBTOR_DAYS", "RATIO.DEBTORS_TURNOVER_DAYS", "DEBTOR_DAYS"],
+    "PL.OTHER_EXP": ["PL.OTHER_EXP", "PL.OTHER_EXP_10YR"],
+    "RATIO.DEBTORS_TURNOVER_DAYS": ["RATIO.DEBTORS_TURNOVER_DAYS", "RATIO.DEBTOR_DAYS"],
+    "RATIO.DEBTOR_DAYS": ["RATIO.DEBTORS_TURNOVER_DAYS", "RATIO.DEBTOR_DAYS"],
+    "RATIO.INVENTORY_DAYS": ["RATIO.INVENTORY_DAYS"],
     "BS.INVENTORIES": ["BS.INVENTORIES", "BS.INVENTORY"],
     "PL.REV_OPS": ["PL.REV_OPS", "REV_OPS"],
-    "PROD.TOTAL_BOE": ["PROD.TOTAL_BOE", "QTY.TOTAL_BOE"],
-    "BS.CWIP_TOTAL": ["BS.CWIP_TOTAL", "BS.CWIP"],
-    "CF.CAPEX": ["CF.CAPEX", "CAPEX.TOTAL", "OTH.CAPEX"],
+    "REV.NET_OF_EXCISE": ["REV.NET_OF_EXCISE"],
+    "BS.CWIP_TOTAL": ["BS.CWIP", "BS.CWIP_TOTAL"],
+    "BS.CWIP": ["BS.CWIP", "BS.CWIP_TOTAL"],
+    "CF.CAPEX": ["CAPEX.TOTAL", "CF.CAPEX", "OTH.CAPEX"],
+    "CAPEX.TOTAL": ["CAPEX.TOTAL", "CF.CAPEX"],
     "PL.EMP_BENEFIT": ["PL.EMP_BENEFIT", "OTH.EMP_EXPENDITURE"],
-    "BS.LEASE_LIAB_TOTAL": ["BS.LEASE_LIAB_TOTAL", "BS.LEASE_LIAB_TOTAL_10YR"],
+    "BS.LEASE_LIAB_TOTAL": ["BS.LEASE_LIAB_NC", "BS.LEASE_LIAB_TOTAL", "BS.LEASE_LIAB_TOTAL_10YR"],
+    "BS.LEASE_LIAB_NC": ["BS.LEASE_LIAB_NC", "BS.LEASE_LIAB_TOTAL"],
     "PL.FIN_COST": ["PL.FIN_COST", "PL.FINANCE_COSTS"],
+    "BS.BORROW_TOTAL_10YR": ["BS.BORROW_TOTAL_10YR", "BS.BORROW_NC"],
+    "REF.CORE_GRM_USD_BBL": ["REF.CORE_GRM_USD_BBL", "REF.GRM_USD_BBL"],
+    "REF.THROUGHPUT_MMT": ["REF.THROUGHPUT_MMT"],
+    "PIP.THROUGHPUT_MMT": ["PIP.THROUGHPUT_MMT"],
+    "MKT.SALES_MMT": ["MKT.SALES_MMT"],
+    "PL.COST_MATERIALS": ["PL.COST_MATERIALS"],
+    "REV.PETCHEM": ["REV.PETCHEM"],
+    "BS.TRADE_PAY": ["BS.TRADE_PAY"],
 }
 
 
@@ -131,7 +141,7 @@ def _lookup_cell(
             return val, lineage
 
     if var_name in ("PROD.TOTAL_BOE", "QTY.TOTAL_BOE"):
-        prod_lines = ["PROD.CRUDE_ONGC", "PROD.GAS_ONGC", "PROD.CRUDE_JV", "PROD.GAS_JV"]
+        prod_lines = ["REF.THROUGHPUT_MMT", "PIP.THROUGHPUT_MMT", "MKT.SALES_MMT"]
         prod_vals = []
         doc = ""
         page = ""
@@ -375,8 +385,8 @@ def generate_actions(
 
     p_upper = persona.upper().strip()
 
-    # Rule: If persona is DIR_HR, L07 is always included when it fires
-    if p_upper == "DIR_HR":
+    # Rule: For Functional Directors, prioritise levers owned by their portfolio first
+    if p_upper == "DIR_REF":
         l07_candidate = next((c for c in candidates if c.lever_id == "L07"), None)
         if l07_candidate:
             selected.append(l07_candidate)
@@ -393,12 +403,9 @@ def generate_actions(
             owner_counts[cand.owner] = owner_counts.get(cand.owner, 0) + 1
 
     # Order the selected items per persona rules
-    if p_upper == "DIR_HR":
-        # DIR_HR levers first, then others sorted by score
-        selected.sort(key=lambda c: (c.owner != "DIR_HR", -c.score, c.lever_id))
-    elif p_upper == "DIR_FIN":
-        # DIR_FIN levers first, then others sorted by score
-        selected.sort(key=lambda c: (c.owner != "DIR_FIN", -c.score, c.lever_id))
+    if p_upper in ("DIR_FIN", "DIR_REF", "DIR_MKT"):
+        # Director-owned levers first, then others sorted by score
+        selected.sort(key=lambda c: (c.owner != p_upper, -c.score, c.lever_id))
     else:
         # Default: sorted by score
         selected.sort(key=lambda c: (-c.score, c.lever_id))

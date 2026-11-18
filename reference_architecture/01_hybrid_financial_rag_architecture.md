@@ -87,7 +87,7 @@ To guarantee both **human auditability** and **sub-second machine retrieval**, e
    - `02_Schedule_III_Notes_5_to_37_Context_Catalog.md`: Line-by-line accounting note disclosures for Property, Plant & Equipment (Note 5), Capital Work-in-Progress & Exploratory Wells (Note 6), Non-Current Investments (Note 8 — OPaL, HPCL, MRPL, OVL), Borrowings & Lease Liabilities (Notes 16, 17, 20), Abandonment Provisions (Note 18), Revenue & Other Income (Notes 24, 25), Production & Statutory Levies (Note 26), Exploration Write-Offs (Note 28), and DD&A/Impairments (Note 30).
    - `03_Director_Finance_Action_Playbook.md`: Concrete, quantified financial interventions mapped to each variance trigger (e.g., Western Onshore chemical EOR vs infills, dry-well write-off governance in KG/Kutch basins, OPaL post-recapitalization feedstock optimization, and working-capital treasury sweeps).
 
-2. **Structured Line-Item Context Bridge Table (`ongc-hr-finance-agent.hrfin_gold.ssot_financial_line_context`):**
+2. **Structured Line-Item Context Bridge Table (`yukti-finance-iocl.hrfin_gold.ssot_financial_line_context`):**
    - Keyed deterministically by `(fy, statement_type, line_code, note_ref)`.
    - Columns:
      - `context_id` (`STRING`)
@@ -103,7 +103,7 @@ To guarantee both **human auditability** and **sub-second machine retrieval**, e
      - `director_finance_action` (`STRING` — specific decision/action item for the Finance Director / CMD)
      - `source_citation` (`STRING` — exact Annual Report Note & page/section citation)
 
-3. **Semantic Vector Knowledge Store (`ongc-hr-finance-agent.hrfin_docs.financial_notes_chunks`):**
+3. **Semantic Vector Knowledge Store (`yukti-finance-iocl.hrfin_docs.financial_notes_chunks`):**
    - Stores chunked context reports and note disclosures embedded with **Vertex AI `text-embedding-005` (`768` dimensions)**.
    - Pre-filtered by `fy`, `statement_type`, `note_ref`, and `line_codes` array before computing exact cosine distance (`1.0 - ML.DISTANCE(embedding, query_vec, 'COSINE')`).
 

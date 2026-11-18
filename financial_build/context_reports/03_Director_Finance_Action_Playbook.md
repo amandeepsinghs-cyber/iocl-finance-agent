@@ -1,33 +1,34 @@
-# Director (Finance) & CMD Action Playbook: Data-Driven Interventions Mapped to Financial Line Items (`FY26–FY27`)
+# Director (Finance) & Chairman Action Playbook: Quantified Downstream OMC Levers (`FY26–FY27`)
 
-This playbook maps ONGC's audited financial findings across P&L, Balance Sheet, Cash Flow, Ratios, Fields, and Subsidiaries to **quantified, actionable decisions for the Director (Finance) and CMD**.
+This playbook maps IOCL's verified `FY26` Schedule III statements and Downstream 360 sub-ledgers (`ssot_refinery_economics_360`, `fact_marketing_sales`, `fact_pipeline_ops`, `subsidiary_financials`) to **actionable, ₹ Crore-quantified interventions** for the **Chairman**, **Director (Finance)**, **Director (Refineries)**, and **Director (Marketing)**.
 
 ---
 
-## 1. Upstream Revenue & Gas Realization Optimization (Note 24)
-- **Financial Trigger:** Nominated crude realization declined `-4.0% YoY` (`$73.80/bbl` vs `$76.90/bbl`), reducing top-line revenue by `-₹6,354 Cr` (`₹1,31,492 Cr`), while New Well Gas (NWG) at `$7.80/MMBTU` (`+20%` premium over `$6.50/MMBTU` APM ceiling) contributed `24.1%` of gas volume.
-- **Director (Finance) Action:**
-  1. **Re-prioritize `₹4,200 Cr` FY27 Infill & Workover Capex toward NWG-Eligible Gas Wells:** Fast-track `48` infill wells in **Bassein & Satellite**, **Daman Upside**, and **Tripura** that qualify for the `20%` New Well Gas premium (`$7.80/MMBTU` vs `$6.50/MMBTU`), generating **`+₹1,480 Cr` incremental annual high-margin revenue** with zero additional statutory SAED exposure.
-  2. **Monetize KG-DWN-98/2 Cluster-2 Gas via HPHT Ceiling (`$9.87/MMBTU`):** Ensure `100%` of Cluster-2 deepwater gas (`3.2 MMSCMD` ramp-up) is marketed under the Deepwater/HPHT price ceiling (`$9.87/MMBTU`) via competitive e-auctions.
+## 1. Refinery Fuel & Loss and Energy Efficiency (`L01`) — `₹940 Cr/yr` EBITDA Uplift
+- **Financial Trigger:** Combined FY26 Fuel & Loss stands at **`8.20%`** across `75.451 MMT` crude processed, led by legacy inland/North-East refineries (`Digboi 11.4%`, `Guwahati 10.6%`, `Bongaigaon 9.2%`, `Barauni 8.9%`) vs coastal `Paradip 7.6%` and `Panipat 7.8%`.
+- **Action:** Commission waste-heat recovery steam turbines, FCC flue-gas power expanders, and flare-gas recovery across Barauni, Haldia, Mathura, and Guwahati to trim corporate Fuel & Loss by **`-30 bps`** (`8.20% -> 7.90%`), saving **`0.226 MMT`** crude equivalent (**`+₹940 Cr/yr` EBITDA**).
 
-## 2. Mature Onshore Field Lifting Cost & Loss-Making Asset Turnaround (Note 26 & Field Sub-Ledger)
-- **Financial Trigger:** Production, Transportation & Selling Expense rose `+2.8% YoY` to `₹25,260 Cr` (`$12.82/boe` lifting cost), and `5` mature onshore fields (`Jodhpur`, `Silchar`, `Rajahmundry`, `Karaikal`, `Cambay`) generated negative PBT (`-₹412 Cr` combined) due to `>78%` water cut and artificial lift power costs.
-- **Director (Finance) Action:**
-  1. **Convert High-Water-Cut Marginal Clusters to Revenue-Sharing PEC (Production Enhancement Contracts):** Ring-fence `12` marginal sub-blocks in **Mehsana, Ankleshwar, and Cambay** where lifting cost exceeds `$18/bbl` into TSP/PEC contracts with fixed baseline recovery, cutting ONGC's direct opex by **`-₹620 Cr/yr`**.
-  2. **Deploy Captive Solar Power (`180 MW` via ONGC Green Ltd) for Artificial Lift (SRP/ESP) in Gujarat & Assam:** Replace grid tariff power (`₹7.90/kWh`) with captive solar (`₹3.10/kWh`) across Mehsana and Ahmedabad ESP/SRP pumps, saving **`₹310 Cr/yr`** in Note 26 field power expenses.
+## 2. High-Sulphur Opportunity Crude & GRM Optimization (`L02`) — `₹1,620 Cr/yr`
+- **Financial Trigger:** Every `$0.35/bbl` expansion in weighted GRM (`$10.85 -> $11.20/bbl` on `55.3 Cr bbls`) generates ~`₹1,620 Cr/yr` incremental margin at `₹86/$`. Complex coastal `Paradip` (`+2.05 $/bbl` premium) and `Panipat` (`+1.15 $/bbl`) outperform older hydroskimming/semi-complex assets (`Guwahati`, `Digboi`).
+- **Action:** Increase discounted heavy/high-TAN crude processing share by `+3.5 pp` (`34% -> 37.5%`) at Paradip and Koyali coker/hydrocracker trains and deploy AI crude-blend linear programming ahead of term-tender lock-ins (`DoA Clause 2.1`).
 
-## 3. Deepwater Exploration Write-Off Governance (Note 28)
-- **Financial Trigger:** Exploration Costs Written Off increased `+7.4% YoY` to **`₹7,320 Cr`** (`₹5,480 Cr` dry-well write-offs + `₹1,840 Cr` seismic surveys), driven by `3` high-cost deepwater dry holes in KG Offshore (`₹2,840 Cr`) and `2` in Kutch-Saurashtra (`₹1,490 Cr`).
-- **Director (Finance) Action:**
-  1. **Mandate Farm-Out / Risk-Sharing (`30%–40%` PI) Before Drilling Ultra-Deepwater Wildcat Wells (`>₹750 Cr/well`):** Require international E&P technical partner carry on Category-II/III frontier wells in Andaman and Ultra-Deepwater KG/Mahanadi to cap single-well dry-hole P&L exposure at **`≤₹450 Cr/well`** (projected annual P&L protection: **`₹1,500–₹2,000 Cr`**).
+## 3. Distillate Yield & Petrochemical Integration (`L03`) — `₹1,180 Cr/yr`
+- **Financial Trigger:** FY26 corporate Distillate Yield is **`82.8%`**, while standalone Petrochemicals (`~₹31,904 Cr` revenue) suffered compressed polymer spreads (`PX/PTA/MEG` cycle trough) compared to higher-margin specialty/butyl/butadiene intermediates.
+- **Action:** Prioritize Panipat P-25 Resid Upgradation and Koyali Petrochemical & Lube Specialty shifts to raise corporate high-value distillate + polymer yield by **`+50 bps`** (`82.8% -> 83.3%`) without incremental crude intake (**`+₹1,180 Cr/yr`**).
 
-## 4. Group Subsidiary Capital Allocation & OPaL Turnaround (Note 8 & Consolidated P&L)
-- **Financial Trigger:** Following the `₹18,365 Cr` CCD conversion and equity infusion in FY25, ONGC holds `95.69%` of **OPaL** (`₹1,18,450 Cr` total Note 8 Non-Current Investments in FY26), yet OPaL recorded a `-₹1,420 Cr` net loss in FY26 due to imported naphtha feedstock cost and compressed polymer spreads.
-- **Director (Finance) Action:**
-  1. **Enforce 100% Captive C2-C3 (Ethane-Propane) Feedstock Supply from Dahej/Hazira to OPaL:** Substitute high-cost naphtha with captive ethane-propane streams and finalize OPaL's SEZ exit notification to save **`₹1,150 Cr/yr`** in domestic customs duty leakage, bringing OPaL to **PAT breakeven by Q3 FY27**.
-  2. **Ring-Fence Downstream Refinancing at HPCL & MRPL:** Prohibit further standalone parent balance-sheet equity support to downstream refining subsidiaries; fund MRPL's petchem expansion strictly through internal accruals and non-recourse project debt.
+## 4. Pipeline vs. Rail/Coastal Freight Shift (`L04`) — `₹685 Cr/yr`
+- **Financial Trigger:** IOCL Pipeline Division moved **`105.556 MMT`** across `Crude (54.5%)`, `Product (41.0%)`, and `Gas (4.5%)` networks (`68%` EBITDA margin), yet `~18 MMT` of inland depot replenishment still moves via higher-cost rail rake/road tankers (`₹1,650/MT` vs `₹845/MT` pipeline tariff).
+- **Action:** Shift **`6.5 MMT`** of inland HSD/MS volume from rail/road to newly commissioned Paradip-Hyderabad and Koyali-Sanganer product pipeline spurs (**`₹520–₹685 Cr/yr`** logistics savings in Note 33).
 
-## 5. Balance Sheet & Treasury Yield Optimization (Notes 12, 16, 18)
-- **Financial Trigger:** ONGC holds **`₹28,450 Cr`** in Cash & Bank Balances (Note 12) against **`₹6,890 Cr`** Total Borrowings (Notes 16 & 20), resulting in a **`-₹21,560 Cr` Net Cash** position and `0.02x` Debt-to-Equity ratio, while earning `₹4,110 Cr` interest income.
-- **Director (Finance) Action:**
-  1. **Retire `₹2,710 Cr` High-Cost Short-Term Working Capital Facilities:** Use surplus liquid cash (`₹14,200 Cr` unrestricted treasury outside Site Restoration Fund) to prepay `7.65%` short-term working capital lines, saving **`₹205 Cr/yr`** in Note 29 Finance Costs while preserving a `1.45x` Current Ratio.
+## 5. Crude Inventory Optimization & Hedging (`L05`, `L06`) — `₹1,450 Cr` Cash Release + Margin Protection
+- **Financial Trigger:** Inventories stood at **`₹1,04,280.00 Cr`** (`58.6 days` holding) in FY26, exposing P&L to large quarterly NRV swings (`₹11,305 Cr` FY20 crash; `$0.90/bbl` inventory gain vs Core GRM in FY26).
+- **Action:**
+  1. Tighten crude cargo-scheduling float and coastal depot days by **`-3 days`** (`58.6 -> 55.6 days`), unlocking **`~₹4,800 Cr` working capital** (`~₹340 Cr/yr` Note 34 finance cost saving).
+  2. Hedge `25%–35%` of unpriced crude-in-transit and Singapore gasoil crack exposure using Treasury Commodity Hedging Desk limits (`DoA Commodity Policy Sec. 3`).
+
+## 6. De-Leveraging & USD/INR Treasury Optimization (`L07`) — `₹720 Cr/yr` Interest Saving
+- **Financial Trigger:** Total Debt fell to **`₹1,10,668.00 Cr`** (`D/E = 0.54x`) with Finance Costs at **`₹7,910.00 Cr`** (`7.15%` implied pretax Kd). Short-term working capital borrowings still carry **`₹59,248.00 Cr`**.
+- **Action:** Channel FY27 projected free cash flow (`₹22,000+ Cr`) and GoI LPG compensation receipts into retiring `₹10,000 Cr` high-cost CP/WCDL facilities (**`-₹720 Cr/yr` Finance Costs**), compressing WACC below **`9.0%`**.
+
+## 7. Premium Retail Mix (`XP95` / `SERVO`) & Green Hydrogen Capex (`L08`–`L10`)
+- **Action:** Expand branded `XP95`/`XtraGreen` penetration from `12%` to `18%` of retail `MS/HSD` (`~1.0 MMT` incremental differential at `+₹1,400/KL`) and ring-fence `35%` captive solar/green power wheeling for Panipat Green Hydrogen & refinery ESP loads via Hurdle-Rate Gate (`≥12%` post-tax equity IRR).

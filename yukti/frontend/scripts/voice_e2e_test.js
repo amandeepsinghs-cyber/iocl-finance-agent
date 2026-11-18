@@ -3,12 +3,12 @@
 // transcript appears, Leda's 24 kHz audio arrives and is scheduled for playback, the
 // canvas updates from the contract; reports speech-end -> first audio and -> canvas.
 //
-// Usage: URL=http://localhost:3200 WAV=/abs/q.wav [EXPECT_TURNS=1] [OUT=dir] node scripts/voice_e2e_test.js
+// Usage: URL=http://localhost:3400 WAV=/abs/q.wav [EXPECT_TURNS=1] [OUT=dir] node scripts/voice_e2e_test.js
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const URL = process.env.URL || 'http://localhost:3200';
+const URL = process.env.URL || 'http://localhost:3400';
 const WAV = process.env.WAV;
 const EXPECT_TURNS = parseInt(process.env.EXPECT_TURNS || '1', 10);
 const OUT = process.env.OUT || path.join(__dirname, '..', 'screenshots', 'voice');

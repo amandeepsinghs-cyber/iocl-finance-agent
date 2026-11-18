@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import * as echarts from 'echarts';
 import { MapSpec } from '@/contracts/answerContract';
 import { INDIA_GEO_JSON } from '@/data/indiaGeoJson';
+import { resolveIoclCoords } from '@/data/ioclLocations';
 import { EChart } from '@/charts/EChart';
 import { useChartTokens } from './ChartRenderer';
 import { px, tooltipBase, tooltipCard, ANIM, alpha } from '@/charts/theme';
@@ -25,7 +26,14 @@ const NEG_STATUS = /loss|deficit|negative|critical|shortfall/i;
 
 export const MapRenderer: React.FC<MapRendererProps> = ({ mapSpec, isDark = false }) => {
   const t = useChartTokens(isDark);
-  const points = useMemo(() => [...(mapSpec.points || [])].sort((a, b) => (b.value || 0) - (a.value || 0)), [mapSpec]);
+  const points = useMemo(() => {
+    const normalized = (mapSpec.points || []).map((p) => {
+      if (p.lat && p.lon) return p;
+      const hit = resolveIoclCoords(p.name);
+      return hit ? { ...p, lat: hit.lat, lon: hit.lon } : p;
+    });
+    return normalized.sort((a, b) => (b.value || 0) - (a.value || 0));
+  }, [mapSpec]);
   const metric = points[0]?.metricLabel || 'Value';
   const total = points.reduce((s, p) => s + (p.value || 0), 0);
 

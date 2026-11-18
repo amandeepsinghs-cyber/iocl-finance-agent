@@ -36,7 +36,7 @@ export interface WsCounters {
 }
 
 const TOOL_LABELS: Record<string, string> = {
-  ask_yukti: 'Analyzing ONGC enterprise data',
+  ask_yukti: 'Analyzing IndianOil enterprise data',
   ui_control: 'Updating screen view',
   control_screen: 'Updating screen view',
   query_data: 'Querying enterprise data',

@@ -780,7 +780,7 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ contract, isDark = false
                   <div className="flex flex-wrap gap-2">
                     {sources.map((s, i) => (
                       <Chip key={i} onClick={() => setSelectedSource(s)} className="!text-label">
-                        {s.kind === 'policy' ? <Scale className="w-3.5 h-3.5 text-ongc-maroon" /> : s.kind === 'document' ? <FileText className="w-3.5 h-3.5 text-[var(--accent)]" /> : <Database className="w-3.5 h-3.5 text-[var(--accent)]" />}
+                        {s.kind === 'policy' ? <Scale className="w-3.5 h-3.5 text-iocl-maroon" /> : s.kind === 'document' ? <FileText className="w-3.5 h-3.5 text-[var(--accent)]" /> : <Database className="w-3.5 h-3.5 text-[var(--accent)]" />}
                         {sourceLabel(s)}
                       </Chip>
                     ))}

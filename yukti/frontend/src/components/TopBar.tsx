@@ -124,7 +124,7 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   // Single state pill: interaction state + connection merged (U4.1). Dot colour = token, aura when Yukti is active.
   const stateTone =
-    state === 'listening' ? 'text-[var(--accent)]' : state === 'thinking' ? 'text-ongc-amber' : state === 'speaking' ? 'text-[var(--accent-deep)]' : 'text-[var(--ink-3)]';
+    state === 'listening' ? 'text-[var(--accent)]' : state === 'thinking' ? 'text-iocl-amber' : state === 'speaking' ? 'text-[var(--accent-deep)]' : 'text-[var(--ink-3)]';
   const conn = !isLiveMode
     ? { label: 'Demo', tone: 'warning' as const }
     : backend === 'online'
@@ -137,26 +137,26 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className="relative z-30 h-[var(--topbar-h)] px-6 flex items-center justify-between gap-4 border-b border-[var(--hairline)] bg-[var(--glass)] backdrop-blur-xl">
-      {/* Brand — ONGC official website scale (80px emblem + Yukti AI Agent / HR and Finance in ONGC Red) */}
+      {/* Brand — IndianOil official identity (80px emblem + Yukti AI Agent / Finance & Downstream Intelligence) */}
       <div className="flex items-center gap-4 min-w-0 flex-1 py-1">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/brand/ongc_logo.png"
-          alt="Oil and Natural Gas Corporation Limited"
+          src="/brand/iocl_logo.png"
+          alt="Indian Oil Corporation Limited"
           className="w-[4.5rem] h-[4.5rem] xl:w-[5rem] xl:h-[5rem] shrink-0 rounded-[var(--radius-sm)] object-cover shadow-[var(--card-shadow)]"
         />
         <div className="min-w-0 flex flex-col justify-center leading-tight">
-          {/* Two lines: "Yukti AI Agent" / "HR and Finance" (sponsor, 26-Oct) */}
+          {/* Two lines: "Yukti AI Agent" / "Finance & Downstream Intelligence" */}
           <div className="flex flex-col gap-[0.2rem] leading-none pb-1">
             <span className="font-display font-bold text-[1.35rem] xl:text-[1.5rem] tracking-[-0.02em] text-[var(--brand-red)] leading-none">
               Yukti AI Agent
             </span>
             <span className="text-[0.88rem] xl:text-[0.95rem] font-semibold tracking-[0.01em] text-[var(--brand-red-deep)] whitespace-nowrap leading-none">
-              HR and Finance
+              Finance &amp; Downstream Intelligence
             </span>
           </div>
           <div className="text-[0.76rem] font-medium text-[var(--ink-2)] truncate leading-tight">
-            Oil and Natural Gas Corporation Limited
+            Indian Oil Corporation Limited
           </div>
           <div className="text-[0.76rem] text-[var(--ink-3)] font-normal truncate leading-tight">
             A Maharatna Company
@@ -217,7 +217,7 @@ export const TopBar: React.FC<TopBarProps> = ({
             title={active ? `Signed in as ${active.display_name}, ${active.designation} (illustrative identity). Click to sign in as another role.` : 'Not signed in. Click to choose a demo identity.'}
             className="flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-pill hover:bg-[var(--surface)] text-label transition-colors"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-ongc-maroon" />
+            <span className="w-1.5 h-1.5 rounded-full bg-iocl-maroon" />
             <span className="font-semibold text-[var(--ink)]">{!active ? 'Sign in as…' : active.tier === 'junior' ? `${active.short} · ${active.display_name}` : active.designation}</span>
             <ChevronDown className="w-4 h-4 text-[var(--ink-3)]" />
           </button>

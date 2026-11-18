@@ -3802,7 +3802,7 @@
           "label": "Draft transfer note",
           "action": "draft_transfer_note",
           "question_template": "Draft a transfer note for {emp_name} ({emp_id})",
-          "min_role": "DIR_HR"
+          "min_role": "DIR_FIN"
         }
       ]
     },

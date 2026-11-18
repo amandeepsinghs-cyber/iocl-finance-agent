@@ -19,7 +19,6 @@ export interface JobCardProps {
 
 const AGENT_LABELS: Record<string, string> = {
   dcf_agent: 'DCF Valuation Agent · v1.0',
-  hr_transfer_agent: 'HR Transfer Pack Agent · v1.0',
   fin_diagnostics_agent: 'Finance Diagnostics Agent · v1.0',
   doc_export_agent: 'Document Export Agent · v1.0',
 };

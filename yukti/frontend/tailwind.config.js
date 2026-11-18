@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       // All colours resolve to CSS variables generated from src/design/tokens.json (U1.1).
-      // Legacy keys (canvas/surface/border/accent/ongc/textPrimary/textSecondary) are kept so
+      // Legacy keys (canvas/surface/border/accent/iocl/textPrimary/textSecondary) are kept so
       // existing classes keep working; light/dark variants map to the same theme-aware variable.
       colors: {
         canvas: { DEFAULT: 'var(--canvas)', light: 'var(--canvas)', dark: 'var(--canvas)' },
@@ -39,7 +39,7 @@ module.exports = {
         positive: { DEFAULT: 'var(--positive)', fill: 'var(--positive-fill)', pale: 'var(--positive-pale)' },
         warning: { DEFAULT: 'var(--warning)', fill: 'var(--warning-fill)', pale: 'var(--warning-pale)' },
         critical: 'var(--critical)',
-        ongc: {
+        iocl: {
           maroon: 'rgb(var(--maroonRgb) / <alpha-value>)',
           darkMaroon: 'var(--maroon-deep)',
           lightMaroon: 'var(--maroon-pale)',

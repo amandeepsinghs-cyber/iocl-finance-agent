@@ -110,7 +110,13 @@ export function bridge(rows: StatementLine[], period?: string, granularity: 'sta
   for (const x of classified) {
     if (x === start) continue;
     if (x.cls === 'add' || x.cls === 'deduct' || x.cls === 'signed') {
-      const isSignedExpense = x.r.line_code === 'PL.INVENTORY_CHANGE' || x.r.line_code === 'CHG_INV';
+      const isSignedExpense =
+        x.r.line_code === 'PL.INVENTORY_CHANGE' ||
+        x.r.line_code === 'CHG_INV' ||
+        x.r.line_code === 'inventory_change_inr_cr' ||
+        x.r.line_code === 'PL.TAX' ||
+        x.r.line_code === 'TAX_EXP' ||
+        x.r.line_code === 'tax_expense_total_inr_cr';
       const delta = x.cls === 'add' ? Math.abs(x.v) : x.cls === 'deduct' ? (isSignedExpense ? -x.v : -Math.abs(x.v)) : x.v;
       running += delta;
       if (granularity === 'standard' && x.cls === 'deduct' && Math.abs(x.v) < threshold) {

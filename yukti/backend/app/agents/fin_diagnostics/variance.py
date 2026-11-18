@@ -109,6 +109,11 @@ LINE_ALIASES: Dict[str, str] = {
 COST_LINE_PREFIXES = (
     "LEVY.",
     "PL.OPEX",
+    "PL.COST_",
+    "PL.PURCHASES_",
+    "PL.INVENTORY_",
+    "PL.EMP_",
+    "PL.IMPAIRMENT_",
     "PL.EXPL_",
     "PL.PROVISIONS",
     "PL.EXCHANGE_LOSS",
@@ -130,6 +135,21 @@ PBT_BRIDGE_DRIVERS = [
     ("PL.PROVISIONS_WRITEOFF", ["PL.PROVISIONS_WRITEOFF"]),
     ("PL.EXCHANGE_LOSS_10YR", ["PL.EXCHANGE_LOSS_10YR", "PL.EXCHANGE_LOSS", "EXP.EXCHANGE_LOSS"]),
     ("PL.OTHER_EXP_10YR", ["PL.OTHER_EXP_10YR", "PL.OTHER_EXP", "PL.OTHER_EXPENSES"]),
+    ("PL.DDA", ["PL.DDA"]),
+    ("PL.FIN_COST", ["PL.FIN_COST"]),
+]
+
+# Schedule III Downstream IOCL PBT bridge drivers
+IOCL_PBT_BRIDGE_DRIVERS = [
+    ("PL.REV_OPS", ["PL.REV_OPS"]),
+    ("PL.OTHER_INCOME", ["PL.OTHER_INCOME"]),
+    ("LEVY.TOTAL", ["LEVY.TOTAL", "PL.STAT_LEVIES"]),
+    ("PL.COST_MATERIALS", ["PL.COST_MATERIALS"]),
+    ("PL.PURCHASES_TRADED", ["PL.PURCHASES_TRADED"]),
+    ("PL.INVENTORY_CHANGE", ["PL.INVENTORY_CHANGE"]),
+    ("PL.EMP_BENEFIT", ["PL.EMP_BENEFIT"]),
+    ("PL.IMPAIRMENT_FIN_ASSETS", ["PL.IMPAIRMENT_FIN_ASSETS"]),
+    ("PL.OTHER_EXP", ["PL.OTHER_EXP"]),
     ("PL.DDA", ["PL.DDA"]),
     ("PL.FIN_COST", ["PL.FIN_COST"]),
 ]
@@ -682,13 +702,19 @@ def pbt_bridge(
     if pbt_to is None or pbt_from is None:
         raise BridgeDoesNotClose(f"Missing PL.PBT in {fy_from} or {fy_to}")
 
-    start_pbt = round(float(pbt_from), 1)
-    end_pbt = round(float(pbt_to), 1)
-    delta_pbt = round(end_pbt - start_pbt, 1)
+    use_iocl = (
+        _lookup_row(df, "PL.COST_MATERIALS", fy_to, scope)[0] is not None
+        and _lookup_row(df, "PL.OPEX_10YR", fy_to, scope)[0] is None
+    )
+    prec = 2 if use_iocl else 1
+    start_pbt = round(float(pbt_from), prec)
+    end_pbt = round(float(pbt_to), prec)
+    delta_pbt = round(end_pbt - start_pbt, prec)
 
     bridge_rows: List[VarianceRow] = []
+    drivers_list = IOCL_PBT_BRIDGE_DRIVERS if use_iocl else PBT_BRIDGE_DRIVERS
 
-    for canonical_code, aliases in PBT_BRIDGE_DRIVERS:
+    for canonical_code, aliases in drivers_list:
         v_to, l_to = _lookup_row(df, aliases, fy_to, scope)
         v_from, l_from = _lookup_row(df, aliases, fy_from, scope)
 
@@ -725,10 +751,9 @@ def pbt_bridge(
                 l_from = {"line_code": canonical_code, "fy": fy_from, "value": v_from, "source": "derived"}
 
         if v_to is not None and v_from is not None:
-            # Compute 1-dp bridge delta: round(round(v_to, 1) - round(v_from, 1), 1)
-            line_delta = round(round(v_to, 1) - round(v_from, 1), 1)
+            line_delta = round(round(v_to, prec) - round(v_from, prec), prec)
             is_cost = _is_cost_line(canonical_code)
-            pbt_impact = round(-line_delta if is_cost else line_delta, 1)
+            pbt_impact = round(-line_delta if is_cost else line_delta, prec)
             inputs = [i for i in [l_from, l_to] if i]
             component = "one_off" if canonical_code in (
                 "PL.PROVISIONS_WRITEOFF", "PL.EXCHANGE_LOSS_10YR", "PL.OTHER_EXP_10YR"
@@ -752,9 +777,9 @@ def pbt_bridge(
     exc_to, l_exc_to = _lookup_row(df, "PL.EXCEPTIONAL", fy_to, scope)
     exc_from, l_exc_from = _lookup_row(df, "PL.EXCEPTIONAL", fy_from, scope)
     if exc_to is not None or exc_from is not None:
-        e_to = round(float(exc_to or 0.0), 1)
-        e_from = round(float(exc_from or 0.0), 1)
-        exc_delta = round(e_to - e_from, 1)
+        e_to = round(float(exc_to or 0.0), prec)
+        e_from = round(float(exc_from or 0.0), prec)
+        exc_delta = round(e_to - e_from, prec)
         if abs(exc_delta) > 0.05:
             inputs = [i for i in [l_exc_from, l_exc_to] if i]
             bridge_rows.append(VarianceRow(
@@ -772,7 +797,7 @@ def pbt_bridge(
             ))
 
     # Closure verification (Packet §5: |Σ impacts − ΔPBT| ≤ 0.1 ₹ cr, else raise BridgeDoesNotClose)
-    total_impact = round(sum(r.impact_on_pbt_inr_cr for r in bridge_rows), 1)
+    total_impact = round(sum(r.impact_on_pbt_inr_cr for r in bridge_rows), prec)
     closure_error = round(abs(total_impact - delta_pbt), 4)
 
     if closure_error > 0.1:

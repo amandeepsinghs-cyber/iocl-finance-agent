@@ -62,7 +62,7 @@ function extractItemData(item: CompareItem): ExtractedItem {
 function isMaroonColor(color: string, t: ChartTokens): boolean {
   const c = color.toLowerCase();
   if (c === t.maroon.toLowerCase() || c === t.maroonSoft.toLowerCase()) return true;
-  if (/^#(8e000c|c2414b|ee6b74|b83a43|6a1814|fc413d|ff6b66)/i.test(c)) return true;
+  if (/^#(b84600|c44d00|f37021|f06d20|fb923c|fc413d|ff6b66)/i.test(c)) return true;
   return false;
 }
 

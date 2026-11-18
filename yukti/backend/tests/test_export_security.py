@@ -1,5 +1,5 @@
 """H1.3a + P4.6 (SPEC-10 §4.7, §4.9, §4.10, §6 AC 6, 8, 9):
-Export path-traversal, download hardening, 11-persona V19 RBAC matrix, cross-principal 403,
+Export path-traversal, download hardening, 8-persona IOCL RBAC matrix, cross-principal 403,
 24h expiry, honest Sheets/Docs toasts (no `docs.google.com`), naming regex, and JSONL audit logging.
 """
 
@@ -24,18 +24,15 @@ from app.tools.export_tool import DOCS_TOAST, SHEETS_TOAST, DocumentExporter
 
 FIXTURES_DIR = Path(__file__).resolve().parent.parent.parent / "contracts" / "fixtures" / "export"
 
-ALL_11_PERSONAS = {
-    "CMD": {"emp_id": "EMP-000001", "display_name": "Arun Kumar Singh", "designation": "Chairman & CEO", "function": "EXEC", "grade": "CMD"},
-    "DIR_HR": {"emp_id": "EMP-000002", "display_name": "Manish Patil", "designation": "Director (Human Resources)", "function": "HR", "grade": "DIR"},
-    "DIR_FIN": {"emp_id": "EMP-000003", "display_name": "Anupam Agarwal", "designation": "Director (Finance)", "function": "FIN", "grade": "DIR"},
-    "E1_HR": {"emp_id": "EMP-100151", "display_name": "Dinesh Deshmukh", "designation": "HR Officer (E1)", "function": "HR", "grade": "E1"},
-    "E2_HR": {"emp_id": "EMP-102451", "display_name": "Pooja Verma", "designation": "HR Executive (E2)", "function": "HR", "grade": "E2"},
-    "E3_HR": {"emp_id": "EMP-100144", "display_name": "Lokesh Verma", "designation": "Senior HR Executive (E3)", "function": "HR", "grade": "E3"},
-    "E4_HR": {"emp_id": "EMP-100178", "display_name": "Umesh D. Bhatia", "designation": "Dy. Manager HR (E4)", "function": "HR", "grade": "E4"},
-    "E1_FIN": {"emp_id": "EMP-100150", "display_name": "Ajay Deshmukh", "designation": "Accounts Officer (E1)", "function": "FIN", "grade": "E1"},
-    "E2_FIN": {"emp_id": "EMP-100152", "display_name": "Praveen Nair", "designation": "Finance Executive (E2)", "function": "FIN", "grade": "E2"},
-    "E3_FIN": {"emp_id": "EMP-100146", "display_name": "Shailesh E. Kapoor", "designation": "Finance Officer (E3)", "function": "FIN", "grade": "E3"},
-    "E4_FIN": {"emp_id": "EMP-100145", "display_name": "Santosh Banerjee", "designation": "Dy. Manager Finance (E4)", "function": "FIN", "grade": "E4"},
+ALL_8_PERSONAS = {
+    "CMD": {"emp_id": "EMP-000001", "display_name": "Arvinder Singh Sahney", "designation": "Chairman, IndianOil", "function": "EXEC", "grade": "CMD"},
+    "DIR_FIN": {"emp_id": "EMP-000003", "display_name": "Anuj Jain", "designation": "Director (Finance) & CFO", "function": "FIN", "grade": "DIR"},
+    "DIR_REF": {"emp_id": "EMP-000002", "display_name": "Arvind Kumar", "designation": "Director (Refineries)", "function": "OPS", "grade": "DIR"},
+    "DIR_MKT": {"emp_id": "EMP-000004", "display_name": "Saumitra P. Srivastava", "designation": "Director (Marketing)", "function": "MKT", "grade": "DIR"},
+    "E1_FIN": {"emp_id": "EMP-100150", "display_name": "Ajay Deshmukh", "designation": "Accounts Officer (Grade A)", "function": "FIN", "grade": "A"},
+    "E2_FIN": {"emp_id": "EMP-100152", "display_name": "Praveen Nair", "designation": "Finance Officer (Grade B)", "function": "FIN", "grade": "B"},
+    "E3_FIN": {"emp_id": "EMP-100146", "display_name": "Shailesh E. Kapoor", "designation": "Manager Finance (Grade C)", "function": "FIN", "grade": "C"},
+    "E4_FIN": {"emp_id": "EMP-100145", "display_name": "Santosh Banerjee", "designation": "Chief Manager Finance (Grade D)", "function": "FIN", "grade": "D"},
 }
 
 
@@ -44,7 +41,7 @@ def _auth(persona: str = "CMD", monkeypatch: pytest.MonkeyPatch | None = None) -
     from app import auth
 
     if persona not in auth.PERSONA_DIRECTORY and monkeypatch is not None:
-        monkeypatch.setitem(auth.PERSONA_DIRECTORY, persona, ALL_11_PERSONAS[persona])
+        monkeypatch.setitem(auth.PERSONA_DIRECTORY, persona, ALL_8_PERSONAS[persona])
     return {"Authorization": f"Bearer {auth.issue_token(persona)}"}
 
 
@@ -130,8 +127,8 @@ def test_errors_do_not_leak_internals(monkeypatch) -> None:
 
 
 # ------------------------------------------------------------------ P4.6 extensions (SPEC-10 §4.7, §4.9, §4.10)
-@pytest.mark.parametrize("persona", list(ALL_11_PERSONAS.keys()))
-def test_11_personas_v19_roster_export_rbac_and_audit(persona: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+@pytest.mark.parametrize("persona", list(ALL_8_PERSONAS.keys()))
+def test_8_personas_v19_roster_export_rbac_and_audit(persona: str, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     from app.main import app
 
     audit_file = tmp_path / "export_audit.jsonl"
@@ -139,11 +136,11 @@ def test_11_personas_v19_roster_export_rbac_and_audit(persona: str, monkeypatch:
 
     v19 = json.loads((FIXTURES_DIR / "v19_delhi_roster_synthetic.json").read_text(encoding="utf-8"))
     turn_id = f"turn_v19_{persona.lower()}"
-    emp_id = ALL_11_PERSONAS[persona]["emp_id"]
+    emp_id = ALL_8_PERSONAS[persona]["emp_id"]
     # Ensure auth directory has the persona with its canonical emp_id
     from app import auth
 
-    monkeypatch.setitem(auth.PERSONA_DIRECTORY, persona, ALL_11_PERSONAS[persona])
+    monkeypatch.setitem(auth.PERSONA_DIRECTORY, persona, ALL_8_PERSONAS[persona])
     register_turn_contract(turn_id=turn_id, contract=v19, emp_id=emp_id, persona=persona, session_id=f"sess_{persona}")
 
     client = TestClient(app, headers=_auth(persona, monkeypatch))
@@ -164,21 +161,19 @@ def test_11_personas_v19_roster_export_rbac_and_audit(persona: str, monkeypatch:
     ws = wb[wb.sheetnames[0]]
     hdrs = [ws.cell(row=4, column=c).value for c in range(1, ws.max_column + 1)]
 
-    if persona in ("CMD", "DIR_HR"):
+    if persona in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
         assert artifact["masked"] is False
         assert not artifact["filename"].endswith("_aggregate.xlsx")
         assert "Name" in hdrs
         assert artifact["rows"] == 65
     else:
-        # DIR_FIN and all 8 juniors (E1_HR..E4_HR, E1_FIN..E4_FIN) get aggregate xlsx with _aggregate suffix
+        # Grades A-D (E1_FIN..E4_FIN) get aggregate xlsx with _aggregate suffix and small-cell suppression
         assert artifact["masked"] is True
         assert artifact["filename"].endswith("_aggregate.xlsx"), artifact["filename"]
         assert "Name" not in hdrs and "name" not in hdrs
         assert f"Aggregate view (access level: {persona})" in str(ws["A3"].value)
-        if persona != "DIR_FIN":
-            # Junior personas also have small cells (<5) suppressed
-            vals = [ws.cell(row=r, column=2).value for r in range(5, ws.max_row + 1)]
-            assert "<5" in vals
+        vals = [ws.cell(row=r, column=2).value for r in range(5, ws.max_row + 1)]
+        assert "<5" in vals
 
     # Every export writes 1 audit row (100%)
     audit_rows = read_export_audit_rows(audit_file)
@@ -211,13 +206,13 @@ def test_cross_principal_turn_export_and_download_return_403_and_24h_expiry_retu
     )
 
     cmd_client = TestClient(app, headers=_auth("CMD"))
-    e2_client = TestClient(app, headers=_auth("E2_HR"))
+    e2_client = TestClient(app, headers=_auth("E2_FIN"))
 
-    # 1. E2_HR trying to export CMD's turn_id -> 403
+    # 1. E2_FIN trying to export CMD's turn_id -> 403
     r_turn_403 = e2_client.post("/api/export", json={"turn_id": "turn_cmd_owned", "format": "xlsx"})
     assert r_turn_403.status_code == 403
 
-    # 2. CMD creates an export -> 200; E2_HR trying to GET /api/export/{CMD's export_id} -> 403 (BEH-04.50)
+    # 2. CMD creates an export -> 200; E2_FIN trying to GET /api/export/{CMD's export_id} -> 403 (BEH-04.50)
     r_ok = cmd_client.post("/api/export", json={"turn_id": "turn_cmd_owned", "format": "xlsx"})
     assert r_ok.status_code == 200
     exp_id = r_ok.json()["export_id"]
@@ -298,24 +293,24 @@ def test_r2_m1_client_supplied_rbac_probes_and_no_contract_field(monkeypatch: py
     # Verify contract field is deleted from ExportRequest
     assert "contract" not in ExportRequest.model_fields
 
-    e2_client = TestClient(app, headers=_auth("E2_HR"))
+    e2_client = TestClient(app, headers=_auth("E2_FIN"))
     fin_client = TestClient(app, headers=_auth("DIR_FIN"))
-    hr_client = TestClient(app, headers=_auth("DIR_HR"))
+    ref_client = TestClient(app, headers=_auth("DIR_REF"))
 
-    # Probe 1: E2_HR client-supplied rows with unrecognized / personal columns -> 403
+    # Probe 1: E2_FIN client-supplied rows with unrecognized / personal columns -> 403
     r_p1 = e2_client.post(
         "/api/export",
         json={"format": "xlsx", "title": "Leak", "rows": [{"full_name": "X", "staff_no": "99", "secret": "123"}]},
     )
     assert r_p1.status_code == 403
 
-    # Probe 1b: E2_HR client-supplied contract with named statement -> ignored because contract is removed, and empty export -> 400
+    # Probe 1b: E2_FIN client-supplied contract with named statement -> ignored because contract is removed, and empty export -> 400
     r_p1b = e2_client.post(
         "/api/export",
         json={
             "format": "xlsx",
             "contract": {
-                "meta": {"domain": "hr"},
+                "meta": {"domain": "finance"},
                 "visual": {
                     "statement": {
                         "meta": {"title": "Salary Slip"},
@@ -327,21 +322,21 @@ def test_r2_m1_client_supplied_rbac_probes_and_no_contract_field(monkeypatch: py
     )
     assert r_p1b.status_code in (400, 403, 422)
 
-    # Probe 1c: E2_HR unknown turn_id + client rows fallback -> 403 (no fallback to client rows when turn_id given)
+    # Probe 1c: E2_FIN unknown turn_id + client rows fallback -> 403 (no fallback to client rows when turn_id given)
     r_p1c = e2_client.post(
         "/api/export",
         json={"turn_id": "unknown_turn_xyz", "format": "xlsx", "rows": [{"grade": "E1", "headcount": 12}]},
     )
     assert r_p1c.status_code == 403
 
-    # Probe 1d: E2_HR free markdown content export without turn_id -> 403
+    # Probe 1d: E2_FIN free markdown content export without turn_id -> 403
     r_p1d = e2_client.post(
         "/api/export",
         json={"format": "pdf", "title": "Exfil", "content": "Named roster: Rahul ₹95,000"},
     )
     assert r_p1d.status_code == 403
 
-    # E2_HR client-supplied rows WITH verifiable grade key: personal columns stripped, collapsed to grade/headcount + <5 suppressed
+    # E2_FIN client-supplied rows WITH verifiable grade key: personal columns stripped, collapsed to grade/headcount + <5 suppressed
     r_e2_agg = e2_client.post(
         "/api/export",
         json={
@@ -364,28 +359,18 @@ def test_r2_m1_client_supplied_rbac_probes_and_no_contract_field(monkeypatch: py
     assert "60000" not in csv_body
     assert "E9,<5" in csv_body
 
-    # DIR_FIN client-supplied HR compensation rows without grade key -> 403; with grade key -> collapsed to grade/headcount
-    r_fin_comp_403 = fin_client.post(
+    # DIR_FIN & DIR_REF director exports -> 200
+    r_fin_ok = fin_client.post(
         "/api/export",
-        json={"format": "xlsx", "title": "Pay", "rows": [{"emp_id": "ONGC-1", "basic_pay": 60000}]},
+        json={"format": "csv", "title": "Refinery Economics", "rows": [{"refinery": "Paradip", "grm_usd": 12.46}]},
     )
-    assert r_fin_comp_403.status_code == 403
+    assert r_fin_ok.status_code == 200
 
-    r_fin_comp_agg = fin_client.post(
+    r_ref_ok = ref_client.post(
         "/api/export",
-        json={"format": "csv", "title": "Pay", "rows": [{"grade": "E1", "basic_pay": 60000}]},
+        json={"format": "csv", "title": "Refinery Roster", "rows": [{"emp_id": "IOCL-1", "grade": "D", "unit": "Panipat"}]},
     )
-    assert r_fin_comp_agg.status_code == 200
-    fin_csv_body = fin_client.get(r_fin_comp_agg.json()["url"]).content.decode("utf-8-sig")
-    assert "basic_pay" not in fin_csv_body
-    assert "60000" not in fin_csv_body
-
-    # DIR_HR client-supplied named HR rows -> 200
-    r_hr_ok = hr_client.post(
-        "/api/export",
-        json={"format": "csv", "title": "HR Roster", "rows": [{"emp_id": "ONGC-1", "grade": "E1", "basic_pay": 60000}]},
-    )
-    assert r_hr_ok.status_code == 200
+    assert r_ref_ok.status_code == 200
 
 
 def test_r2_m2_and_m5_fail_closed_download_and_24h_sidecar_sweep(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -404,7 +389,7 @@ def test_r2_m2_and_m5_fail_closed_download_and_24h_sidecar_sweep(monkeypatch: py
     orphan_file.write_bytes(b"orphan-bytes")
     _ARTIFACT_STORE.pop(orphan_id, None)
 
-    e2_client = TestClient(app, headers=_auth("E2_HR"))
+    e2_client = TestClient(app, headers=_auth("E2_FIN"))
     r_orphan = e2_client.get(f"/api/export/{orphan_id}")
     assert r_orphan.status_code == 404
     assert not orphan_file.exists()
@@ -469,7 +454,7 @@ def test_r2_m6_session_manager_fallback_ownership_and_full_rows(monkeypatch: pyt
     _TURN_STORE.pop("turn_m6_75rows", None)
 
     # E2_HR trying to resolve CMD's session turn -> 403
-    e2_client = TestClient(app, headers=_auth("E2_HR"))
+    e2_client = TestClient(app, headers=_auth("E2_FIN"))
     assert e2_client.post("/api/export", json={"turn_id": "turn_m6_75rows", "format": "csv"}).status_code == 403
 
     # CMD resolves via SessionManager fallback and gets all 75 rows
@@ -506,7 +491,7 @@ def test_r2_s6_s7_s8_naming_zip_csv_and_audit_ownership(monkeypatch: pytest.Monk
     )
 
     cmd_client = TestClient(app, headers=_auth("CMD"))
-    e2_client = TestClient(app, headers=_auth("E2_HR"))
+    e2_client = TestClient(app, headers=_auth("E2_FIN"))
 
     # S8: E2_HR trying to audit CMD's turn_id -> 403
     assert e2_client.post("/api/export/audit", json={"turn_id": "turn_s7_multi", "format": "png"}).status_code == 403

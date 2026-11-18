@@ -129,7 +129,7 @@ async def route_turn(query: str, persona: str, session: Any = None) -> Dict[str,
         )
         doc_title = doc_res.get("title", "Executive Briefing Note")
         spoken_doc = (
-            f"I have drafted the official document '{doc_title}' grounded in ONGC's Single Source of Truth data. "
+            f"I have drafted the official document '{doc_title}' grounded in IndianOil's Single Source of Truth data. "
             f"You can review the full formatted memorandum on screen and export it directly to Word, PDF, or Excel."
         )
         doc_vis: Dict[str, Any] = {

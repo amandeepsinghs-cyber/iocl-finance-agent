@@ -24,10 +24,10 @@ Voice-first HR & Finance executive agent for ONGC leadership (**CMD**, **Directo
 
 ---
 
-## GCP Architecture (Project `ongc-hr-finance-agent`)
+## GCP Architecture (Project `yukti-finance-iocl`)
 
 - **BigQuery (`asia-south1`):** `hrfin_bronze`, `hrfin_silver`, `hrfin_gold` (`ssot_workforce_employee`, `ssot_work_centre_360`, `ssot_field_economics_360`, `ssot_corporate_annual_360`), `hrfin_docs`
-- **Cloud Storage:** `gs://ongc-hr-finance-agent-landing` and `gs://ongc-hr-finance-agent-docs`
+- **Cloud Storage:** `gs://yukti-finance-iocl-landing` and `gs://yukti-finance-iocl-docs`
 - **Vertex AI Search (`global`):** `hrfin-doc-search-engine`
 - **Gemini on Vertex AI:** `gemini-2.5-flash` (structured-output QuerySpec planner & ADK text runner), `gemini-3.8-live` (bi-directional voice with Leda voice & server/client barge-in)
 
@@ -35,21 +35,21 @@ Voice-first HR & Finance executive agent for ONGC leadership (**CMD**, **Directo
 
 ## Run Locally
 
-Requires `gcloud auth application-default login` with access to `ongc-hr-finance-agent`.
+Requires `gcloud auth application-default login` with access to `yukti-finance-iocl`.
 
 ```bash
-# 1. Start Backend (FastAPI + QuerySpec Planner on :8095)
+# 1. Start Backend (FastAPI + QuerySpec Planner on :8195)
 cd yukti/backend
-YUKTI_PLANNER=1 GOOGLE_CLOUD_PROJECT=ongc-hr-finance-agent GOOGLE_GENAI_USE_VERTEXAI=TRUE \
-  .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8095
+YUKTI_PLANNER=1 GOOGLE_CLOUD_PROJECT=yukti-finance-iocl GOOGLE_GENAI_USE_VERTEXAI=TRUE \
+  .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8195
 
-# 2. Start Frontend Single-Origin Server (Next.js + HTTP/WS Proxy on :3300)
+# 2. Start Frontend Single-Origin Server (Next.js + HTTP/WS Proxy on :3400)
 cd yukti/frontend
 npm install && npm run build
-NODE_ENV=production PORT=3300 HOST=0.0.0.0 YUKTI_BACKEND_URL=http://127.0.0.1:8095 node server.js
+NODE_ENV=production PORT=3400 HOST=0.0.0.0 YUKTI_BACKEND_URL=http://127.0.0.1:8195 node server.js
 ```
 
-Open [http://localhost:3300](http://localhost:3300) (or [http://localhost:3300/design-system](http://localhost:3300/design-system) for the design system & chart showcase).
+Open [http://localhost:3400](http://localhost:3400) (or [http://localhost:3400/design-system](http://localhost:3400/design-system) for the design system & chart showcase).
 
 ---
 

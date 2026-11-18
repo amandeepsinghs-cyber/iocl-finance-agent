@@ -65,8 +65,8 @@ def test_create_job_idempotency_and_rbac_403_410_422():
         assert resp_repeat.status_code == 202
         assert resp_repeat.json()["job"]["id"] == job_id
 
-    # 403 Forbidden for E2_FIN, E1_HR, DIR_HR (SPEC-03 AC-03)
-    for denied_persona in ("E2_FIN", "E1_HR", "DIR_HR"):
+    # 403 Forbidden for E1_FIN, E2_FIN, DIR_REF (SPEC-03 AC-03)
+    for denied_persona in ("E1_FIN", "E2_FIN", "DIR_REF"):
         sid = f"sess_{denied_persona}"
         s_denied = sm.get_or_create(sid, persona=denied_persona)
         s_denied.pending_actions["pa_denied"] = {
@@ -173,7 +173,7 @@ def test_sse_events_and_rehydration():
         dcf_model = contract["visual"].get("dcf_model")
         assert isinstance(dcf_model, dict)
         assert "per_share" in dcf_model and dcf_model["per_share"]["intrinsic_inr"] > 0
-        assert "wacc_build" in dcf_model and abs(dcf_model["wacc_build"]["wacc_pct"] - 11.6556) < 1e-3
+        assert "wacc_build" in dcf_model and abs(dcf_model["wacc_build"]["wacc_pct"] - 9.2534) < 1e-3
         assert "forecast" in dcf_model and "years" in dcf_model["forecast"] and "lines" in dcf_model["forecast"]
         assert len(dcf_model["forecast"]["lines"]["pv_fcff"]) == len(dcf_model["forecast"]["years"])
         assert "terminal" in dcf_model and "pv_tv_inr_cr" in dcf_model["terminal"]
@@ -242,8 +242,8 @@ def test_s2_security_attacks_and_session_ownership():
     )
     assert r_forged.status_code == 401
 
-    # 2. E1_HR on CMD's pending action -> 403
-    e1_hr_headers = _auth_headers("E1_HR")
+    # 2. E1_FIN on CMD's pending action -> 403
+    e1_hr_headers = _auth_headers("E1_FIN")
     r_e1_post = client.post(
         "/api/jobs",
         json={"proposed_action_id": "pa_cmd", "session_id": "sess_cmd"},

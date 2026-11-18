@@ -9,7 +9,7 @@ import time
 import wave
 from pathlib import Path
 
-os.environ["GOOGLE_CLOUD_PROJECT"] = "ongc-hr-finance-agent"
+os.environ["GOOGLE_CLOUD_PROJECT"] = "yukti-finance-iocl"
 os.environ["GOOGLE_CLOUD_LOCATION"] = "us-central1"
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "TRUE"
 
@@ -21,7 +21,7 @@ from google.genai import types
 
 from app.agent import create_ongc_agent
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "us-central1"
 MODEL_ID = os.getenv("LIVE_MODEL", "gemini-3.8-live")
 TEST_AUDIO_PATH = Path(__file__).resolve().parent.parent / "test_audio" / "delhi_5yr_en.wav"

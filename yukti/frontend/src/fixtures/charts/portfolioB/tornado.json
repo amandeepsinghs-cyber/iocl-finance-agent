@@ -8,7 +8,7 @@
    "unit": "INR",
    "base": 250.0
   },
-  "source": "Illustrative UI test fixture, not ONGC data",
+  "source": "Illustrative UI test fixture, not IOCL AR data",
   "bars": [
    {
     "driver": "wacc",

@@ -86,7 +86,7 @@ export const AccessRequestBar: React.FC<Props> = ({ contract, persona, question 
           <div className="text-caption text-[var(--ink-2)]">
             {status === 'approved' || status === 'rejected'
               ? req?.outcome
-              : 'The detailed records exist in ONGC’s data, but they are not shown at your access level.'}
+              : 'The detailed records exist in IndianOil’s data, but they are restricted at your access level.'}
           </div>
         </div>
       </div>

@@ -9,6 +9,6 @@ SELECT
     ta_da_travel_class,
     daily_lodging_limit_cat_a_inr,
     0.25 AS da_fraction_when_free_board_and_lodging
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_grade`
+FROM `yukti-finance-iocl.hrfin_silver.dim_grade`
 WHERE LOWER(cadre) = 'executive'
 ORDER BY level_order;

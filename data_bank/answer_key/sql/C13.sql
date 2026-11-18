@@ -23,7 +23,7 @@ pool AS (
         COUNT(DISTINCT e.emp_id) AS source_pool_e3_e5,
         COUNT(DISTINCT IF(v.continuous_stay_months >= 60 AND DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 AND ex.emp_id IS NULL, e.emp_id, NULL)) AS source_pool_overdue
     FROM employee_master e
-    LEFT JOIN `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v ON v.emp_id = e.emp_id AND v.is_current_stay
+    LEFT JOIN `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v ON v.emp_id = e.emp_id AND v.is_current_stay
     LEFT JOIN (SELECT DISTINCT emp_id FROM posting_history WHERE is_current_posting = TRUE AND NULLIF(exemption_tag, 'None') IS NOT NULL
                AND (exemption_valid_until >= DATE '2026-10-19' OR exemption_valid_until IS NULL)) ex ON ex.emp_id = e.emp_id
     WHERE LOWER(e.employment_status) = 'active' AND e.current_wc_id IN ('WC-DEL', 'WC-DDN') AND e.current_grade_id IN ('E3', 'E4', 'E5')

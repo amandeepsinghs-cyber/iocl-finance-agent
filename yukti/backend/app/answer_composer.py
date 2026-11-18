@@ -84,12 +84,9 @@ PERSONA_DISPLAY_STRINGS: Dict[str, str] = {
 _VALID_LANGUAGES = {"en", "hi", "hi-en"}
 _VALID_PERSONAS = set(PERSONA_DISPLAY.keys()) or {
     "CMD",
-    "DIR_HR",
     "DIR_FIN",
-    "E1_HR",
-    "E2_HR",
-    "E3_HR",
-    "E4_HR",
+    "DIR_REF",
+    "DIR_MKT",
     "E1_FIN",
     "E2_FIN",
     "E3_FIN",
@@ -139,10 +136,10 @@ def persona_display_info(persona: Optional[str]) -> Dict[str, Any]:
             "display_name": "Signed-in User",
             "designation": "Current Role",
             "functional_designation": "Current Role",
-            "grade": "E2",
-            "function": "HR",
+            "grade": "B",
+            "function": "FIN",
             "wc_id": "WC-DEL",
-            "work_centre": "Delhi HQ",
+            "work_centre": "IndianOil Bhavan, New Delhi",
             "display_string": "Signed-in User, Current Role",
         }
     return dict(PERSONA_DISPLAY[canon])
@@ -189,13 +186,13 @@ def render_refusal_copy(
     raw_alt = entry.get("alternative")
     alt_out: Optional[Dict[str, str]] = None
     if isinstance(raw_alt, dict):
-        # D-66: APAR is not displayed for named office-holders (CMD, DIR_HR, DIR_FIN),
-        # so offer their own leave balance as the safe self-service chip instead of self APAR.
-        if norm_code == "R-APAR" and p_info.get("persona_id") in ("CMD", "DIR_HR", "DIR_FIN"):
+        # D-66: APAR is not displayed for named office-holders (CMD, DIR_FIN, DIR_REF, DIR_MKT),
+        # so offer an aggregate downstream query as the safe chip instead of self APAR.
+        if norm_code == "R-APAR" and p_info.get("persona_id") in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
             alt_out = (
-                {"label": "मेरी छुट्टी का बैलेंस", "question": "मेरी छुट्टी कितनी बची है?"}
+                {"label": "MoU स्कोरकार्ड FY26", "question": "IndianOil MoPNG MoU लक्ष्यों पर कैसा प्रदर्शन कर रहा है?"}
                 if is_hi
-                else {"label": "My leave balance", "question": "What is my leave balance?"}
+                else {"label": "MoU Scorecard FY26", "question": "How is IndianOil tracking on MoPNG MoU targets?"}
             )
         else:
             lbl_tpl = raw_alt.get("label_hi" if is_hi and raw_alt.get("label_hi") else "label") or ""
@@ -210,7 +207,7 @@ def render_refusal_copy(
     seen_questions = {(alt_out["question"].strip().lower()) for _ in [1] if alt_out}
     for item in entry.get("alternatives") or []:
         if isinstance(item, dict):
-            if norm_code == "R-APAR" and p_info.get("persona_id") in ("CMD", "DIR_HR", "DIR_FIN"):
+            if norm_code == "R-APAR" and p_info.get("persona_id") in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
                 continue
             lbl_en = (item.get("label") or "").format(display_name=disp, designation=desig, n=n_val, grade_num=n_val)
             lbl_hi = (item.get("label_hi") or lbl_en).format(display_name=disp, designation=desig, n=n_val, grade_num=n_val)
@@ -383,14 +380,14 @@ def validate_and_repair_contract(contract: Dict[str, Any]) -> Dict[str, Any]:
         else:
             contract["language"] = "en"
 
-    # Normalize persona across all 11 canonical personas
+    # Normalize persona across all 8 canonical IOCL personas
     persona = str(contract.get("persona") or "CMD").strip().upper()
     if persona not in _VALID_PERSONAS:
         from app.access_control import UnknownPersona, normalize_persona
         try:
             contract["persona"] = normalize_persona(persona)
         except UnknownPersona:  # P0.4: repair only; the turn runner re-stamps the principal's persona
-            contract["persona"] = "E2_HR"
+            contract["persona"] = "E2_FIN"
 
     # Ensure required string fields
     if not contract.get("turn_id") or not isinstance(contract.get("turn_id"), str):

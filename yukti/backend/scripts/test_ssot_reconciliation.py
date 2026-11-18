@@ -1,8 +1,10 @@
 """Automated SSOT Reconciliation & Grain Verification Suite (Phase 1.5)."""
 
+import os
+
 from google.cloud import bigquery
 
-PROJECT = "ongc-hr-finance-agent"
+PROJECT = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or "yukti-finance-iocl"
 LOCATION = "asia-south1"
 LABELS = {"datacloud": "ai-agent"}
 

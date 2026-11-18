@@ -4,11 +4,11 @@
   "language": "en",
   "persona": "CMD",
   "spoken_summary": "The DCF model is ready — intrinsic value is 312 rupees per share versus a market price of 272 rupees, an upside of 14.7 percent, at 11.4 percent WACC and 2.5 percent terminal growth. Illustrative valuation, not investment advice.",
-  "display_text": "ONGC Standalone DCF valuation complete: intrinsic value ₹312.4/sh vs NSE close ₹272.3/sh (+14.7% upside) at 11.42% WACC and 2.50% terminal growth.",
+  "display_text": "IOCL Standalone DCF valuation complete: intrinsic value ₹312.4/sh vs NSE close ₹272.3/sh (+14.7% upside) at 11.42% WACC and 2.50% terminal growth.",
   "visual": {
     "type": "dcf_model",
     "mode": "replace",
-    "title": "ONGC Standalone DCF Valuation (FY27–FY36)",
+    "title": "IOCL Standalone DCF Valuation (FY27–FY36)",
     "dcf_model": {
       "run_id": "dcf_20261024_001",
       "engine_version": "3.0.0",
@@ -172,7 +172,7 @@
     {
       "kind": "data",
       "object": "v_fin_statement_line",
-      "title": "ONGC Standalone Audited Financials (FY17–FY26)"
+      "title": "IOCL Standalone Audited Financials (FY17–FY26)"
     }
   ],
   "suggestions": [
@@ -191,7 +191,7 @@
   ],
   "provenance": {
     "label": "illustrative",
-    "detail": "ONGC AR FY17–FY26 + NSE Snapshot (2026-03-31) · Illustrative DCF valuation",
+    "detail": "IOCL AR FY17–FY26 + NSE Snapshot (2026-03-31) · Illustrative DCF valuation",
     "snapshot_date": "2026-03-31"
   },
   "artifacts": [

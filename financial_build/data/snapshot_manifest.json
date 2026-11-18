@@ -1,15 +1,17 @@
 {
-  "snapshot_date": "2026-10-24",
-  "label": "Annual Report snapshot (fact_financial_statement_line)",
-  "note": "P1.10a: runtime snapshot exported from verified fact_snapshot.parquet.",
+  "snapshot_date": "2026-11-16",
+  "run_id": "20261116T000000Z",
+  "company": "Indian Oil Corporation Limited (IOCL)",
+  "ticker": "IOC.NS",
+  "label": "Verified IOCL Annual Report & Downstream 360 SSOT snapshot (FY17-FY26)",
+  "note": "Step 4 IOCL SSOT build: Schedule III 3-statements, Downstream 360 & Ratios with 0.00 Cr identity reconciliation.",
   "files": {
-    "ongc_10yr_schedule_iii_lines.json": "f0e91a8a0e572ea1971fc2f6cedbcf1db2bec743fe93912730a16b8d3df6e3aa",
-    "ongc_10yr_balance_sheet_lines.json": "3995527254cf770241430ae9a77c2987b01f738227034ed62e33f500ba0e5fb8",
-    "ongc_10yr_cash_flow_lines.json": "cf8ae7f60168ce9858c76c176870fdc7fabb69daa282bab15d0aacbc205b6cdd",
-    "ongc_10yr_ratios_lines.json": "f5f49b60bfbc00ac381315097f179abb0ff6afac4eaef69c9af569cf1530a202",
-    "ongc_10yr_corporate_wide.json": "4e6c25ad09af99512dabfc47fa931591ca8a6876bd90fa4dfe4c1f008987ed39",
-    "ssot_financial_line_context.json": "80e47cff16687bb137d1821bba51f25a8ba80d119ca4d87e962c402f92120bbd",
-    "financial_notes_corpus.jsonl": "c7e663ab815b2e3914cc15196040a86ad9499035aa20dddc489e017966fab84a"
-  },
-  "run_id": "20261024T032346Z"
+    "iocl_10yr_corporate_wide.json": "8c841df814bc6a814a75d01b1f8204c252c3e7ddf7bf6d9b7263aab05e843bd7",
+    "iocl_10yr_schedule_iii_lines.json": "951301e171a660f3eb0dddec3100441d414af88cd18c9fef39e6b3bb54884737",
+    "iocl_10yr_balance_sheet_lines.json": "986b4ef5fad92a62fe9d3c7774ad86f76b597363490d300e04471bfe1274738b",
+    "iocl_10yr_cash_flow_lines.json": "54b4166d22a94567511bfe0666cf9b3e398efe90e1552d832c412a23e880d500",
+    "iocl_10yr_ratios_lines.json": "221214a8f3a397eae2a7ad25fc4db920c01aa55c5876b5d894da16a4da11390c",
+    "ssot_financial_line_context.json": "eee6e167572007cae35092cd9b565667554fb3ef592670aa58fec1e5efac0628",
+    "financial_notes_corpus.jsonl": "d44a7d3d202982d9e3d51418767cf277f8f614ad8dc47b850b1fbd925ee79004"
+  }
 }

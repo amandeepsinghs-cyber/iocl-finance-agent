@@ -5,7 +5,7 @@
 > - **Planned questions:** all 89 questions and 267 follow-ups have a verified answer.
 > - **Unplanned questions:** in a blind test of 150 new CMD- and Director-style prompts, **86.7%** could be answered. The **15 remaining gaps** are niche, and I recommend closing them in parallel with the agent build.
 
-## 1. What exists now (project `ongc-hr-finance-agent`)
+## 1. What exists now (project `yukti-finance-iocl`)
 
 | Layer | Contents | Verified |
 |---|---|---|

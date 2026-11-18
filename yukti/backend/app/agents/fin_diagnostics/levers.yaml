@@ -1,6 +1,25 @@
 levers:
   - id: L01
-    title: "Inventory optimisation (over-inventory)"
+    title: "Opportunity crude slate & high-sulphur basket optimisation"
+    owner: DIR_REF
+    kpi: "Core GRM ($/bbl)"
+    horizon_days: 90
+    confidence_base: 1.0
+    uses_assumption: true
+    uses_synthetic: false
+    trigger:
+      inputs: ["REF.CORE_GRM_USD_BBL", "REF.THROUGHPUT_MMT"]
+      expr: "REF.CORE_GRM_USD_BBL < (avg5(REF.CORE_GRM_USD_BBL) * 1.15)"
+    impact:
+      kind: annual
+      low_expr: "REF.THROUGHPUT_MMT * 7.33 * 0.35 * 88.37 / 10.0"
+      mid_expr: "REF.THROUGHPUT_MMT * 7.33 * 0.50 * 88.37 / 10.0"
+      high_expr: "REF.THROUGHPUT_MMT * 7.33 * 0.70 * 88.37 / 10.0"
+    what_to_do_template: "Increase high-sulphur opportunity crude intake across Paradip and Panipat (+$0.50/bbl core GRM uplift on {REF.THROUGHPUT_MMT} MMT throughput; current core GRM ${REF.CORE_GRM_USD_BBL}/bbl)."
+    ask_template: "Increase high-sulphur opportunity crude blending to expand core GRM by $0.50/bbl"
+
+  - id: L02
+    title: "Crude & product inventory DIO compression (-3 days)"
     owner: DIR_FIN
     kpi: "Inventory days"
     horizon_days: 90
@@ -8,183 +27,164 @@ levers:
     uses_assumption: false
     uses_synthetic: false
     trigger:
-      inputs: ["BS.INVENTORIES", "PL.OPEX"]
-      expr: "(BS.INVENTORIES / (PL.OPEX / 365)) >= (median5(BS.INVENTORIES / (PL.OPEX / 365)) * 1.10)"
+      inputs: ["BS.INVENTORIES", "RATIO.INVENTORY_DAYS"]
+      expr: "(BS.INVENTORIES > 50000) and (RATIO.INVENTORY_DAYS >= 50)"
     impact:
       kind: one_off
-      low_expr: "((BS.INVENTORIES / (PL.OPEX / 365)) - median5(BS.INVENTORIES / (PL.OPEX / 365))) * (PL.OPEX / 365) * 0.8"
-      mid_expr: "((BS.INVENTORIES / (PL.OPEX / 365)) - median5(BS.INVENTORIES / (PL.OPEX / 365))) * (PL.OPEX / 365)"
-      high_expr: "((BS.INVENTORIES / (PL.OPEX / 365)) - median5(BS.INVENTORIES / (PL.OPEX / 365))) * (PL.OPEX / 365) * 1.2"
-    what_to_do_template: "Reduce inventory holding toward the 5-year median by rationalising slow-moving stores and spares (current inventories ₹{BS.INVENTORIES} cr on opex ₹{PL.OPEX} cr)."
-    ask_template: "Rationalise slow-moving stores and spares toward the 5-year median inventory days"
+      low_expr: "(BS.INVENTORIES / RATIO.INVENTORY_DAYS) * 2.0"
+      mid_expr: "(BS.INVENTORIES / RATIO.INVENTORY_DAYS) * 3.0"
+      high_expr: "(BS.INVENTORIES / RATIO.INVENTORY_DAYS) * 4.5"
+    what_to_do_template: "Compress crude-in-transit and finished product inventory holding by 3.0 days from {RATIO.INVENTORY_DAYS} days (current inventories ₹{BS.INVENTORIES} cr vs prior ₹{prior(BS.INVENTORIES)} cr) to unlock working capital."
+    ask_template: "Release working capital by trimming inventory holding from {RATIO.INVENTORY_DAYS} days by 3 days"
 
-  - id: L02
-    title: "Receivables collection"
-    owner: DIR_FIN
+  - id: L03
+    title: "Institutional & bulk trade receivable DSO discipline"
+    owner: DIR_MKT
     kpi: "Debtor days"
     horizon_days: 90
     confidence_base: 1.0
     uses_assumption: false
     uses_synthetic: false
     trigger:
-      inputs: ["RATIO.DEBTOR_DAYS", "PL.REV_OPS"]
-      expr: "RATIO.DEBTOR_DAYS > prior(RATIO.DEBTOR_DAYS)"
+      inputs: ["RATIO.DEBTORS_TURNOVER_DAYS", "REV.NET_OF_EXCISE"]
+      expr: "RATIO.DEBTORS_TURNOVER_DAYS > 5.0"
     impact:
       kind: one_off
-      low_expr: "(RATIO.DEBTOR_DAYS - prior(RATIO.DEBTOR_DAYS)) * (PL.REV_OPS / 365) * 0.8"
-      mid_expr: "(RATIO.DEBTOR_DAYS - prior(RATIO.DEBTOR_DAYS)) * (PL.REV_OPS / 365)"
-      high_expr: "(RATIO.DEBTOR_DAYS - prior(RATIO.DEBTOR_DAYS)) * (PL.REV_OPS / 365) * 1.2"
-    what_to_do_template: "Bring debtor days from {RATIO.DEBTOR_DAYS} back to {prior(RATIO.DEBTOR_DAYS)} on revenue from operations of ₹{PL.REV_OPS} cr through accelerated PSU/offtaker billing reconciliation."
-    ask_template: "Bring debtor days from {RATIO.DEBTOR_DAYS} back to {prior(RATIO.DEBTOR_DAYS)}"
+      low_expr: "(RATIO.DEBTORS_TURNOVER_DAYS - 5.0) * (REV.NET_OF_EXCISE / 365) * 0.8"
+      mid_expr: "(RATIO.DEBTORS_TURNOVER_DAYS - 5.0) * (REV.NET_OF_EXCISE / 365)"
+      high_expr: "(RATIO.DEBTORS_TURNOVER_DAYS - 5.0) * (REV.NET_OF_EXCISE / 365) * 1.2"
+    what_to_do_template: "Bring trade receivable days from {RATIO.DEBTORS_TURNOVER_DAYS} down toward 5.0 days on net revenue of ₹{REV.NET_OF_EXCISE} cr via accelerated airline ATF & bulk industrial collections."
+    ask_template: "Reduce institutional receivable days from {RATIO.DEBTORS_TURNOVER_DAYS} toward 5.0 days"
 
-  - id: L03
-    title: "Opex per BOE discipline"
+  - id: L04
+    title: "Pipeline vs coastal/rail primary freight cost containment"
     owner: CMD
-    kpi: "Opex ₹/boe"
+    kpi: "Other opex ₹ cr"
     horizon_days: 180
     confidence_base: 1.0
     uses_assumption: false
     uses_synthetic: false
     trigger:
-      inputs: ["PL.OPEX", "PROD.TOTAL_BOE"]
-      expr: "(PL.OPEX / PROD.TOTAL_BOE) > (prior(PL.OPEX / PROD.TOTAL_BOE) * 1.04)"
+      inputs: ["PL.OTHER_EXP", "PIP.THROUGHPUT_MMT"]
+      expr: "yoy(PL.OTHER_EXP) > 0.05"
     impact:
       kind: annual
-      low_expr: "((PL.OPEX / PROD.TOTAL_BOE) - (prior(PL.OPEX / PROD.TOTAL_BOE) * 1.04)) * PROD.TOTAL_BOE * 0.75"
-      mid_expr: "((PL.OPEX / PROD.TOTAL_BOE) - (prior(PL.OPEX / PROD.TOTAL_BOE) * 1.04)) * PROD.TOTAL_BOE"
-      high_expr: "((PL.OPEX / PROD.TOTAL_BOE) - (prior(PL.OPEX / PROD.TOTAL_BOE) * 1.04)) * PROD.TOTAL_BOE * 1.25"
-    what_to_do_template: "Cap field operating expense growth at 4% inflation per BOE (operating expenses ₹{PL.OPEX} cr across {PROD.TOTAL_BOE} MMBOE)."
-    ask_template: "Contain field opex per BOE within 4% inflation benchmark"
-
-  - id: L04
-    title: "Contract renegotiation (charter hire & contractual services)"
-    owner: DIR_FIN
-    kpi: "Contract ₹/boe"
-    horizon_days: 180
-    confidence_base: 1.0
-    uses_assumption: true
-    uses_synthetic: false
-    trigger:
-      inputs: ["PL.OPEX"]
-      expr: "yoy(PL.OPEX) > 0.05"
-    impact:
-      kind: annual
-      low_expr: "PL.OPEX * 0.03"
-      mid_expr: "PL.OPEX * 0.04"
-      high_expr: "PL.OPEX * 0.05"
-    what_to_do_template: "Renegotiate rig charter-hire and O&M contractual rates (3–5% modelled savings on ₹{PL.OPEX} cr operating expense base)."
-    ask_template: "Renegotiate charter-hire and O&M service contracts for 3–5% cost reduction"
+      low_expr: "(PL.OTHER_EXP - (prior(PL.OTHER_EXP) * 1.05)) * 0.4"
+      mid_expr: "(PL.OTHER_EXP - (prior(PL.OTHER_EXP) * 1.05)) * 0.5"
+      high_expr: "(PL.OTHER_EXP - (prior(PL.OTHER_EXP) * 1.05)) * 0.7"
+    what_to_do_template: "Shift bulk product evacuation onto cross-country pipelines ({PIP.THROUGHPUT_MMT} MMT throughput) to contain operating expenses (₹{PL.OTHER_EXP} cr vs prior ₹{prior(PL.OTHER_EXP)} cr)."
+    ask_template: "Shift evacuation volume to pipelines and contain other opex growth to 5%"
 
   - id: L05
-    title: "Capex phasing & CWIP ageing"
+    title: "CWIP commissioning & Panipat P-25 / Koyali capital turn"
     owner: CMD
-    kpi: "CWIP days, capitalisation rate"
+    kpi: "CWIP-to-Capex ratio"
     horizon_days: 180
     confidence_base: 1.0
     uses_assumption: true
     uses_synthetic: false
     trigger:
-      inputs: ["BS.CWIP_TOTAL", "CF.CAPEX"]
-      expr: "(BS.CWIP_TOTAL / abs(CF.CAPEX)) > median5(BS.CWIP_TOTAL / abs(CF.CAPEX))"
+      inputs: ["BS.CWIP", "CAPEX.TOTAL"]
+      expr: "(BS.CWIP / abs(CAPEX.TOTAL)) > median5(BS.CWIP / abs(CAPEX.TOTAL))"
     impact:
       kind: annual
-      low_expr: "(BS.CWIP_TOTAL - (median5(BS.CWIP_TOTAL / abs(CF.CAPEX)) * abs(CF.CAPEX))) * 0.10"
-      mid_expr: "(BS.CWIP_TOTAL - (median5(BS.CWIP_TOTAL / abs(CF.CAPEX)) * abs(CF.CAPEX))) * 0.12"
-      high_expr: "(BS.CWIP_TOTAL - (median5(BS.CWIP_TOTAL / abs(CF.CAPEX)) * abs(CF.CAPEX))) * 0.14"
-    what_to_do_template: "Accelerate commissioning of aged capital work-in-progress (CWIP ₹{BS.CWIP_TOTAL} cr vs annual capex ₹{CF.CAPEX} cr) to reduce capital carrying cost."
+      low_expr: "(BS.CWIP - (median5(BS.CWIP / abs(CAPEX.TOTAL)) * abs(CAPEX.TOTAL))) * 0.10"
+      mid_expr: "(BS.CWIP - (median5(BS.CWIP / abs(CAPEX.TOTAL)) * abs(CAPEX.TOTAL))) * 0.12"
+      high_expr: "(BS.CWIP - (median5(BS.CWIP / abs(CAPEX.TOTAL)) * abs(CAPEX.TOTAL))) * 0.14"
+    what_to_do_template: "Accelerate mechanical completion of brownfield CWIP (₹{BS.CWIP} cr vs annual capex ₹{CAPEX.TOTAL} cr) across Panipat P-25 and Barauni BR-9 to begin earning ROCE."
     ask_template: "Accelerate CWIP commissioning toward the 5-year median CWIP-to-capex ratio"
 
   - id: L06
-    title: "Exploration efficiency (dry-well write-offs)"
-    owner: CMD
-    kpi: "Dry-well cost ₹ cr"
+    title: "Petrochemicals (PX/PTA/polymers) & SERVO margin mix uplift"
+    owner: DIR_MKT
+    kpi: "Petchem revenue ₹ cr"
     horizon_days: 180
+    confidence_base: 1.0
+    uses_assumption: true
+    uses_synthetic: false
+    trigger:
+      inputs: ["REV.PETCHEM", "MKT.SALES_MMT"]
+      expr: "REV.PETCHEM > prior(REV.PETCHEM)"
+    impact:
+      kind: annual
+      low_expr: "REV.PETCHEM * 0.03"
+      mid_expr: "REV.PETCHEM * 0.04"
+      high_expr: "REV.PETCHEM * 0.05"
+    what_to_do_template: "Scale high-margin specialty polymers, XP95/XtraGreen branded fuels, and SERVO lubes (petchem revenue ₹{REV.PETCHEM} cr across {MKT.SALES_MMT} MMT sales)."
+    ask_template: "Expand specialty polymers and branded fuel mix on ₹{REV.PETCHEM} cr segment base"
+
+  - id: L07
+    title: "Refinery fuel & loss (MBN) heat-integration optimisation"
+    owner: DIR_REF
+    kpi: "Refinery feedstock ₹ cr"
+    horizon_days: 90
     confidence_base: 1.0
     uses_assumption: false
     uses_synthetic: false
     trigger:
-      inputs: ["EXPL.WELLS"]
-      expr: "EXPL.WELLS > (avg5(EXPL.WELLS) * 1.20)"
+      inputs: ["REF.THROUGHPUT_MMT", "PL.COST_MATERIALS", "PL.EMP_BENEFIT"]
+      expr: "(REF.THROUGHPUT_MMT > prior(REF.THROUGHPUT_MMT)) or (yoy(PL.EMP_BENEFIT) > 0.05)"
     impact:
       kind: annual
-      low_expr: "(EXPL.WELLS - avg5(EXPL.WELLS)) * 0.7"
-      mid_expr: "EXPL.WELLS - avg5(EXPL.WELLS)"
-      high_expr: "(EXPL.WELLS - avg5(EXPL.WELLS)) * 1.2"
-    what_to_do_template: "Tighten seismic prospect grading to bring exploratory well write-offs (₹{EXPL.WELLS} cr) back toward the 5-year average (₹{avg5(EXPL.WELLS)} cr)."
-    ask_template: "Bring exploratory dry-well write-offs from ₹{EXPL.WELLS} cr toward the 5-year average"
-
-  - id: L07
-    title: "Employee cost & overtime efficiency"
-    owner: DIR_HR
-    kpi: "Cost/employee, revenue/employee"
-    horizon_days: 90
-    confidence_base: 1.0
-    uses_assumption: false
-    uses_synthetic: true
-    trigger:
-      inputs: ["PL.EMP_BENEFIT"]
-      expr: "yoy(PL.EMP_BENEFIT) > 0.05"
-    impact:
-      kind: annual
-      low_expr: "(PL.EMP_BENEFIT - prior(PL.EMP_BENEFIT)) * 0.5"
-      mid_expr: "(PL.EMP_BENEFIT - prior(PL.EMP_BENEFIT)) * 0.75"
-      high_expr: "PL.EMP_BENEFIT - prior(PL.EMP_BENEFIT)"
-    what_to_do_template: "Rebalance overtime and field deployment rosters to contain employee benefit expense (₹{PL.EMP_BENEFIT} cr vs prior year ₹{prior(PL.EMP_BENEFIT)} cr)."
-    ask_template: "Contain overtime and allowance drift across field work centres"
+      low_expr: "PL.COST_MATERIALS * 0.0035"
+      mid_expr: "PL.COST_MATERIALS * 0.005"
+      high_expr: "PL.COST_MATERIALS * 0.0065"
+    what_to_do_template: "Cut internal Fuel & Loss across older inland refineries via waste-heat recovery and MBN optimisation (0.50% saving on ₹{PL.COST_MATERIALS} cr crude feedstock across {REF.THROUGHPUT_MMT} MMT throughput)."
+    ask_template: "Reduce refinery fuel & loss intensity by 0.50% on ₹{PL.COST_MATERIALS} cr crude basket"
 
   - id: L08
-    title: "FX exposure & natural/forward hedging"
+    title: "Short-term working capital debt & FX borrowing refinancing"
     owner: DIR_FIN
-    kpi: "FX loss ₹ cr"
+    kpi: "Finance cost ₹ cr"
     horizon_days: 30
     confidence_base: 1.0
     uses_assumption: true
     uses_synthetic: false
     trigger:
-      inputs: ["OPEX.EXCH_LOSS"]
-      expr: "(OPEX.EXCH_LOSS > 1000) or (OPEX.EXCH_LOSS > (2 * prior(OPEX.EXCH_LOSS)))"
+      inputs: ["BS.BORROW_TOTAL_10YR", "PL.FIN_COST"]
+      expr: "PL.FIN_COST > avg5(PL.FIN_COST)"
     impact:
       kind: annual
-      low_expr: "OPEX.EXCH_LOSS * 0.35"
-      mid_expr: "OPEX.EXCH_LOSS * 0.50"
-      high_expr: "OPEX.EXCH_LOSS * 0.65"
-    what_to_do_template: "Hedge 50% of USD-denominated lease/vendor exposure to mitigate exchange loss (₹{OPEX.EXCH_LOSS} cr vs prior year ₹{prior(OPEX.EXCH_LOSS)} cr)."
-    ask_template: "Implement 50% FX hedge coverage on USD lease and payable exposures"
+      low_expr: "BS.BORROW_TOTAL_10YR * 0.003"
+      mid_expr: "BS.BORROW_TOTAL_10YR * 0.004"
+      high_expr: "BS.BORROW_TOTAL_10YR * 0.005"
+    what_to_do_template: "Shift short-term rupee/CP working capital borrowings (total debt ₹{BS.BORROW_TOTAL_10YR} cr; finance cost ₹{PL.FIN_COST} cr) toward lower-spread TReDS/FX buyer's credit by 40 bps."
+    ask_template: "Refinance ₹{BS.BORROW_TOTAL_10YR} cr debt stack targeting a 40 bps blended rate saving"
 
   - id: L09
-    title: "Provisions & write-offs review"
+    title: "Crude import supplier credit & trade payables alignment"
     owner: DIR_FIN
-    kpi: "Provisions ₹ cr"
+    kpi: "Trade payables ₹ cr"
     horizon_days: 90
     confidence_base: 1.0
-    uses_assumption: false
+    uses_assumption: true
     uses_synthetic: false
     trigger:
-      inputs: ["OPEX.PROVISIONS"]
-      expr: "yoy(OPEX.PROVISIONS) > 0.25"
+      inputs: ["BS.TRADE_PAY", "PL.COST_MATERIALS"]
+      expr: "BS.TRADE_PAY < (avg5(BS.TRADE_PAY) * 1.15)"
     impact:
-      kind: annual
-      low_expr: "(OPEX.PROVISIONS - prior(OPEX.PROVISIONS)) * 0.75"
-      mid_expr: "OPEX.PROVISIONS - prior(OPEX.PROVISIONS)"
-      high_expr: "(OPEX.PROVISIONS - prior(OPEX.PROVISIONS)) * 1.15"
-    what_to_do_template: "Audit ageing doubtful advances and disputed claims driving the increase in provisions and write-offs (₹{OPEX.PROVISIONS} cr vs prior year ₹{prior(OPEX.PROVISIONS)} cr)."
-    ask_template: "Review and resolve disputed claims driving ₹{OPEX.PROVISIONS} cr in provisions"
+      kind: one_off
+      low_expr: "BS.TRADE_PAY * 0.03"
+      mid_expr: "BS.TRADE_PAY * 0.04"
+      high_expr: "BS.TRADE_PAY * 0.05"
+    what_to_do_template: "Extend usance LC credit terms on term-crude cargoes by 3–4% on trade payables base of ₹{BS.TRADE_PAY} cr (avg5 ₹{avg5(BS.TRADE_PAY)} cr)."
+    ask_template: "Align crude trade payables (₹{BS.TRADE_PAY} cr) via extended LC credit terms"
 
   - id: L10
-    title: "Lease portfolio refinancing"
+    title: "Ind AS 116 charter & terminal lease liability refinancing"
     owner: DIR_FIN
-    kpi: "Lease interest ₹ cr"
+    kpi: "Lease liability ₹ cr"
     horizon_days: 180
     confidence_base: 1.0
     uses_assumption: true
     uses_synthetic: false
     trigger:
-      inputs: ["BS.LEASE_LIAB_TOTAL", "PL.FIN_COST"]
-      expr: "(BS.LEASE_LIAB_TOTAL > 20000) and (PL.FIN_COST > prior(PL.FIN_COST))"
+      inputs: ["BS.LEASE_LIAB_NC", "PL.FIN_COST"]
+      expr: "(BS.LEASE_LIAB_NC > median5(BS.LEASE_LIAB_NC)) and (PL.FIN_COST > avg5(PL.FIN_COST))"
     impact:
       kind: annual
-      low_expr: "BS.LEASE_LIAB_TOTAL * 0.0075"
-      mid_expr: "BS.LEASE_LIAB_TOTAL * 0.01"
-      high_expr: "BS.LEASE_LIAB_TOTAL * 0.0125"
-    what_to_do_template: "Refinance high-rate charter/lease liabilities (₹{BS.LEASE_LIAB_TOTAL} cr; finance costs ₹{PL.FIN_COST} cr) targeting a 100 bps rate reduction."
-    ask_template: "Refinance lease liabilities (₹{BS.LEASE_LIAB_TOTAL} cr) for ~100 bps interest saving"
+      low_expr: "BS.LEASE_LIAB_NC * 0.0075"
+      mid_expr: "BS.LEASE_LIAB_NC * 0.01"
+      high_expr: "BS.LEASE_LIAB_NC * 0.0125"
+    what_to_do_template: "Refinance time-charter tanker and terminal lease obligations (₹{BS.LEASE_LIAB_NC} cr vs 5y median ₹{median5(BS.LEASE_LIAB_NC)} cr) targeting 100 bps implicit rate reduction."
+    ask_template: "Refinance lease liabilities (₹{BS.LEASE_LIAB_NC} cr) for ~100 bps interest saving"

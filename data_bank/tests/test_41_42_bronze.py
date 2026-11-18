@@ -31,10 +31,10 @@ import pytest
 import yaml
 from google.cloud import bigquery, storage
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 BRONZE_DATASET = "hrfin_bronze"
-LANDING_BUCKET = "ongc-hr-finance-agent-landing"
-DOCS_BUCKET = "ongc-hr-finance-agent-docs"
+LANDING_BUCKET = "yukti-finance-iocl-landing"
+DOCS_BUCKET = "yukti-finance-iocl-docs"
 BATCH_ID = "20261019"
 
 # Non-canonical duplicate sources in landing/ (generator bug; dropped per Lead instructions)

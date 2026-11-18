@@ -6,18 +6,19 @@ set -euo pipefail
 # Requires: --no-cpu-throttling --min-instances=1 --session-affinity --timeout=300
 # ---
 
-export GOOGLE_CLOUD_PROJECT="${GOOGLE_CLOUD_PROJECT:-ongc-hr-finance-agent}"
-export TARGET_PROJECT="${TARGET_PROJECT:-ongc-hr-finance-agent}"
+export GOOGLE_CLOUD_PROJECT="${GOOGLE_CLOUD_PROJECT:-yukti-finance-iocl}"
+export TARGET_PROJECT="${TARGET_PROJECT:-yukti-finance-iocl}"
 export GOOGLE_GENAI_USE_VERTEXAI="TRUE"
 # B2: QuerySpec planner on by default (gate: root 87.5%, follow-ups 90%; D-31). Set YUKTI_PLANNER=0 to roll back.
 export YUKTI_PLANNER="${YUKTI_PLANNER:-1}"
-export YUKTI_BACKEND_URL="http://127.0.0.1:8095"
+export YUKTI_CONTRACT_V3_FIELDS="${YUKTI_CONTRACT_V3_FIELDS:-all}"
+export YUKTI_BACKEND_URL="http://127.0.0.1:8195"
 export PORT="${PORT:-8080}"
 export HOST="0.0.0.0"
 
-echo "[yukti-cloudrun] Starting FastAPI + ADK + Gemini Live backend on 127.0.0.1:8095..."
+echo "[yukti-cloudrun] Starting FastAPI + ADK + Gemini Live backend on 127.0.0.1:8195..."
 cd /app/yukti/backend
-/app/yukti/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8095 &
+/app/yukti/backend/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8195 &
 BACKEND_PID=$!
 
 # Wait for backend health
@@ -27,20 +28,20 @@ for i in $(seq 1 60); do
     echo "[yukti-cloudrun] Backend process exited during startup" >&2
     exit 1
   fi
-  if curl -sf http://127.0.0.1:8095/health >/dev/null 2>&1; then
-    echo "[yukti-cloudrun] Backend healthy on :8095"
+  if curl -sf http://127.0.0.1:8195/health >/dev/null 2>&1; then
+    echo "[yukti-cloudrun] Backend healthy on :8195"
     break
   fi
   sleep 1
 done
-if ! curl -sf http://127.0.0.1:8095/health >/dev/null 2>&1; then
+if ! curl -sf http://127.0.0.1:8195/health >/dev/null 2>&1; then
   echo "[yukti-cloudrun] Backend did not become healthy within 60 s" >&2
   exit 1
 fi
 
 echo "[yukti-cloudrun] Starting Next.js + WebSocket single-origin server on 0.0.0.0:${PORT}..."
 cd /app/yukti/frontend
-env NODE_ENV=production PORT="${PORT}" HOST="0.0.0.0" YUKTI_BACKEND_URL="http://127.0.0.1:8095" node server.js &
+env NODE_ENV=production PORT="${PORT}" HOST="0.0.0.0" YUKTI_BACKEND_URL="http://127.0.0.1:8195" node server.js &
 FRONTEND_PID=$!
 # Supervise both: if either exits, stop the container so Cloud Run restarts it (no endless 502s)
 # bash is PID 1 now: forward Cloud Run's SIGTERM to both children for a clean, fast shutdown

@@ -1,7 +1,7 @@
 # ONGC Data Bank — Answer Key & Follow-Up Verification Index
 
 **Generated:** 2026-10-20 07:04:28 UTC (semantic audit 2026-10-20 applied — see `AUDIT_SEMANTIC_2026-10-20.md`)
-**GCP Project:** `ongc-hr-finance-agent` | **Datasets:** `hrfin_gold`, `hrfin_silver`, `hrfin_docs`
+**GCP Project:** `yukti-finance-iocl` | **Datasets:** `hrfin_gold`, `hrfin_silver`, `hrfin_docs`
 **Total Entries:** `356` (`89` Root Questions + `267` Follow-ups)
 **Audit Status:** `334` Answered, `22` Refusals, `0` Gaps
 **Total BigQuery Bytes Processed:** `3,023,120,048` bytes (2883.07 MB)

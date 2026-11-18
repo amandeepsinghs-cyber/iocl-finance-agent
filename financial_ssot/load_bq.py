@@ -31,7 +31,7 @@ SSOT_DIR = Path(__file__).resolve().parent
 OUT_DIR = SSOT_DIR / "out"
 DIM_CSV_PATH = SSOT_DIR / "dim_financial_line.csv"
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or "yukti-finance-iocl"
 LOCATION = "asia-south1"
 BRONZE_DS = "hrfin_bronze"
 STAGING_DS = "hrfin_gold_staging"

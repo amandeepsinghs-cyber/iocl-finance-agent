@@ -1,6 +1,6 @@
 """test_43_44_silver_gold.py: Comprehensive verification suite for Phase 4 Steps 4.3 (Silver) and 4.4 (Gold).
 
-Validates directly against BigQuery ongc-hr-finance-agent:
+Validates directly against BigQuery yukti-finance-iocl:
 1. All 53 silver tables exist with 100% matching columns and data types per schema_silver.yaml.
 2. Dataform assertions pass with 0 failing rows (silver_foreign_keys, silver_accepted_values, gold_calibration_reconciliation).
 3. Silver for every Excel source EXACTLY matches clean tables (landing/excel/_clean/*.xlsx as oracle:
@@ -26,7 +26,7 @@ import pytest
 import yaml
 from google.cloud import bigquery
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 SILVER_DATASET = "hrfin_silver"
 GOLD_DATASET = "hrfin_gold"
 BRONZE_DATASET = "hrfin_bronze"

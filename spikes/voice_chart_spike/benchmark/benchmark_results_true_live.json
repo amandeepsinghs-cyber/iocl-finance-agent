@@ -11,7 +11,7 @@
     "tool_duration_ms": 2096.28,
     "time_to_chart_rendered_ms": 3955.99,
     "total_turn_ms": 3960.19,
-    "backend_grounding": "BigQuery ongc-hr-finance-agent.hrfin_gold.v_continuous_stay"
+    "backend_grounding": "BigQuery yukti-finance-iocl.hrfin_gold.v_continuous_stay"
   },
   {
     "test_id": "LIVE-TXT-FLASH-NATIVE",
@@ -25,7 +25,7 @@
     "tool_duration_ms": 1969.9,
     "time_to_chart_rendered_ms": 4572.52,
     "total_turn_ms": 4572.91,
-    "backend_grounding": "BigQuery ongc-hr-finance-agent.hrfin_gold.v_continuous_stay"
+    "backend_grounding": "BigQuery yukti-finance-iocl.hrfin_gold.v_continuous_stay"
   },
   {
     "test_id": "LIVE-AUDIO-REAL-EN",
@@ -39,7 +39,7 @@
     "tool_duration_ms": 2258.27,
     "time_to_chart_rendered_ms": 4811.46,
     "total_turn_ms": 4811.97,
-    "backend_grounding": "BigQuery ongc-hr-finance-agent.hrfin_gold.v_continuous_stay"
+    "backend_grounding": "BigQuery yukti-finance-iocl.hrfin_gold.v_continuous_stay"
   },
   {
     "test_id": "LIVE-AUDIO-REAL-HI",
@@ -53,7 +53,7 @@
     "tool_duration_ms": 1933.09,
     "time_to_chart_rendered_ms": 4560.86,
     "total_turn_ms": 4561.52,
-    "backend_grounding": "BigQuery ongc-hr-finance-agent.hrfin_gold.v_continuous_stay"
+    "backend_grounding": "BigQuery yukti-finance-iocl.hrfin_gold.v_continuous_stay"
   },
   {
     "test_id": "LIVE-TXT-FOLLOWUP",
@@ -67,7 +67,7 @@
     "tool_duration_ms": 2077.64,
     "time_to_chart_rendered_ms": 4867.44,
     "total_turn_ms": 4868.07,
-    "backend_grounding": "BigQuery ongc-hr-finance-agent.hrfin_gold.v_continuous_stay (filtered 140 execs)"
+    "backend_grounding": "BigQuery yukti-finance-iocl.hrfin_gold.v_continuous_stay (filtered 140 execs)"
   },
   {
     "test_id": "LIVE-TXT-POLICY",

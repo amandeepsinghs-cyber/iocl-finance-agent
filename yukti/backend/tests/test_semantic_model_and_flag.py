@@ -66,7 +66,8 @@ def test_metric_names_unique_and_units_known():
 @pytest.fixture()
 def runner(monkeypatch):
     from app import turn_runner as tr
-    r = tr.AgentTurnRunner(model_name="gemini-2.5-flash")
+    from app.config import DEFAULT_TEXT_MODEL
+    r = tr.AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
     return r
 
 

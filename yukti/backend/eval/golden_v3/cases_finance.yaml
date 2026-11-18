@@ -760,7 +760,7 @@
     - "Pichhle 10 saal ka WACC dikhao"
   expect:
     visual_type: chart:line
-    oracle_sql: "SELECT fiscal_year, wacc_pct, ke_pct, kd_used_pct FROM `ongc-hr-finance-agent.hrfin_gold.fact_wacc_annual` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' ORDER BY fiscal_year"
+    oracle_sql: "SELECT fiscal_year, wacc_pct, ke_pct, kd_used_pct FROM `yukti-finance-iocl.hrfin_gold.fact_wacc_annual` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' ORDER BY fiscal_year"
     provenance: modelled
     cite:
       spec: "SPEC-02"
@@ -774,7 +774,7 @@
     - "FY23 mein WACC zyada kyu tha?"
   expect:
     visual_type: chart:waterfall
-    oracle_sql: "SELECT input_code, marginal_contribution_pct FROM `ongc-hr-finance-agent.hrfin_gold.fact_wacc_shapley` WHERE fiscal_year = 'FY23' ORDER BY ABS(marginal_contribution_pct) DESC"
+    oracle_sql: "SELECT input_code, marginal_contribution_pct FROM `yukti-finance-iocl.hrfin_gold.fact_wacc_shapley` WHERE fiscal_year = 'FY23' ORDER BY ABS(marginal_contribution_pct) DESC"
     provenance: modelled
     cite:
       spec: "SPEC-02 §5.3"
@@ -811,7 +811,7 @@
     - "FY26 ka consolidated revenue kitna tha?"
   expect:
     visual_type: kpi
-    oracle_sql: "SELECT value_inr_cr FROM `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line` WHERE scope = 'consolidated' AND line_code = 'PL.REV_OPS' AND fiscal_year = 'FY26' AND period_type = 'annual' AND is_latest_vintage = TRUE LIMIT 1"
+    oracle_sql: "SELECT value_inr_cr FROM `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line` WHERE scope = 'consolidated' AND line_code = 'PL.REV_OPS' AND fiscal_year = 'FY26' AND period_type = 'annual' AND is_latest_vintage = TRUE LIMIT 1"
     scope: consolidated
     provenance: verified_ar
     cite:
@@ -1216,7 +1216,7 @@
     - "Pichhle 10 saal ka WACC kya tha?"
   expect:
     visual_type: chart:line
-    oracle_sql: "SELECT fiscal_year, wacc_pct, ke_pct, kd_used_pct FROM `ongc-hr-finance-agent.hrfin_gold.fact_wacc_annual` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' ORDER BY fiscal_year"
+    oracle_sql: "SELECT fiscal_year, wacc_pct, ke_pct, kd_used_pct FROM `yukti-finance-iocl.hrfin_gold.fact_wacc_annual` WHERE fiscal_year BETWEEN 'FY17' AND 'FY26' ORDER BY fiscal_year"
     badge: "Modelled"
     provenance: modelled
     cite:
@@ -1231,7 +1231,7 @@
     - "FY23 mein WACC zyada kyu tha?"
   expect:
     visual_type: chart:waterfall
-    oracle_sql: "SELECT input_code, marginal_contribution_pct FROM `ongc-hr-finance-agent.hrfin_gold.fact_wacc_shapley` WHERE fiscal_year = 'FY23' ORDER BY ABS(marginal_contribution_pct) DESC"
+    oracle_sql: "SELECT input_code, marginal_contribution_pct FROM `yukti-finance-iocl.hrfin_gold.fact_wacc_shapley` WHERE fiscal_year = 'FY23' ORDER BY ABS(marginal_contribution_pct) DESC"
     badge: "Modelled"
     provenance: modelled
     cite:

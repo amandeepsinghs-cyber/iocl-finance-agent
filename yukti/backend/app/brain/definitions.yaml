@@ -20,14 +20,14 @@ definitions:
     exemption_handling: "counted_not_removed"
     rule_sentence: "Continuous stay at the current station, more than 5.0 years, as of {anchor_date_fmt}"
     citations:
-      - doc_id: "ONGC-HR-POL-JRTP"
+      - doc_id: "IOCL-HR-POL-JRTP"
         kind: "policy"
         title: "JRTP Rev 4 cl. 3.2 — rotation after 3–5 years (**Illustrative**)"
         section: "cl. 3.2"
         illustrative: true
       - doc_id: "J-03"
         kind: "case_law"
-        title: "Delhi High Court (2018), ONGC v. B.V. Srihari Rao"
+        title: "Delhi High Court (2018), IOCL Administrative Rotation Jurisprudence"
         section: "2018 SCC OnLine Del (Administrative Exigency & Rotation)"
         illustrative: false
     reference_sql: |
@@ -38,7 +38,7 @@ definitions:
         e.current_grade_id AS grade,
         e.grade_level_order,
         e.discipline_id,
-        ROUND(e.total_tenure_years, 1) AS ongc_tenure_years,
+        ROUND(e.total_tenure_years, 1) AS iocl_tenure_years,
         ROUND(DATE_DIFF(DATE '{anchor_date}', s.continuous_from_date, DAY) / 365.25, 1) AS delhi_tenure_years,
         ROUND(e.years_to_retirement, 1) AS years_to_retirement,
         e.exemption_tag AS exemption,
@@ -67,14 +67,14 @@ definitions:
     exemption_handling: "counted_not_removed"
     rule_sentence: "Continuous stay at the current station, more than 5.0 years, as of {anchor_date_fmt}"
     citations:
-      - doc_id: "ONGC-HR-POL-JRTP"
+      - doc_id: "IOCL-HR-POL-JRTP"
         kind: "policy"
         title: "JRTP Rev 4 cl. 3.2 — rotation after 3–5 years (**Illustrative**)"
         section: "cl. 3.2"
         illustrative: true
       - doc_id: "J-03"
         kind: "case_law"
-        title: "Delhi High Court (2018), ONGC v. B.V. Srihari Rao"
+        title: "Delhi High Court (2018), IOCL Administrative Rotation Jurisprudence"
         section: "2018 SCC OnLine Del (Administrative Exigency & Rotation)"
         illustrative: false
     reference_sql: |
@@ -85,7 +85,7 @@ definitions:
         e.current_grade_id AS grade,
         e.grade_level_order,
         e.discipline_id,
-        ROUND(e.total_tenure_years, 1) AS ongc_tenure_years,
+        ROUND(e.total_tenure_years, 1) AS iocl_tenure_years,
         ROUND(DATE_DIFF(DATE '{anchor_date}', s.continuous_from_date, DAY) / 365.25, 1) AS station_tenure_years,
         ROUND(e.years_to_retirement, 1) AS years_to_retirement,
         e.exemption_tag AS exemption,

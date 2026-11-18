@@ -112,7 +112,8 @@ class FullEvaluator:
     def __init__(self, concurrency: int = 5, model_name: Optional[str] = None):
         self.concurrency = concurrency
         self.semaphore = asyncio.Semaphore(concurrency)
-        self.model_name = model_name or os.getenv("YUKTI_EVAL_MODEL", "gemini-2.5-flash")
+        from app.config import DEFAULT_TEXT_MODEL
+        self.model_name = model_name or os.getenv("YUKTI_EVAL_MODEL", DEFAULT_TEXT_MODEL)
         self.runner = get_agent_turn_runner(model_name=self.model_name)
         self.checkpoints = CheckpointManager()
 

@@ -230,4 +230,4 @@ Debugging the 42 zero-row/error queries revealed crucial schema nuances that the
 ## 4. Verification Methodology & Audit Guarantee
 1. **Zero High-Similarity Collisions**: Evaluated against all 356 planned reference prompts in `world_bible/reference/questions.yaml` (difflib score < 0.80 across all prompts).
 2. **Strict Answerability Standard**: A prompt is marked `ANSWERABLE` if and only if `row_count > 0` AND the result directly answers the user's business question. Zero-row queries and errors are strictly classified as GAPs or PARTIALs.
-3. **Live GCP Execution**: Every single SQL query was executed against BigQuery (`ongc-hr-finance-agent`) in `asia-south1` with label `{'datacloud': 'ai-agent'}`. Unstructured queries were run via Vertex AI Discovery Engine search and `hrfin_docs.silver_chunks`.
+3. **Live GCP Execution**: Every single SQL query was executed against BigQuery (`yukti-finance-iocl`) in `asia-south1` with label `{'datacloud': 'ai-agent'}`. Unstructured queries were run via Vertex AI Discovery Engine search and `hrfin_docs.silver_chunks`.

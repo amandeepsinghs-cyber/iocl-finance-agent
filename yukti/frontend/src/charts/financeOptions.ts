@@ -179,16 +179,19 @@ export function sortTornado(bars: TornadoBarSpec[]): TornadoBarSpec[] {
 }
 
 const DRIVER_LABELS: Record<string, string> = {
-  brent: 'Brent',
-  opex: 'Opex/boe',
-  opex_boe: 'Opex/boe',
-  capex: 'Capex',
-  production: 'Production',
+  brent: 'Brent / GRM spread',
+  grm: 'Singapore GRM',
+  opex: 'Refining & Mktg Opex',
+  opex_boe: 'Refining & Mktg Opex',
+  capex: 'Capex scale',
+  prod: 'Refining throughput',
+  production: 'Refining throughput',
   wacc: 'WACC',
   terminal_g: 'Terminal g',
   g: 'Terminal g',
   inr_usd: 'INR/USD',
   fx: 'INR/USD',
+  holdco: 'Holdco discount',
   holdco_discount: 'Holdco discount',
 };
 

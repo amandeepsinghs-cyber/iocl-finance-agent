@@ -7,7 +7,7 @@ WITH price_params AS (
         AVG(brent_usd_bbl) AS avg_brent,
         AVG(ongc_crude_net_realisation_usd_bbl) AS avg_realisation,
         AVG(brent_usd_bbl - ongc_crude_net_realisation_usd_bbl) AS avg_discount
-    FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+    FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
     WHERE fiscal_year IN ('FY26', '2026')
 ),
 sim_brent60 AS (
@@ -21,8 +21,8 @@ sim_brent60 AS (
         (pnl.oil_revenue_inr_cr * ((60.0 - params.avg_discount) / params.avg_realisation) + pnl.gas_revenue_inr_cr) AS sim_gross_rev_cr,
         SAFE_DIVIDE(pnl.statutory_royalty_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0)) AS eff_royalty_rate,
         SAFE_DIVIDE(pnl.statutory_cess_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0)) AS eff_cess_rate
-    FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` pnl
-    JOIN `ongc-hr-finance-agent.hrfin_silver.dim_field` f ON pnl.field_id = f.field_id
+    FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual` pnl
+    JOIN `yukti-finance-iocl.hrfin_silver.dim_field` f ON pnl.field_id = f.field_id
     CROSS JOIN price_params params
     WHERE pnl.fiscal_year IN ('FY26', '2026') AND pnl.line_type = 'field'
 )

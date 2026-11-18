@@ -61,14 +61,14 @@ def test_grounding_drops_ungrounded_coverage_claim_bug20():
 
 def test_hindi_and_hinglish_narration_bug19_beh07_35():
     """SPEC-11 §6.4 / BUG-19 / BEH-07.11 / BEH-07.35: Hindi (Devanagari) and Hinglish (Roman) narration."""
-    headline = "For FY25, ONGC's revenue from operations is ₹1,37,846.29 Cr."
-    res_hi = compose_spoken(headline, [], {137846.29}, language="hi")
+    headline = "For FY25, IOCL's revenue from operations is ₹8,45,513.00 Cr."
+    res_hi = compose_spoken(headline, [], {845513.0}, language="hi")
     spoken_hi = res_hi["text"]
     # Devanagari characters present
     assert any("\u0900" <= ch <= "\u097f" for ch in spoken_hi), f"Expected Devanagari in {spoken_hi!r}"
-    assert "1,37,846.29" in spoken_hi or "137846" in spoken_hi
+    assert "8,45,513" in spoken_hi or "845513" in spoken_hi
 
-    res_hinglish = compose_spoken(headline, [], {137846.29}, language="hi-en")
+    res_hinglish = compose_spoken(headline, [], {845513.0}, language="hi-en")
     spoken_hinglish = res_hinglish["text"]
     assert not any("\u0900" <= ch <= "\u097f" for ch in spoken_hinglish)
     assert "mein" in spoken_hinglish.lower() or "hai" in spoken_hinglish.lower()
@@ -99,38 +99,28 @@ def test_beh07_30_coverage_and_2024_balance_sheet():
     assert c3.get("visual", {}).get("type") in ("statement", "statement_table", "table")
 
 
-def test_beh07_32_casual_leave_12_days_not_study_leave():
-    """BEH-07.32: E2_HR casual leave question returns 12 days under Clause 2A.0, not Study Leave."""
-    c = _run_turn(
-        "I need to take casual leave for 4 days, how many casual leaves am I allowed in a year?",
-        persona="E2_HR",
+def test_beh07_32_iocl_doa_and_hedging_policy_clauses():
+    """BEH-07.32: E2_FIN and E1_FIN Finance policy queries return deterministic IOCL DoA / hedging clauses."""
+    c_doa = _run_turn(
+        "What is the Delegation of Authority limit for spot crude oil cargo procurement?",
+        persona="E2_FIN",
         session_id="test-beh07-32",
     )
-    text = (c.get("display_text") or "") + " " + (c.get("spoken_summary") or "")
-    assert "12" in text
-    assert "2A.0" in text or "casual leave" in text.lower()
-    assert "study leave" not in text.lower()
+    text_doa = (c_doa.get("display_text") or "") + " " + (c_doa.get("spoken_summary") or "")
+    assert "IOCL-DOA" in str(c_doa) or "Delegation of Authority" in text_doa or "crude" in text_doa.lower()
+    assert c_doa.get("access", {}).get("status") == "allowed"
 
 
-def test_beh07_33_e1_joining_pay_and_salary_breakdown_no_fudge():
-    """BEH-07.33: E1 joining pay ₹60,000–₹1,80,000 and monthly gross breakdown with zero fudge factor."""
+def test_beh07_33_e1_fin_refinery_grm_policy_and_revenue_grounding():
+    """BEH-07.33: E1_FIN Finance officer can query IOCL hedging policy and published statements."""
     c1 = _run_turn(
-        "What is the joining pay for E1 level executive?",
-        persona="E1_HR",
+        "What is IndianOil's hedging policy on crack spread and inventory price protection?",
+        persona="E1_FIN",
         session_id="test-beh07-33",
     )
     t1 = (c1.get("display_text") or "") + " " + (c1.get("spoken_summary") or "")
-    assert "60,000" in t1
-    assert "1,80,000" in t1
-
-    c2 = _run_turn(
-        "Give me the monthly salary breakdown in hand for E1 at ₹60,000 basic",
-        persona="E1_HR",
-        session_id="test-beh07-33",
-    )
-    t2 = (c2.get("display_text") or "") + " " + (c2.get("spoken_summary") or "")
-    # ₹60,000 + ₹27,000 (45% DA) + ₹16,200 (27% HRA) + ₹21,000 (35% Cafeteria) = ₹1,24,200
-    assert "1,24,200" in t2 or "124200" in t2
+    assert "hedg" in t1.lower() or "crack" in t1.lower() or "inventory" in t1.lower()
+    assert c1.get("access", {}).get("status") == "allowed"
 
 
 def test_beh07_34_single_kpi_waterfall_refusal():

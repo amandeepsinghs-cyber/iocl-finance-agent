@@ -58,7 +58,7 @@ async def health_check() -> Dict[str, Any]:
         "default_model": DEFAULT_LIVE_MODEL,
         "default_voice": DEFAULT_VOICE,
         "location": os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1"),
-        "project": os.getenv("GOOGLE_CLOUD_PROJECT", "ongc-hr-finance-agent"),
+        "project": os.getenv("GOOGLE_CLOUD_PROJECT", "yukti-finance-iocl"),
     }
 
 

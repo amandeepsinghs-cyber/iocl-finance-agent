@@ -43,17 +43,13 @@ SECTION_WEIGHT = 0.01
 CANDIDATE_FACTOR = 4
 LEXICAL_WEIGHT = 0.05
 _STOP = set("""what which when where how much many does did were was have has with from that this
-during year years into about their there they your ongc company report annual total being been
+during year years into about their there they your iocl indianoil company report annual total being been
 also than then them over under after before such other will would should could""".split())
 _TERM_RX = re.compile(r"[A-Za-z][A-Za-z0-9/&.-]{2,}")
 PROVENANCE_LABEL = "verified_ar"  # SPEC-11 §7.1: verbatim AR text with a page citation
 
 _FY_RX = re.compile(r"^FY(\d{2})$")
-# Prefixes of the codes that `doc_chunks_ar.line_codes` actually holds. Chunker v1/v2 only emits
-# keyword tags (KW.*) because `financial_ssot/dim_financial_line.csv` does not exist yet. Filtering
-# on any other code (e.g. PL.REV_OPS) would silently match nothing, so such filters are skipped and
-# logged. Add the dim prefixes here once the chunker tags `dim_financial_line.ar_labels`.
-TAGGED_LINE_CODE_PREFIXES = ("KW.",)
+TAGGED_LINE_CODE_PREFIXES = ("KW.", "PL.", "BS.", "CF.", "LEVY.", "REV.", "RATIO.", "OTH.", "CAPEX.", "REF.", "PIP.", "MKT.")
 
 
 def usable_line_code(line_code: Optional[str]) -> Optional[str]:

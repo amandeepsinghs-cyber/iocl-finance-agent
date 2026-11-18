@@ -132,7 +132,7 @@ async def transfer_note_contract(query: str, session_state: Any, persona: str, t
             metric_label="Employees",
             unit="employees",
             source="generated",
-            tables=["hrfin_gold.ssot_workforce_employee"],
+            tables=["hrfin_gold.ssot_corporate_annual_360"],
             grain="row",
         )
     )
@@ -157,7 +157,7 @@ async def transfer_note_contract(query: str, session_state: Any, persona: str, t
                                 "template_id": doc["template_id"], "version": doc["version"]},
                    "table": {"columns": cols, "rows": rows, "total_rows": len(rows)}},
         "insights": [f"{n} employees listed (selected rows re-fetched by employee id)"],
-        "sources": [{"kind": "data", "object": "hrfin_gold.ssot_workforce_employee", "sql": sql},
+        "sources": [{"kind": "data", "object": "hrfin_gold.ssot_corporate_annual_360", "sql": sql},
                     {"kind": "document", "title": doc["template_id"]}],
         "suggestions": [], "access": {"status": "allowed"},
         "export_options": ["word", "pdf", "docs", "xlsx"],

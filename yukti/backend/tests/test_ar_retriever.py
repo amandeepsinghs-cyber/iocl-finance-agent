@@ -37,13 +37,13 @@ class FakeBQ:
 
 def _rows():
     return [
-        {"chunk_id": "AR_FY26_p0300_c01", "fiscal_year": "FY26", "source_doc": "ONGC_AR_FY2025-26.pdf",
+        {"chunk_id": "AR_FY26_p0300_c01", "fiscal_year": "FY26", "source_doc": "IOCL_AR_FY2025-26.pdf",
          "source_page": 300, "source_page_label": None, "section": "other", "note_no": None,
          "heading": "x", "text": "t1", "distance": 0.200},
-        {"chunk_id": "AR_FY26_p0098_c01", "fiscal_year": "FY26", "source_doc": "ONGC_AR_FY2025-26.pdf",
+        {"chunk_id": "AR_FY26_p0098_c01", "fiscal_year": "FY26", "source_doc": "IOCL_AR_FY2025-26.pdf",
          "source_page": 98, "source_page_label": "96", "section": "directors_report", "note_no": None,
          "heading": "Board's Report", "text": "accreted 44.01 MMTOE", "distance": 0.205},
-        {"chunk_id": "AR_FY26_p0240_c02", "fiscal_year": "FY26", "source_doc": "ONGC_AR_FY2025-26.pdf",
+        {"chunk_id": "AR_FY26_p0240_c02", "fiscal_year": "FY26", "source_doc": "IOCL_AR_FY2025-26.pdf",
          "source_page": 240, "source_page_label": "238", "section": "mdna", "note_no": None,
          "heading": "MD&A", "text": "t3", "distance": 0.30},
     ]
@@ -102,18 +102,18 @@ def test_lexical_bonus_and_top_k_cut():
 
 
 def test_untagged_line_code_filter_is_skipped_and_logged(caplog):
-    # G4 C2: line_codes holds only KW.* tags today; a dim code such as PL.REV_OPS must not turn the
-    # pre-filter into "match nothing".
+    # Codes whose prefix is not emitted by chunk_ar are safely skipped rather than turning pre-filter empty.
     bq = FakeBQ(_rows())
     r = ar.ARRetriever(bq_client=bq, embed_fn=lambda q: [0.1] * 768)
     with caplog.at_level("INFO", logger=ar.logger.name):
-        out = r.retrieve("revenue from operations", fiscal_year="FY26", line_code="PL.REV_OPS")
+        out = r.retrieve("revenue from operations", fiscal_year="FY26", line_code="UNMAPPED.CODE")
     sql, cfg = bq.calls[0]
     assert "line_codes" not in sql and "line_code" not in _params(cfg)
     assert "fiscal_year IN UNNEST(@fys)" in sql
     assert out, "results must not be emptied by an untagged line_code"
-    assert any("PL.REV_OPS" in m and "skipped" in m for m in caplog.messages)
-    assert ar.usable_line_code("KW.ROYALTY") == "KW.ROYALTY"
+    assert any("UNMAPPED.CODE" in m and "skipped" in m for m in caplog.messages)
+    assert ar.usable_line_code("KW.GRM") == "KW.GRM"
+    assert ar.usable_line_code("PL.REV_OPS") == "PL.REV_OPS"
     assert ar.usable_line_code(None) is None
 
 
@@ -134,7 +134,9 @@ def test_empty_question_and_bad_dims():
 
 
 @pytest.mark.skipif(os.getenv("YUKTI_LIVE_BQ") != "1", reason="live BigQuery test (set YUKTI_LIVE_BQ=1, ADC)")
-def test_live_fy26_reserve_accretion():
-    out = ar.ARRetriever().retrieve("How much 2P reserves did ONGC accrete during the year and what was the reserve replacement ratio?",
-                                    fiscal_year="FY26")
-    assert out and any(o["fiscal_year"] == "FY26" and o["source_page"] == 98 for o in out[:5])
+def test_live_fy26_iocl_refining_grm():
+    out = ar.ARRetriever().retrieve(
+        "What was IndianOil's FY26 refinery throughput, capacity utilisation and Gross Refining Margin GRM?",
+        fiscal_year="FY26",
+    )
+    assert out and any(o["fiscal_year"] == "FY26" and o["citation"].startswith("[AR FY26") for o in out[:5])

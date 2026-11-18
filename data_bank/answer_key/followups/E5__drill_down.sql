@@ -8,5 +8,5 @@ SELECT
     clause_ref,
     heading,
     SUBSTR(REGEXP_REPLACE(REGEXP_EXTRACT(text, r'(?s)(6\.3 .*)'), r'\s+', ' '), 1, 400) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'JRTP' AND clause_ref = 'Clause 6.0';

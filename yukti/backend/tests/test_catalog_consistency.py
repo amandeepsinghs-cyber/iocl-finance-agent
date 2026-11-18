@@ -29,6 +29,10 @@ KNOWN_ENTITY_CODES = (
     set(ENTITIES.get("work_centres", {}).keys())
     | set(ENTITIES.get("disciplines", {}).keys())
     | set(ENTITIES.get("fields", {}).keys())
+    | set(ENTITIES.get("refineries", {}).keys())
+    | set(ENTITIES.get("subsidiaries", {}).keys())
+    | set(ENTITIES.get("products", {}).keys())
+    | set(ENTITIES.get("pipelines", {}).keys())
 )
 
 TABLE_RE = re.compile(r"\b(hrfin_(?:gold|silver))\b\.([A-Za-z0-9_]+)", re.IGNORECASE)
@@ -260,38 +264,43 @@ def test_injected_bad_code_is_caught():
     v_table = table_violations("FROM hrfin_gold.not_a_table", "injected")
     assert len(v_table) > 0, "Expected table_violations to catch hrfin_gold.not_a_table"
 
-    bad_sql = "SELECT 1 FROM hrfin_gold.ssot_workforce_employee WHERE employment_status = 'active'"
+    bad_sql = "SELECT 1 FROM hrfin_gold.ssot_refinery_economics_360 WHERE unit_type = 'refinery'"
     v_cat = categorical_literal_violations(bad_sql, "injected")
-    assert len(v_cat) > 0, "Expected categorical_literal_violations to catch lowercase 'active'"
+    assert len(v_cat) > 0, "Expected categorical_literal_violations to catch lowercase 'refinery'"
 
 
 def test_entities_match_catalog():
-    """Entities.json work_centres must match catalog dim_work_centre.wc_id values (or distinct == 46)."""
-    ent_wcs = set(ENTITIES.get("work_centres", {}).keys())
-    dim_wc = (
+    """Entities.json refineries must match catalog ssot_refinery_economics_360.refinery_id values."""
+    ent_refs = set(ENTITIES.get("refineries", {}).keys())
+    dim_ref = (
         CAT.get("tables", {})
-        .get("hrfin_silver.dim_work_centre", {})
+        .get("hrfin_gold.ssot_refinery_economics_360", {})
         .get("columns", {})
-        .get("wc_id", {})
+        .get("refinery_id", {})
     )
-    if "values" in dim_wc and dim_wc["values"]:
-        cat_wcs = set(dim_wc["values"])
-        assert ent_wcs == cat_wcs, (
-            f"Work centre codes mismatch:\n"
-            f"In entities only: {ent_wcs - cat_wcs}\n"
-            f"In catalog only: {cat_wcs - ent_wcs}"
+    if "values" in dim_ref and dim_ref["values"]:
+        cat_refs = set(dim_ref["values"])
+        assert ent_refs == cat_refs, (
+            f"Refinery codes mismatch:\n"
+            f"In entities only: {ent_refs - cat_refs}\n"
+            f"In catalog only: {cat_refs - ent_refs}"
         )
     else:
-        assert dim_wc.get("distinct") == 46, (
-            f"Expected distinct == 46, got {dim_wc.get('distinct')}"
+        assert dim_ref.get("distinct") == 12, (
+            f"Expected distinct == 12, got {dim_ref.get('distinct')}"
         )
-        assert len(ent_wcs) == 46, f"Expected 46 entities, got {len(ent_wcs)}"
+        assert len(ent_refs) == 12, f"Expected 12 refinery/division entities, got {len(ent_refs)}"
 
 
 def test_no_malformed_or_legacy_codes():
-    """Codes like WC-N&H / WC-B&S / lower-case codes escape CODE_RE; scan for them separately (G4 B1 r1)."""
-    pat = re.compile(r"\b(WC|DISC|FLD)-[A-Za-z0-9&]{2,}(?:-[A-Za-z]{3})?", re.I)
-    known = set(ENTITIES["work_centres"]) | set(ENTITIES["disciplines"]) | set(ENTITIES["fields"])
+    """Codes like WC-N&H / lower-case codes escape CODE_RE; scan for them separately."""
+    pat = re.compile(r"\b(WC|DISC|FLD|REF)-[A-Za-z0-9&]{2,}(?:-[A-Za-z]{3})?", re.I)
+    known = (
+        set(ENTITIES["work_centres"])
+        | set(ENTITIES["disciplines"])
+        | set(ENTITIES["fields"])
+        | set(ENTITIES.get("refineries", {}))
+    )
     bad = []
     files = list((BACKEND / "app").rglob("*.py")) + [BACKEND / "certified/library.yaml",
                                                       BACKEND / "app/semantic/entity_aliases.yaml"]

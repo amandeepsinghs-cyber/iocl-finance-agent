@@ -26,16 +26,15 @@ def _default_specs():
     specs = []
     for s in m.subjects.values():
         for mn in s.metrics:
-            dims = [] if s.row_only else ([d for d in ("wc", "asset", "field", "fy") if d in s.fields][:1])
+            dims = [] if s.row_only else ([d for d in ("refinery", "subsidiary", "product", "pipeline", "fy") if d in s.fields][:1])
             specs.append(QuerySpec(domain=s.domain, metric=mn, dimensions=dims))
         if s.row_columns:
             specs.append(QuerySpec(domain=s.domain, metric=next(iter(s.metrics)), grain="row", limit=5))
     for t in m.templates:
         specs.append(QuerySpec(metric=t))
-    # time-shift (as-of) variant used by "last year" on the workforce subject
-    specs.append(QuerySpec(domain="hr", metric="headcount", dimensions=["wc"], period=Period(fy="FY26"),
-                           filters=[Filter(field="station_tenure_years", op=">=", value=5),
-                                    Filter(field="wc", op="in", value=["WC-DEL", "WC-MUM"])]))
+    # refinery comparison variant on refinery_economics
+    specs.append(QuerySpec(domain="finance", metric="refinery_grm_usd_bbl", dimensions=["refinery"], period=Period(fy="FY26"),
+                           filters=[Filter(field="refinery", op="in", value=["REF-PNP", "REF-PRD"])]))
     return specs
 
 

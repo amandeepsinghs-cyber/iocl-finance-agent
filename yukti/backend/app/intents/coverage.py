@@ -74,10 +74,10 @@ def handle_coverage_query(
             display_text = spoken_summary
 
         rows = [
-            {"domain": "Finance", "statement": "Balance Sheet (Standalone & Consolidated)", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "ONGC Annual Report & XBRL"},
-            {"domain": "Finance", "statement": "Profit & Loss (Standalone & Consolidated)", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "ONGC Annual Report & XBRL"},
-            {"domain": "Finance", "statement": "Cash Flow Statement", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "ONGC Annual Report & XBRL"},
-            {"domain": "Finance", "statement": "Financial Ratios & WACC", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "ONGC Annual Report & SSOT"},
+            {"domain": "Finance", "statement": "Balance Sheet (Standalone & Consolidated)", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "IOCL Annual Report & XBRL"},
+            {"domain": "Finance", "statement": "Profit & Loss (Standalone & Consolidated)", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "IOCL Annual Report & XBRL"},
+            {"domain": "Finance", "statement": "Cash Flow Statement", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "IOCL Annual Report & XBRL"},
+            {"domain": "Finance", "statement": "Financial Ratios & WACC", "fy": f"{target_fy} ({fy_span})", "status": "Available (FY17–FY26)", "source": "IOCL Annual Report & SSOT"},
         ]
         columns = ["domain", "statement", "fy", "status", "source"]
         return {
@@ -103,7 +103,7 @@ def handle_coverage_query(
                 },
             },
             "sources": [
-                {"kind": "data", "object": "coverage_manifest:v_fin_coverage", "doc": f"ONGC_AR_FY{fy_span}.pdf"},
+                {"kind": "data", "object": "coverage_manifest:v_fin_coverage", "doc": f"IOCL_AR_FY{fy_span}.pdf"},
             ],
             "access": {"status": "allowed"},
             "provenance": {
@@ -137,28 +137,25 @@ def handle_coverage_query(
     # General coverage query (F47: "What data do you have?")
     if lang == "hi":
         spoken_summary = (
-            "मेरे पास ONGC की वार्षिक रिपोर्टों से FY17 से FY26 तक का स्टैंडअलोन और समेकित आय विवरण (P&L), बैलेंस शीट और नकदी प्रवाह (Cash Flow), "
-            "FY13 से FY26 तक का 10-वर्षीय सारांश, FY17 से FY26 तक WACC और 28 क्षेत्रों का फील्ड इकोनॉमिक्स, "
-            "तथा 30,782 कर्मचारियों का Employee-360 डेटाबेस और एचआर नीतियाँ उपलब्ध हैं।"
+            "मेरे पास IndianOil (IOCL) की वार्षिक रिपोर्टों से FY17 से FY26 तक का स्टैंडअलोन और समेकित आय विवरण (P&L), "
+            "बैलेंस शीट और नकदी प्रवाह (Cash Flow), WACC व 9 रिफाइनरियों, पाइपलाइन व मार्केटिंग का Downstream-360 डेटा, "
+            "तथा Finance, DoA, Hedging और MoU नीतियाँ उपलब्ध हैं।"
         )
         display_text = spoken_summary
     else:
         spoken_summary = (
-            "I have ONGC's standalone and consolidated income statement, balance sheet, cash flow statement, and financial ratios from FY17 to FY26 from the annual reports, "
-            "10-year summary highlights from FY13 to FY26, WACC from FY17 to FY26, Field & Basin Economics across 28 fields from FY17 to FY26, "
-            "Employee-360 workforce data (30,782 employees as of March 2026), and the HR & Finance policy corpus."
+            "I have IOCL's standalone and consolidated income statement (incl. Gross vs Net of Excise), balance sheet, "
+            "cash flow statement, and financial ratios from FY17 to FY26 from the annual reports, plus WACC, Downstream 360 economics "
+            "across 9 standalone refineries (70.25 MMTPA + CPCL), cross-country pipelines, marketing sales, and IOCL Finance & DoA policies."
         )
         display_text = spoken_summary
 
     rows = [
-        {"domain": "Finance", "scope": "Standalone & Consolidated Statements (BS, P&L, CF, Ratios)", "years": "FY17–FY26", "source": "ONGC Annual Reports & XBRL", "label": "Verified · Annual Report"},
-        {"domain": "Finance", "scope": "10-Year Financial & Physical Highlights Summary", "years": "FY13–FY26", "source": "ONGC Annual Report 10-Yr Table", "label": "Verified · Annual Report"},
-        {"domain": "Finance", "scope": "Consolidated Market View", "years": "FY23–FY26", "source": "Yahoo Finance (ONGC.NS)", "label": "Yahoo view · Consolidated"},
-        {"domain": "Finance", "scope": "WACC & Capital Structure Diagnostics", "years": "FY17–FY26", "source": "AR + RBI G-Sec + Damodaran ERP", "label": "Modelled"},
-        {"domain": "Assets", "scope": "Field & Basin Economics (28 fields, 7 basins)", "years": "FY17–FY26", "source": "AR Reconciled RAS Allocation", "label": "Modelled / Synthetic"},
-        {"domain": "HR", "scope": "Workforce Aggregates (AR Note 35 & BRSR)", "years": "FY17–FY26", "source": "ONGC Annual Reports & BRSR", "label": "Verified · Annual Report"},
-        {"domain": "HR", "scope": "Employee-360 Roster & Payroll (30,782 active staff)", "years": "As of 2026-03-31", "source": "Calibrated Employee-360", "label": "Synthetic data"},
-        {"domain": "Policy", "scope": "HR & Finance Policy Corpus (JRTP, Leave, DFP, PRBS)", "years": "Current", "source": "ONGC Policy Reconstruction", "label": "Illustrative"},
+        {"domain": "Finance", "scope": "Standalone & Consolidated Statements (BS, P&L, CF, Ratios)", "years": "FY17–FY26", "source": "IOCL Annual Reports & Schedule III", "label": "Verified · Annual Report"},
+        {"domain": "Finance", "scope": "Consolidated Market View & Macro Feeds", "years": "FY17–FY26", "source": "Yahoo Finance (IOC.NS, BZ=F, INR=X)", "label": "Yahoo view · Consolidated"},
+        {"domain": "Finance", "scope": "WACC & DCF Valuation Engine", "years": "FY17–FY26", "source": "AR + RBI G-Sec + Damodaran ERP", "label": "Modelled"},
+        {"domain": "Downstream 360", "scope": "9 Refineries, Pipelines, Marketing & CPCL/JVs", "years": "FY17–FY26", "source": "IOCL Annual Reports & PPAC SSOT", "label": "Verified · Downstream 360"},
+        {"domain": "Policy", "scope": "IOCL Finance & Governance Policies (DoA, Hedging, Ind AS, Capex, MoU)", "years": "Current", "source": "IOCL Policy & AR Notes", "label": "Real & Illustrative"},
     ]
     columns = ["domain", "scope", "years", "source", "label"]
 
@@ -174,8 +171,8 @@ def handle_coverage_query(
         "visual": {
             "type": "table",
             "mode": "replace",
-            "title": "Yukti AI — Verified Data Coverage Manifest",
-            "subtitle": "Single Source of Truth (FY17–FY26 Financial Statements · FY13–FY26 Summary · Employee-360)",
+            "title": "Yukti IOCL — Verified Data Coverage Manifest",
+            "subtitle": "Single Source of Truth (FY17–FY26 Schedule III Statements · Downstream 360 · IOCL Finance Policies)",
             "headers": ["Domain", "Scope", "Years", "Source", "Provenance Label"],
             "rows": rows,
             "table": {
@@ -194,9 +191,9 @@ def handle_coverage_query(
             "detail": f"Generated at {manifest.generated_at}",
         },
         "suggestions": [
-            "Show me the balance sheet for FY24",
-            "Show me the income statement for FY26",
-            "How many employees are in Delhi by level?",
+            "Show me the Schedule III Profit and Loss statement of IOCL for FY26",
+            "Rank all 9 IOCL refineries by GRM and EBITDA in FY26",
+            "Run a DCF valuation for IOCL (NSE:IOC)",
         ],
     }
 
@@ -215,7 +212,7 @@ def handle_coverage(
     t0: float,
 ) -> Optional[AnswerContract]:
     if _SOURCE_INQUIRY_RE.search(query or ""):
-        spoken = "This figure comes from ONGC's verified enterprise data bank and posting records."
+        spoken = "This figure comes from IndianOil's verified Schedule III Annual Report & Downstream 360 SSOT data bank."
         vis = {"type": "none", "mode": "keep"}
         if session_state and getattr(session_state, "visual_history", None):
             last_vis = session_state.visual_history[-1]
@@ -233,7 +230,7 @@ def handle_coverage(
             "display_text": spoken,
             "visual": vis,
             "insights": [],
-            "sources": [{"kind": "data", "object": "ONGC Enterprise Data Bank"}],
+            "sources": [{"kind": "data", "object": "IOCL Enterprise Financial & Downstream 360 SSOT"}],
             "suggestions": ["What data do you have?"],
             "access": {"status": "allowed"},
             "export_options": [],

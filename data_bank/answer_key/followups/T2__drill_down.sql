@@ -6,7 +6,7 @@
 
 WITH delhi5 AS (
     SELECT v.emp_id, v.discipline_id, v.retirement_date
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
 WHERE v.is_current_stay AND v.wc_id = 'WC-DEL' AND v.grade_id LIKE 'E%' AND v.continuous_stay_months >= 60
 ),
 ne_vac AS (

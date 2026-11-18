@@ -33,14 +33,14 @@ import pyarrow.parquet as pq
 import yaml
 from google.cloud import bigquery
 
-PROJECT_ID = os.getenv("GCP_PROJECT", "ongc-hr-finance-agent")
+PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT") or "yukti-finance-iocl"
 ALLOWED_BRONZE_DATASETS = {"hrfin_bronze", "hrfin_bronze_v3"}
 _BQ_SFX = os.getenv("BQ_DATASET_SUFFIX", os.getenv("YUKTI_DATASET_SUFFIX", "")).strip().lstrip("_")
 _DEFAULT_BRONZE_DS = f"hrfin_bronze_{_BQ_SFX}" if _BQ_SFX else "hrfin_bronze"
 DATASET_ID = os.getenv("YUKTI_BRONZE_DATASET", _DEFAULT_BRONZE_DS).strip()
 if DATASET_ID not in ALLOWED_BRONZE_DATASETS:
     raise ValueError(f"Disallowed YUKTI_BRONZE_DATASET={DATASET_ID!r}; must be in {sorted(ALLOWED_BRONZE_DATASETS)}")
-LANDING_BUCKET = "ongc-hr-finance-agent-landing"
+LANDING_BUCKET = os.getenv("YUKTI_LANDING_BUCKET", "yukti-finance-iocl-landing")
 BATCH_ID = os.getenv("YUKTI_BATCH_ID", "20261019")
 LOAD_LOCAL = os.getenv("YUKTI_LOAD_LOCAL", "1") in ("1", "true", "yes")
 

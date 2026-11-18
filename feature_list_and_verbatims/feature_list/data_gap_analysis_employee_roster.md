@@ -49,8 +49,8 @@ SELECT
   ROUND(post.tenure_months / 12.0, 1) AS delhi_tenure_years,
   emp.category,
   post.order_no AS last_posting_order
-FROM `ongc-hr-finance-agent.hrfin_gold.dim_employee` emp
-JOIN `ongc-hr-finance-agent.hrfin_gold.fct_posting` post 
+FROM `yukti-finance-iocl.hrfin_gold.dim_employee` emp
+JOIN `yukti-finance-iocl.hrfin_gold.fct_posting` post 
   ON emp.PERNR = post.PERNR 
   AND post.is_current_posting = TRUE
   AND post.WERKS = 'WC-DEL'

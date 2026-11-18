@@ -5,6 +5,7 @@ from typing import Optional, List, Tuple
 from google import genai
 from pydantic import BaseModel
 from app.agents.registry import get_registry
+from app.config import DEFAULT_TEXT_MODEL, GCP_PROJECT, VERTEX_TEXT_LOCATION
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,7 @@ def cosine_sim(v1: List[float], v2: List[float]) -> float:
 class IntentRouter:
     def __init__(self, registry=None):
         self.registry = registry or get_registry()
-        self.client = genai.Client()
+        self.client = genai.Client(vertexai=True, project=GCP_PROJECT, location=VERTEX_TEXT_LOCATION)
         self._cached_embeddings = {}
 
     def _get_embedding(self, text: str) -> List[float]:
@@ -78,8 +79,8 @@ class IntentRouter:
         # Simple fallback for now
         # Actually this uses the LLM Coordinator
         try:
-            prompt = f"Route the query '{query}' to one of: analyst, fin_diagnostics_agent, dcf_agent, hr_transfer_agent, doc_export_agent."
-            res = self.client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+            prompt = f"Route the query '{query}' to one of: analyst, fin_diagnostics_agent, dcf_agent, doc_export_agent."
+            res = self.client.models.generate_content(model=DEFAULT_TEXT_MODEL, contents=prompt)
             text = res.text.lower()
             for a in self.registry.agents:
                 if a.id in text:

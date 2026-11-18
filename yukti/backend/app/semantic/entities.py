@@ -9,9 +9,9 @@ Every other module must import from here instead of keeping its own map:
 
     from app.semantic.entities import get_entities
     ents = get_entities()
-    ents.resolve_wc("Mumbai mein kitne log hain")  # -> "WC-MUM"
+    ents.resolve_wc("Mumbai HQ")                     # -> "WC-MUM"
     ents.friendly("WC-DEL")                          # -> "Delhi HQ"
-    ents.replace_codes({"wc": "WC-RAJ-BSN"})         # -> {"wc": "Rajasthan Basin"}
+    ents.replace_codes({"refinery": "REF-PNP"})      # -> {"refinery": "Panipat Refinery"}
 """
 
 from functools import lru_cache
@@ -26,8 +26,8 @@ SEMANTIC_DIR = Path(__file__).resolve().parent
 ENTITIES_PATH = SEMANTIC_DIR / "entities.json"
 ALIASES_PATH = SEMANTIC_DIR / "entity_aliases.yaml"
 
-# Longest codes first so "WC-RAJ-BSN" is never read as "WC-RAJ" + "-BSN".
-CODE_RE = re.compile(r"\b(WC-[A-Z]{3}(?:-[A-Z]{3})?|DISC-[A-Z]{2,4}|FLD-[A-Z0-9]{2,6})\b")
+# Longest codes first so multi-segment codes are never read partially.
+CODE_RE = re.compile(r"\b(WC-[A-Z]{3}(?:-[A-Z]{3})?|REF-[A-Z]{3}|DIV-[A-Z]{3}|DISC-[A-Z]{2,4}|FLD-[A-Z0-9]{2,6})\b")
 _DEVANAGARI = re.compile(r"[\u0900-\u097F]")
 _MIN_AUTO_ALIAS_LEN = 4
 
@@ -45,6 +45,10 @@ class EntityDictionary:
 
     def __init__(self, data: Dict[str, Any], aliases: Dict[str, Any]):
         self.work_centres: Dict[str, Dict[str, Any]] = data.get("work_centres", {})
+        self.refineries: Dict[str, Dict[str, Any]] = data.get("refineries", {})
+        self.subsidiaries: Dict[str, Dict[str, Any]] = data.get("subsidiaries", {})
+        self.products: Dict[str, Dict[str, Any]] = data.get("products", {})
+        self.pipelines: Dict[str, Dict[str, Any]] = data.get("pipelines", {})
         self.disciplines: Dict[str, Dict[str, Any]] = data.get("disciplines", {})
         self.fields: Dict[str, Dict[str, Any]] = data.get("fields", {})
         self.grades: Dict[str, Dict[str, Any]] = data.get("grades", {})
@@ -52,10 +56,12 @@ class EntityDictionary:
         self._regions_cfg: Dict[str, Dict[str, Any]] = aliases.get("regions") or {}
         self.discipline_groups: Dict[str, List[str]] = aliases.get("discipline_groups") or {}
 
-        # Region names ("western offshore") must never be swallowed by an automatic work-centre alias
-        # derived from e.g. "Western Offshore Basin" (G4 B1 r1).
         self._reserved = {_norm(r) for r in self._regions_cfg} | {_norm(g) for g in self.discipline_groups}
         self.wc_alias = self._build(self.work_centres, aliases.get("work_centres") or {}, with_city=True)
+        self.refinery_alias = self._build(self.refineries, aliases.get("refineries") or {})
+        self.subsidiary_alias = self._build(self.subsidiaries, aliases.get("subsidiaries") or {})
+        self.product_alias = self._build(self.products, aliases.get("products") or {})
+        self.pipeline_alias = self._build(self.pipelines, aliases.get("pipelines") or {})
         self.disc_alias = self._build(self.disciplines, aliases.get("disciplines") or {})
         self.field_alias = self._build(self.fields, aliases.get("fields") or {})
         self.grade_alias = {(_norm(a)): code for code, al in (aliases.get("grades") or {}).items() for a in al}
@@ -142,11 +148,41 @@ class EntityDictionary:
         hits = self._find_all(text, self.field_alias)
         return hits[0][2] if hits else None
 
+    def resolve_refinery(self, text: str) -> Optional[str]:
+        hits = self._find_all(text, self.refinery_alias)
+        return hits[0][2] if hits else None
+
+    def resolve_refineries(self, text: str) -> List[str]:
+        out: List[str] = []
+        for _, _, code in self._find_all(text, self.refinery_alias):
+            if code not in out:
+                out.append(code)
+        return out
+
+    def resolve_subsidiary(self, text: str) -> Optional[str]:
+        hits = self._find_all(text, self.subsidiary_alias)
+        return hits[0][2] if hits else None
+
+    def resolve_product(self, text: str) -> Optional[str]:
+        hits = self._find_all(text, self.product_alias)
+        return hits[0][2] if hits else None
+
+    def resolve_pipeline(self, text: str) -> Optional[str]:
+        hits = self._find_all(text, self.pipeline_alias)
+        return hits[0][2] if hits else None
+
     def resolve_grades(self, text: str) -> List[str]:
         out: List[str] = []
-        for m in re.finditer(r"\b(E[0-9])\b", text or "", flags=re.I):
+        for m in re.finditer(r"\bgrade\s+([A-I])\b", text or "", flags=re.I):
             g = m.group(1).upper()
             if g in self.grades and g not in out:
+                out.append(g)
+        for m in re.finditer(r"\b(E[0-9])\b", text or "", flags=re.I):
+            g = m.group(1).upper()
+            mapped = self.grade_alias.get(_norm(g))
+            if mapped and mapped in self.grades and mapped not in out:
+                out.append(mapped)
+            elif g in self.grades and g not in out:
                 out.append(g)
         for _, _, code in self._find_all(text, self.grade_alias):
             if code not in out:
@@ -184,6 +220,14 @@ class EntityDictionary:
         """Human label for any known code; unknown strings are returned unchanged."""
         if code in self.work_centres:
             return self.wc_name(code)
+        if code in self.refineries:
+            return self.refineries[code].get("name", code)
+        if code in self.subsidiaries:
+            return self.subsidiaries[code].get("name", code)
+        if code in self.products:
+            return self.products[code].get("name", code)
+        if code in self.pipelines:
+            return self.pipelines[code].get("name", code)
         if code in self.disciplines:
             return self.disciplines[code].get("name", code)
         if code in self.fields:
@@ -201,8 +245,16 @@ class EntityDictionary:
         return obj
 
     def all_codes(self) -> Dict[str, set]:
-        return {"wc": set(self.work_centres), "discipline": set(self.disciplines),
-                "field": set(self.fields), "grade": set(self.grades)}
+        return {
+            "wc": set(self.work_centres),
+            "refinery": set(self.refineries),
+            "subsidiary": set(self.subsidiaries),
+            "product": set(self.products),
+            "pipeline": set(self.pipelines),
+            "discipline": set(self.disciplines),
+            "field": set(self.fields),
+            "grade": set(self.grades),
+        }
 
 
 @lru_cache(maxsize=1)

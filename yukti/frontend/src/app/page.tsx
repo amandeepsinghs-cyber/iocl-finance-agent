@@ -49,16 +49,16 @@ const GATED_RING_FRAMES = 17; // P0.10 r2 S-1: 17 × 30 ms worklet frames ≈ 0.
 type Lang = 'en' | 'hi' | 'hi-en';
 
 const STARTERS = [
-  'How many executives have been posted in Delhi for 5 years or more?',
-  'Which fields or assets were the most profitable and which made losses in FY26?',
-  'How are we tracking against our MoU targets with MoPNG/DPE for this year?',
+  'Show the Schedule III Profit and Loss statement of IOCL for FY26',
+  'Rank all 9 IOCL refineries by Gross Refining Margin ($/bbl) and EBITDA in FY26',
+  'How did IOCL Total Borrowings, Net Worth, and WACC move from FY17 to FY26?',
 ];
 
 const GREETING: AnswerContract = {
   turn_id: 'turn_greeting',
   language: 'en',
-  spoken_summary: 'Hello, I am Yukti, your HR and Finance agent. Please tell me how I can help.',
-  display_text: 'Hello, I am Yukti, your HR and Finance agent. Please tell me how I can help.',
+  spoken_summary: 'Hello, I am Yukti, your IndianOil Finance and Downstream Intelligence agent. Please tell me how I can help.',
+  display_text: 'Hello, I am Yukti, your IndianOil Finance and Downstream Intelligence agent. Please tell me how I can help.',
   visual: { type: 'none', mode: 'replace' },
   sources: [],
   suggestions: STARTERS,

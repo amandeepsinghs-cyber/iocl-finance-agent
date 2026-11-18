@@ -18,7 +18,7 @@
      "kind": "annual",
      "label": "Modelled estimate"
     },
-    "owner": "DIR_HR",
+    "owner": "DIR_FIN",
     "horizon_days": 180,
     "kpi": "Fixture KPI 2",
     "evidence": [
@@ -90,7 +90,7 @@
     "evidence": "fixture:AR p.1"
    },
    {
-    "owner": "DIR_HR",
+    "owner": "DIR_FIN",
     "ask": "Fixture ask two",
     "by_when": "180 days",
     "kpi": "Fixture KPI 2",
@@ -98,5 +98,5 @@
    }
   ]
  },
- "source_note": "Illustrative UI test fixture, not ONGC data"
+ "source_note": "Illustrative UI test fixture, not IOCL AR data"
 }

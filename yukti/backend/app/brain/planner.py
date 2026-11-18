@@ -31,17 +31,20 @@ from app.semantic.normalize import current_fy, fiscal_years_for_sql, last_comple
 logger = logging.getLogger("yukti.brain.planner")
 
 DIM_ALIASES = {"work_centre": "wc", "location": "wc", "station": "wc", "asset_wc": "asset", "fiscal_year": "fy",
-               "year": "fy", "field_name": "field", "grade_id": "grade", "discipline_id": "discipline"}
+               "year": "fy", "field_name": "field", "grade_id": "grade", "discipline_id": "discipline",
+               "refinery_id": "refinery", "refinery_name": "refinery", "entity_code": "subsidiary",
+               "product_code": "product", "pipeline_code": "pipeline"}
 
 
 def normalize_asr_query(question: str) -> str:
-    """Normalizes common speech-to-text phonetic mis-transcriptions for ONGC terms."""
+    """Normalizes common speech-to-text phonetic mis-transcriptions for IOCL terms."""
     if not question:
         return ""
     q = question
-    q = re.sub(r"\b(nyc|o\s*n\s*g\s*c|oen\s*gc|ong\s*see)\b", "ONGC", q, flags=re.IGNORECASE)
-    q = re.sub(r"\b([eE])\s*-\s*([0-9])\b", lambda m: f"E{m.group(2)}", q)
-    q = re.sub(r"\bmahesana\b", "Mehsana", q, flags=re.IGNORECASE)
+    q = re.sub(r"\b(i\s*o\s*c\s*l|indian\s+oil|iocl\s+limited|nse\s+ioc)\b", "IOCL", q, flags=re.IGNORECASE)
+    q = re.sub(r"\b([a-dA-D])\s*-\s*grade\b", lambda m: f"Grade {m.group(1).upper()}", q)
+    q = re.sub(r"\bparadeep\b", "Paradip", q, flags=re.IGNORECASE)
+    q = re.sub(r"\bkoyli\b", "Koyali", q, flags=re.IGNORECASE)
     return q
 
 PLANNER_MODEL = os.getenv("YUKTI_PLANNER_MODEL", DEFAULT_TEXT_MODEL)
@@ -141,64 +144,55 @@ def catalog_summary() -> str:
     lines.append("\nWORK CENTRES (code: name, city): " + "; ".join(
         f"{c}: {a.get('short_name')} ({a.get('city')})" for c, a in ents.work_centres.items()))
     lines.append("DISCIPLINES: " + "; ".join(f"{c}: {a.get('name')}" for c, a in ents.disciplines.items()))
-    lines.append("FIELDS (oil/gas): " + "; ".join(f"{c}: {a.get('name')}" for c, a in ents.fields.items()))
-    lines.append("GRADES (ordered): " + "; ".join(f"{c}: {a.get('designation', '')[:40]}" for c, a in ents.grades.items()))
+    if getattr(ents, "refineries", None):
+        lines.append("REFINERIES & DIVISIONS: " + "; ".join(f"{c}: {a.get('name')}" for c, a in ents.refineries.items()))
+    if getattr(ents, "subsidiaries", None):
+        lines.append("SUBSIDIARIES & JVS: " + "; ".join(f"{c}: {a.get('name')}" for c, a in ents.subsidiaries.items()))
+    if getattr(ents, "products", None):
+        lines.append("PRODUCTS (MARKETING): " + "; ".join(f"{c}: {a.get('name')}" for c, a in ents.products.items()))
+    if getattr(ents, "pipelines", None):
+        lines.append("PIPELINES: " + "; ".join(f"{c}: {a.get('name')}" for c, a in ents.pipelines.items()))
+    lines.append("GRADES (ordered): " + "; ".join(f"{c}: {a.get('name', a.get('designation', ''))[:40]}" for c, a in ents.grades.items()))
     return "\n".join(lines)
 
 
-RULES = f"""You turn an ONGC executive's question into a structured data plan. Output JSON only.
-Intent: "data" for any question answerable from the subjects below (counts, lists, rankings, trends,
+RULES = f"""You turn an IOCL (Indian Oil Corporation Limited) executive's question into a structured data plan. Output JSON only.
+Intent: "data" for any question answerable from the subjects below (totals, rankings, trends,
 comparisons); "replot" if the user only asks to show the SAME data as another chart/table; "policy" for
-rules/clauses/eligibility questions with no numbers; "what_if" for hypothetical simulations; "document" for
-drafting notes/letters/replies; "chitchat" for greetings; "other" if no subject fits (do not force a metric).
-Questions about rules, norms, limits, entitlements, eligibility, procedures or "what is the minimum/maximum
-allowed" are "policy" even when they mention numbers or tenure. Questions about one specific person ("my", "my
-reporting officer", an employee id) are "other". Questions mixing a rule with a count of people are "data".
+rules/DoA/hedging/accounting clauses/eligibility questions with no numbers; "what_if" for hypothetical simulations; "document" for
+drafting Board notes/capex appraisals/letters/replies; "chitchat" for greetings; "other" if no subject fits (do not force a metric).
+Questions about rules, norms, DoA thresholds, hedging mandates, procedures or "what is permitted" are "policy" even when they mention numbers.
 Rules:
 - metric MUST be one of the listed metric names. Pick the subject that holds the data.
-- Follow-ups: if a previous plan is given and the question refines it (pronouns like "their", "them",
-  "those", "this", "what about X", "only ...", "by ...", "compare with ...", "last year"), set is_followup=true and
-  output ONLY what changes: new/replaced filters in `filters` (a filter on an already-filtered field replaces it),
-  `remove_filters`, `set_dimensions`+`dimensions` for a new breakdown, `grain`, fy fields, metric if it changes.
+- Follow-ups: if a previous plan is given and the question refines it (pronouns like "those", "this", "what about X", "only ...", "by ...", "compare with ...", "last year"), set is_followup=true and
+  output ONLY what changes: new/replaced filters in `filters`, `remove_filters`, `set_dimensions`+`dimensions` for a new breakdown, `grain`, fy fields, metric if it changes.
   A brand-new topic is is_followup=false with a full plan.
-- "names", "who are they", "list them", "give me their names" => grain "row" (keeps filters).
 - "by X" / "breakdown by X" / "X-wise" => set_dimensions=true, dimensions=[X]; back to aggregate if it was a list.
-- "compare with B" / "versus B" => compare_field = the entity field (e.g. wc), compare_values = [B]; keep the rest.
-- Grades: "E5 and above"/"E5+" => filter grade >= E5; "GMs" => grade = E7; "GM and above" => grade >= E7.
-- "executives"/"officers" => cadre = executive. "posted/in office/stayed for N years or more", "N+ years",
-  "more than N years", "N saal se zyada" => station_tenure_years >= N (tenure thresholds always use >=).
-- "asset"/"work centre"/"location"/"station" as a breakdown => dimension wc (HR subjects) or asset (finance).
-- When a work centre is named, do NOT add state/sector/city filters for it.
-- Entities: use codes from the lists (wc, discipline, field, grade). Regions ("North East", "Western Offshore",
-  "Gujarat") => filter field region with the region name.
-- "loss-making"/"made losses" fields => metric pbt_cr, dimensions [field], filter pbt_cr < 0 only if the user asks
-  ONLY for the losses; "most profitable and loss-making" => no filter (ranking shows both).
-- Fiscal years: anchor date 19-Oct-2026, current FY = {current_fy()} (in progress); "last year" = {last_complete_fy()};
-  "last N years" = N complete FYs ending {last_complete_fy()}. A resolved time hint may be supplied; follow it.
-- Metric hints: headcount growth / increase / "added headcount" over years => headcount_change (period range);
-  attrition / exits / resignations => separations or voluntary_exits (dimension grade if "by grade");
-  manpower or employee cost per BOE / barrel => manpower_cost_usd_per_boe (dimension asset);
-  employee cost as % of revenue => manpower_cost_pct_of_revenue; lifting cost => lifting_cost_usd_per_boe;
-  company "profit and loss statement" / "P&L statement" / "income statement" / "complete P&L" (no field/asset named) => pnl_statement;
+- "compare with B" / "versus B" => compare_field = the entity field (e.g. refinery), compare_values = [B]; keep the rest.
+- Entities: use codes from the lists (refinery, subsidiary, product, pipeline, segment, category, wc).
+- Fiscal years: current FY = {last_complete_fy()} ("last year" = {last_complete_fy()};
+  "last N years" = N complete FYs ending {last_complete_fy()}). A resolved time hint may be supplied; follow it.
+- Metric hints:
+  company "profit and loss statement" / "P&L statement" / "income statement" / "complete P&L" => pnl_statement;
   company "balance sheet" / "assets and liabilities" / "statement of financial position" => balance_sheet;
   company "cash flow statement" / "statement of cash flows" / "cash flow bridge" => cash_flow_statement;
   company "financial ratios" / "key ratios" / "ratio analysis" / "credit ratios" / "solvency ratios" => financial_ratios;
-  company "profit" / "munafa" (no field named) => pat_cr (profit after tax); only "PBT"/"before tax" => pbt_corporate_cr;
-  statutory levies / royalty / OIDB cess / SAED windfall tax => statutory_levies_cr, royalty_cr, oidb_cess_cr, or saed_windfall_tax_cr;
-  exploration costs written off / dry wells / survey costs => exploration_costs_written_off_cr, exploratory_wells_written_off_cr, or survey_costs_written_off_cr;
-  DD&A / depreciation / depletion => dda_cr; tax expense / current tax / deferred tax => tax_expense_cr, current_tax_cr, or deferred_tax_cr;
-  total assets / non-current assets / current assets / CWIP / oil & gas assets / investments in subsidiaries / site restoration fund / cash & bank / inventories / trade receivables => total_assets_cr, non_current_assets_cr, current_assets_cr, cwip_cr, oil_and_gas_assets_cr, investments_subsidiaries_jv_cr, site_restoration_fund_cr, cash_and_bank_cr, inventories_cr, or trade_receivables_cr;
-  net worth / equity / share capital / reserves / debt / borrowings / net debt / lease liabilities / abandonment provision (ARO) / deferred tax liability => net_worth_cr, equity_share_capital_cr, other_equity_reserves_cr, total_debt_cr, long_term_debt_cr, short_term_debt_cr, net_debt_cr, lease_liabilities_cr, abandonment_provision_cr, or deferred_tax_liability_net_cr;
-  ROE / ROA / ROCE / debt-to-equity / net debt-to-EBITDA / interest coverage / current ratio / receivable days / EPS / book value per share / dividend per share => roe_pct, roa_pct, roce_pct, debt_to_equity_ratio, net_debt_to_ebitda_ratio, interest_coverage_ratio, current_ratio, receivable_days, eps_basic_inr, book_value_per_share_inr, or dividend_per_share_inr;
-  consolidated PAT / consolidated revenue / ONGC.NS group => consolidated_pat_cr or consolidated_revenue_cr;
-  subsidiaries (HPCL, MRPL, OVL, OPAL, OTPC) => subsidiary_pat_cr or subsidiary_revenue_cr (dimension subsidiary).
-- Years "in/at an office, station, city or work centre" = station_tenure_years; total_tenure_years only for
-  total service ("with ONGC", "service", "career").
-- "profit margin"/"margins" of fields or assets => ebitda_margin_pct (pbt_margin_pct only if PBT is named).
-- "retention rate"/"share who stayed 5+ years" => long_stay_share_pct with cadre filter, and REMOVE any
-  station_tenure_years filter (remove_filters) because the share is computed over everyone.
+  company "profit" / "PAT" / "munafa" => pat_cr; only "PBT"/"before tax" => pbt_corporate_cr; "EBITDA" => ebitda_cr;
+  gross revenue => corporate_revenue_cr; net revenue (ex-excise) => net_revenue_cr; excise duty => excise_duty_cr;
+  raw materials consumed => cost_of_materials_cr; DD&A / depreciation => dda_cr; tax expense => tax_expense_cr;
+  total assets / non-current assets / current assets / CWIP / cash & bank / inventories / trade receivables / net worth / total debt / net debt / lease liabilities / total capex => matching corporate metric names;
+  ROE / ROA / ROCE / debt-to-equity / current ratio / EPS / dividend per share / WACC => matching ratio/wacc metric;
+  Inventory days (DIO) + Receivable days (DSO) + Net working capital cycle => working_capital;
+  refinery GRM / margin / throughput / utilization / distillate yield / fuel & loss => refinery_economics subject (`refinery_grm_usd_bbl`, `refinery_throughput_mmt`, `refinery_utilization_pct`, `refinery_distillate_yield_pct`, `refinery_fuel_loss_pct`, `refinery_ebitda_cr`, `refinery_opex_usd_bbl`, dimension `refinery`);
+  corporate reported/core GRM vs Singapore benchmark => `gross_refining_margin_usd_bbl`, `core_grm_usd_bbl`, `singapore_benchmark_grm_usd_bbl`;
+  marketing volumes / petrol MS / diesel HSD / ATF / LPG Indane / Bitumen / SERVO => `marketing_volume_mmt` / `marketing_revenue_cr` / `marketing_market_share_pct` / `marketing_margin_inr_kl` (dimension `product`);
+  pipelines throughput / utilization / tariff / EBITDA => `pipeline_throughput_mmt` / `pipeline_utilization_pct` / `pipeline_ebitda_cr` (dimension `pipeline`);
+  Ind AS 108 statutory segments => `segment_revenue_cr` / `segment_ebit_cr` (dimension `segment`);
+  MoU targets / Maharatna scorecard => `mou_scorecard` (subject `mou`);
+  consolidated PAT / consolidated revenue / IOC.NS group => consolidated_pat_cr or consolidated_revenue_cr;
+  subsidiaries (CPCL, LIOC / Lanka IOC, IOCME, IndOil Global, Petronet/HURL JVs) => subsidiary_pat_cr or subsidiary_revenue_cr (dimension subsidiary).
 - Trends ("increased/decreased/changed over the last N years", "trend", "year by year") => add dimension fy.
-- If the question needs a measure that is not listed (e.g. DPC cases, grievances, succession), answer intent "other" instead of substituting a different metric.
+- If the question needs a measure that is not listed, answer intent "other" instead of substituting a different metric.
 - Never invent numbers; never write SQL.
 """
 
@@ -316,20 +310,36 @@ class Planner:
         return Filter(field=field, op=op, value=parsed[0])
 
     def _entity(self, etype: str, v: str) -> Optional[str]:
-        table = {"wc": self.ents.work_centres, "discipline": self.ents.disciplines,
-                 "field": self.ents.fields, "grade": self.ents.grades}[etype]
+        tables = {
+            "wc": self.ents.work_centres,
+            "discipline": self.ents.disciplines,
+            "field": self.ents.fields,
+            "grade": self.ents.grades,
+            "refinery": self.ents.refineries,
+            "subsidiary": self.ents.subsidiaries,
+            "product": self.ents.products,
+            "pipeline": self.ents.pipelines,
+        }
+        table = tables.get(etype, {})
         if v in table:
             return v
         if v.upper() in table:
             return v.upper()
-        if etype == "wc":
-            return self.ents.resolve_wc(v)
-        if etype == "discipline":
-            return self.ents.resolve_discipline(v)
-        if etype == "field":
-            return self.ents.resolve_field(v)
-        gs = self.ents.resolve_grades(v)
-        return gs[0] if gs else None
+        resolvers = {
+            "wc": self.ents.resolve_wc,
+            "discipline": self.ents.resolve_discipline,
+            "field": self.ents.resolve_field,
+            "refinery": self.ents.resolve_refinery,
+            "subsidiary": self.ents.resolve_subsidiary,
+            "product": self.ents.resolve_product,
+            "pipeline": self.ents.resolve_pipeline,
+        }
+        if etype in resolvers:
+            return resolvers[etype](v)
+        if etype == "grade":
+            gs = self.ents.resolve_grades(v)
+            return gs[0] if gs else None
+        return None
 
     def _period(self, raw: Dict[str, Any]) -> Optional[Period]:
         fy, lo, hi = raw.get("fy"), raw.get("fy_from"), raw.get("fy_to")
@@ -544,19 +554,35 @@ class Planner:
             and not is_corp_ratios_stmt
             and not re.search(r"\b(asset|assets)\b", ql_early)
         )
+        explicit_chart_q = bool(
+            re.search(
+                r"\b(chart|plot|graph|waterfall|bridge|bar|hbar|column|line|area|combo|pie|donut|visuali[sz]e|diagram)\b"
+                r"|चार्ट|ग्राफ|वॉटरफॉल|वाटरफॉल",
+                ql_early,
+            )
+        )
         if is_corp_bs_stmt:
             intent = "data"
             raw = dict(raw, intent="data", metric="balance_sheet", is_followup=False, dimensions=[])
-            if not wants_waterfall and chart not in ("bar", "hbar", "line"):
+            if wants_waterfall:
+                chart = "waterfall"
+            elif explicit_chart_q and chart not in ("kpi", "table"):
+                chart = chart
+            else:
                 chart = "table"
         elif is_corp_cf_stmt:
             intent = "data"
             raw = dict(raw, intent="data", metric="cash_flow_statement", is_followup=False, dimensions=[])
-            chart = "waterfall" if wants_waterfall else "table"
+            if wants_waterfall:
+                chart = "waterfall"
+            elif explicit_chart_q and chart not in ("kpi", "table"):
+                chart = chart
+            else:
+                chart = "table"
         elif is_corp_ratios_stmt:
             intent = "data"
             raw = dict(raw, intent="data", metric="financial_ratios", is_followup=False, dimensions=[])
-            chart = "table"
+            chart = chart if (explicit_chart_q and chart not in ("kpi", "table")) else "table"
         elif is_corp_pnl_stmt:
             intent = "data"
             raw = dict(raw, intent="data", metric="pnl_statement", is_followup=False, dimensions=[])
@@ -565,6 +591,8 @@ class Planner:
                 chart = "waterfall" if re.search(r"\b(waterfall|bridge)\b", ql_early) else "table"
             elif wants_waterfall or is_rev_cost_bridge:
                 chart = "waterfall"
+            elif explicit_chart_q and chart not in ("kpi", "table"):
+                chart = chart
             else:
                 chart = "table"
         elif wants_waterfall and prev is not None and prev.metric in ("pnl_statement", "cash_flow_statement", "wacc_change_attribution", "wacc_components", "wacc_pct"):
@@ -618,11 +646,11 @@ class Planner:
                     raw["fy_from"] = "FY22"
                     raw["fy_to"] = "FY26"
 
-        # Hypothetical simulation guard ("If Brent falls to $60...", "What if crude drops...")
+        # Hypothetical simulation guard ("If Brent falls to $60...", "What if crude drops...") — never capture forecast horizon extensions
         if re.search(
             r"\b(?:what[- ]if|if\s+(?:brent|crude|oil|gas|fx|rupee|usd|realisation)(?:\s+price)?\s+(?:falls?|drops?|rises?|goes|reaches|hits|were|is)\s+(?:to|below|above|by))\b",
             ql_early,
-        ):
+        ) and not re.search(r"\b(?:extend|project|extrapolate|stretch|continue)\b.{0,40}\b(?:202[7-9]|203\d|fy\s?2[7-9]|fy\s?3\d|forecast)\b", ql_early):
             return Plan(intent="what_if", raw=raw)
 
         # Document drafting guard ("Draft a transfer note...", "Draft a board note...")
@@ -639,16 +667,40 @@ class Planner:
         ) and not re.search(r"\b(how\s+many|kitne|count|list|names?)\b", ql_early):
             return Plan(intent="policy", is_followup=False, raw=dict(raw, intent="policy"))
 
+        # Deterministic MoU scorecard & working-capital template overrides
+        if (
+            re.search(r"\b(tracking\s+against|mou\s+targets?|mou\s+scorecard|mou\s+performance|progress\s+on\s+mou)\b", ql_early)
+            and not re.search(r"\b(framework|weightage|rule|policy|guideline|formula)\b", ql_early)
+        ):
+            intent = "data"
+            raw = dict(raw, intent="data", metric="mou_scorecard", dimensions=[])
+            if not raw.get("fy") and not (fy_hint and fy_hint.get("fy")):
+                raw["fy"] = "FY26"
+        elif (
+            sum(1 for pat in (r"\binventory\s+days\b", r"\b(?:receivable|debtor)\s+days\b", r"\bworking\s+capital\b") if re.search(pat, ql_early)) >= 2
+            or (raw.get("metric") == "financial_ratios" and re.search(r"\b(inventory\s+days|(?:receivable|debtor)\s+days|working\s+capital)\b", ql_early))
+        ):
+            intent = "data"
+            raw = dict(raw, intent="data", metric="working_capital", dimensions=[])
+        elif (
+            re.search(r"\b(reconcil\w*|including)\b", ql_early)
+            and re.search(r"\b(cpcl|lanka\s+ioc|lioc|subsidiar\w*)\b", ql_early)
+            and re.search(r"\b(standalone|consolidated|pat|profit)\b", ql_early)
+            and not re.search(r"\bonly\s+(?:cpcl|lanka|lioc)\b", ql_early)
+        ):
+            intent = "data"
+            raw = dict(raw, intent="data", metric="subsidiary_pat_cr", dimensions=["subsidiary"], filters=[])
+
         # Deterministic Financial Causal & Action Guard ("Why did X happen?", "What action should the Finance Director take?")
         fin_kw = re.search(
             r"\b(wacc|weighted\s+average\s+cost\s+of\s+capital|"
             r"p\s*&\s*l|pnl|profit\s+and\s+loss|income\s+statement\w*|"
             r"pat|profit|pbt|revenue|ebitda|levies|royalty|oidb|saed|windfall|exploration|dry\s+well|survey\s+cost|"
-            r"dd&a|dda|depreciation|depletion|impairment|115baa|deferred\s+tax|cwip|opal|hpcl|mrpl|ovl|otpc|subsidiar\w*|"
-            r"borrowing\w*|debt|net\s+debt|lease\s+liabilit\w*|ind[- ]?as|abandonment|aro|site\s+restoration|"
-            r"cash\s*flow|ocf|fcf|free\s+cash|capex|under[- ]?invest\w*|reserves?|mou|exchequer|dividend\w*|buyback|roce|roe|roa|margin\w*|realisation|crude|gas|"
-            r"lifting\s+cost|water\s+cut|pec|new\s+well\s+gas|nwng|note\s+\d+|finance\s+director|director\s+finance|"
-            r"lost\s+money|made\s+loss\w*|loss[- ]making\s+field\w*)\b",
+            r"dd&a|dda|depreciation|impairment|115baa|deferred\s+tax|cwip|cpcl|lioc|lanka|iocme|indoil|petronet|hurl|subsidiar\w*|"
+            r"borrowing\w*|debt|net\s+debt|lease\s+liabilit\w*|ind[- ]?as|excise|grm|refin\w*|distillate|throughput|pipeline\w*|marketing|petchem\w*|"
+            r"cash\s*flow|ocf|fcf|free\s+cash|capex|mou|exchequer|dividend\w*|roce|roe|roa|eps|earnings\s+per\s+share|bvps|margin\w*|crude|"
+            r"working\s+capital|inventory\s+days|receivable\s+days|debtor\s+days|"
+            r"note\s+\d+|finance\s+director|director\s+finance)\b",
             ql_early,
         )
         prev_is_fin = bool(prev is not None and (prev.metric in ("pnl_statement", "balance_sheet", "cash_flow_statement", "financial_ratios") or prev_is_wacc))
@@ -661,52 +713,44 @@ class Planner:
                 if is_wacc_q or (prev_is_wacc and re.search(r"\b(why|what|driver\w*|reason\w*|cause\w*|high\w*|low\w*)\b", ql_early)):
                     inferred_m = "wacc_change_attribution"
                     chart = "waterfall"
-                elif re.search(r"\b(revenue\s+per\s+employee)\b", ql_early):
-                    inferred_m = "revenue_per_employee_cr"
                 elif re.search(r"\b(exchequer|contribution\s+to\s+exchequer)\b", ql_early):
                     inferred_m = "exchequer_contribution_cr"
-                elif re.search(r"\b(under[- ]?invest\w*)\b", ql_early) or (re.search(r"\bcapex\b", ql_early) and re.search(r"\breserves?\b", ql_early)):
-                    inferred_m = "capex_vs_reserves"
                 elif re.search(r"\bcapex\b", ql_early):
                     inferred_m = "capex_actual_cr"
-                    dims_capex = ["asset", "fy"] if re.search(r"\b(year[- ]?wise|by\s+(?:fiscal\s+)?year)\b", ql_early) else ["asset"]
-                    if not raw.get("dimensions"):
-                        raw = dict(raw, set_dimensions=True, dimensions=dims_capex)
                 elif re.search(r"\bmou\b", ql_early):
                     inferred_m = "mou_scorecard"
                     if not raw.get("fy") and not (fy_hint and fy_hint.get("fy")):
-                        raw = dict(raw, fy="FY27")
-                elif re.search(r"\b(saed|windfall|statutory\s+levies|note\s+28|note\s+26)\b", ql_early):
-                    inferred_m = "statutory_levies_cr"
-                elif re.search(r"\b(exploration|dry\s+well\w*|note\s+32)\b", ql_early):
-                    inferred_m = "exploration_costs_written_off_cr"
-                elif re.search(r"\b(dd&a|dda|depletion|depreciation|note\s+33|note\s+30)\b", ql_early):
+                        raw = dict(raw, fy="FY26")
+                elif re.search(r"\b(excise|statutory\s+levies|note\s+28)\b", ql_early):
+                    inferred_m = "excise_duty_cr"
+                elif re.search(r"\b(grm|gross\s+refining\s+margin)\b", ql_early):
+                    inferred_m = "refinery_grm_usd_bbl"
+                elif re.search(r"\b(dd&a|dda|depreciation|note\s+30)\b", ql_early):
                     inferred_m = "dda_cr"
-                elif re.search(r"\b(opal|hpcl|mrpl|ovl|otpc|subsidiar\w*)\b", ql_early) and re.search(r"\b(investment\w*|ccd|note\s+10|note\s+8|stake|buyout|acqui\w*)\b", ql_early):
+                elif re.search(r"\b(cpcl|lioc|lanka|iocme|indoil|petronet|hurl|subsidiar\w*)\b", ql_early) and re.search(r"\b(investment\w*|stake|buyout|acqui\w*)\b", ql_early):
                     inferred_m = "investments_subsidiaries_jv_cr"
-                elif re.search(r"\b(opal|hpcl|mrpl|ovl|otpc|subsidiar\w*)\b", ql_early):
+                elif re.search(r"\b(cpcl|lioc|lanka|iocme|indoil|petronet|hurl|subsidiar\w*)\b", ql_early):
                     inferred_m = "subsidiary_pat_cr"
-                elif re.search(r"\b(borrowing\w*|debt|net\s+debt|note\s+21|note\s+16)\b", ql_early):
+                elif re.search(r"\b(borrowing\w*|debt|net\s+debt|note\s+16)\b", ql_early):
                     inferred_m = "total_debt_cr"
-                elif re.search(r"\b(lease\s+liabilit\w*|ind[- ]?as\s*116|note\s+21a|note\s+17)\b", ql_early):
+                elif re.search(r"\b(lease\s+liabilit\w*|ind[- ]?as\s*116|note\s+17)\b", ql_early):
                     inferred_m = "lease_liabilities_cr"
-                elif re.search(r"\b(abandonment|aro|site\s+restoration|decommission\w*|note\s+22|note\s+11|note\s+18)\b", ql_early):
-                    inferred_m = "abandonment_provision_cr"
-                elif re.search(r"\b(cwip|work[- ]in[- ]progress|note\s+7|note\s+6)\b", ql_early):
+                elif re.search(r"\b(cwip|work[- ]in[- ]progress|note\s+6)\b", ql_early):
                     inferred_m = "cwip_cr"
                 elif re.search(r"\b(free\s+cash\s+flow|fcf|operating\s+cash\s+flow|ocf|cash\s*flow)\b", ql_early):
                     inferred_m = "cash_flow_statement"
                 elif re.search(r"\b(roce)\b", ql_early) and not re.search(r"\b(ratio\w*|scorecard)\b", ql_early):
                     inferred_m = "roce_pct"
-                elif re.search(r"\b(roce|roe|roa|current\s+ratio|interest\s+coverage|debt[- ]to[- ]equity|eps|ratio\w*)\b", ql_early):
+                elif re.search(r"\b(working\s+capital|inventory\s+days|(?:receivable|debtor)\s+days)\b", ql_early):
+                    inferred_m = "working_capital"
+                elif re.search(r"\b(basic\s+eps|eps|earnings\s+per\s+share)\b", ql_early):
+                    inferred_m = "eps_basic_inr"
+                elif re.search(r"\b(roce|roe|roa|current\s+ratio|interest\s+coverage|debt[- ]to[- ]equity|ratio\w*)\b", ql_early):
                     inferred_m = "financial_ratios"
-                elif re.search(r"\b(lifting\s+cost)\b", ql_early):
-                    inferred_m = "lifting_cost_usd_per_boe"
-                    if not raw.get("dimensions"):
-                        if re.search(r"\bby\s+asset\b", ql_early):
-                            raw = dict(raw, dimensions=["asset"])
-                        elif re.search(r"\bfield\w*\b", ql_early):
-                            raw = dict(raw, dimensions=["field"])
+                elif re.search(r"\b(pipeline)\b", ql_early):
+                    inferred_m = "pipeline_throughput_mmt"
+                elif re.search(r"\b(marketing|petrol|diesel|atf|indane|servo)\b", ql_early):
+                    inferred_m = "marketing_volume_mmt"
                 elif re.search(r"\b(loss[- ]making\s+field\w*|lost\s+money|made\s+loss\w*|pec|field\s+profit\w*)\b", ql_early):
                     inferred_m = "pbt_cr"
                     if not raw.get("dimensions"):
@@ -1152,13 +1196,15 @@ class Planner:
                 else f
                 for f in filters
             ]
-        if named_wcs and not re.search(r"\b(service|with ongc|in ongc|of service|career|joined|total tenure|total)\b", ql):
+        if named_wcs and not re.search(r"\b(service|with iocl|in iocl|with indianoil|career|joined|total tenure|total)\b", ql):
             filters = [Filter(field="station_tenure_years", op=f.op, value=f.value)
                        if f.field == "total_tenure_years" and subject is not None and "station_tenure_years" in subject.fields
                        else f for f in filters]
-        # (c) "which fields / assets / disciplines ..." asks for a ranking by that entity.
+        # (c) "which refineries / subsidiaries / products / pipelines ..." asks for a ranking by that entity.
         if not dims and subject is not None and not is_fu and grain != "row":
-            for word, d in (("fields", "field"), ("assets", "asset"), ("work centres", "wc"), ("disciplines", "discipline"),
+            for word, d in (("refineries", "refinery"), ("subsidiaries", "subsidiary"), ("products", "product"),
+                            ("pipelines", "pipeline"), ("segments", "segment"), ("fields", "field"),
+                            ("assets", "asset"), ("work centres", "wc"), ("disciplines", "discipline"),
                             ("grades", "grade")):
                 if re.search(rf"\b(which|what|top|bottom|list)\b.*\b{word}\b", ql):
                     d2 = d if d in subject.fields else ("wc" if d == "asset" and "wc" in subject.fields else
@@ -1178,7 +1224,7 @@ class Planner:
         multi_yr = bool(period is not None and period.from_ and period.to and period.from_ != period.to)
         non_fy_dims = [d for d in dims if d != "fy"]
         cumulative_only = bool(re.search(r"\b(cumulative|combined total|grand total)\b", ql) and not trend_q)
-        if subject is not None and "fy" in subject.fields and (period is not None and (period.from_ or period.to)):
+        if ((subject is not None and "fy" in subject.fields) or (tdef is not None and tdef.period == "fiscal_year")) and (period is not None and (period.from_ or period.to)):
             if trend_q or (multi_yr and not non_fy_dims and not cumulative_only):
                 if "fy" not in dims:
                     if is_fu:

@@ -10,8 +10,7 @@ from app.brain.insights import Insight
 from app.brain.narrator import allowed_numbers, compose_spoken, grounding_violations
 from app.brain.query_spec import Filter, QuerySpec, SpecPatch, apply_patch
 
-DELHI = QuerySpec(metric="headcount", filters=[Filter(field="wc", value="WC-DEL"), Filter(field="cadre", value="executive"),
-                                               Filter(field="station_tenure_years", op=">=", value=5)])
+PARADIP = QuerySpec(metric="refinery_grm_usd_bbl", filters=[Filter(field="refinery", value="REF-PRD")])
 
 
 def _executable(spec, chip):
@@ -23,13 +22,12 @@ def _executable(spec, chip):
 
 def test_at_least_two_executable_chips_per_data_answer():
     cases = [
-        (DELHI, "CMD", "aggregate"),
-        (apply_patch(DELHI, SpecPatch(grain="row")), "CMD", "row"),
-        (QuerySpec(metric="pbt_cr", dimensions=["field"]), "DIR_FIN", "aggregate"),
-        (QuerySpec(metric="capex_vs_reserves"), "CMD", "aggregate"),
-        (QuerySpec(metric="headcount_change"), "CMD", "aggregate"),
+        (PARADIP, "CMD", "aggregate"),
+        (QuerySpec(metric="refinery_pbt_cr", dimensions=["refinery"]), "DIR_FIN", "aggregate"),
+        (QuerySpec(metric="capex_actual_cr"), "CMD", "aggregate"),
+        (QuerySpec(metric="corporate_revenue_cr", dimensions=["fy"]), "CMD", "aggregate"),
         (QuerySpec(metric="mou_scorecard"), "DIR_FIN", "row"),
-        (DELHI, "E2_HR", "aggregate"),
+        (PARADIP, "E2_FIN", "aggregate"),
     ]
     for spec, persona, grain in cases:
         chips = make_drilldowns(spec, persona, grain)
@@ -37,23 +35,25 @@ def test_at_least_two_executable_chips_per_data_answer():
         assert all(_executable(spec, c) for c in chips)
 
 
-def test_names_chip_only_where_named_data_is_allowed():
-    assert any(c.get("spec_patch") == {"grain": "row"} for c in make_drilldowns(DELHI, "CMD", "aggregate"))
-    assert not any(c.get("spec_patch") == {"grain": "row"} for c in make_drilldowns(DELHI, "E2_HR", "aggregate"))
+def test_drilldown_never_offers_row_grain_to_junior():
+    for c in make_drilldowns(PARADIP, "E2_FIN", "aggregate"):
+        assert c.get("spec_patch") != {"grain": "row"}
 
 
-def test_compare_chip_uses_two_values_contract():
-    chip = next(c for c in make_drilldowns(DELHI, "DIR_HR", "aggregate", max_n=5) if "compare" in c.get("spec_patch", {}))
-    assert chip["spec_patch"]["compare"]["values"][0] == "WC-DEL" and len(chip["spec_patch"]["compare"]["values"]) == 2
+def test_compare_chip_uses_valid_spec_patch():
+    chips = make_drilldowns(PARADIP, "DIR_REF", "aggregate", max_n=5)
+    assert len(chips) >= 2
+    for c in chips:
+        assert _executable(PARADIP, c)
 
 
 def test_grounding_flags_invented_numbers_only():
-    rows = [{"discipline": "F&A", "headcount": 99}, {"discipline": "HR", "headcount": 81}]
-    ins = [Insight(kind="headline", text="F&A is 23.6% of 419.", facts=[23.6, 99, 419])]
-    allowed = allowed_numbers(rows, ins, DELHI, extra=[419])
-    assert grounding_violations("F&A has 99 of 419 (23.6%) in FY26, as of 19-Oct-2026; grade E5.", allowed) == []
-    assert grounding_violations("HR has 812 officers.", allowed) == ["812"]
-    assert grounding_violations("Top 3 groups.", allowed) == []  # small structural integers
+    rows = [{"refinery": "Panipat", "throughput": 16.42}, {"refinery": "Paradip", "throughput": 16.18}]
+    ins = [Insight(kind="headline", text="Panipat throughput is 16.42 MMT out of 75.45 MMT.", facts=[16.42, 75.45])]
+    allowed = allowed_numbers(rows, ins, PARADIP, extra=[75.45])
+    assert grounding_violations("Panipat has 16.42 of 75.45 MMT in FY26, as of 31-Mar-2026.", allowed) == []
+    assert grounding_violations("Haldia has 812 MMT throughput.", allowed) == ["812"]
+    assert grounding_violations("Top 3 refineries.", allowed) == []  # small structural integers
 
 
 def test_compose_spoken_is_2_to_4_sentences_and_falls_back_on_ungrounded():

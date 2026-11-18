@@ -1,70 +1,53 @@
-# ONGC 10-Year Chronological MD&A & Annual Report Context Dossier (FY17–FY26)
+# IOCL 10-Year Chronological MD&A & Annual Report Context Dossier (FY17–FY26)
 
-This dossier captures the audited year-by-year financial, operational, regulatory, and strategic context from ONGC's Annual Reports (`FY17–FY26`) and Yahoo Finance (`ONGC.NS`) filings. Every figure aligns 100% with `hrfin_gold.ssot_corporate_annual_360`.
-
----
-
-## 1. Ten-Year Master Financial & Macro Summary (`FY17–FY26`)
-
-| FY | Standalone Revenue (`₹ Cr`) | Standalone EBITDA (`₹ Cr`) | Standalone PAT (`₹ Cr`) | Consolidated Revenue (`₹ Cr`) | Consolidated PAT (`₹ Cr`) | Crude Realization (`$/bbl`) | Gas Price (`$/MMBTU`) | Total Assets (`₹ Cr`) | Total Borrowings (`₹ Cr`) | Primary Annual Report Regime & Catalyst |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| **FY17** | `77,908` | `38,595` | `17,900` | `3,25,660` | `21,478` | `$50.27` | `$2.50` | `2,47,250` | `0` | Debt-free standalone balance sheet; low APM gas price floor; KG-DWN-98/2 FDP approval. |
-| **FY18** | `85,004` | `44,261` | `19,945` | `3,62,246` | `22,106` | `$57.33` | `$2.89` | `2,91,828` | `25,592` | **HPCL 51.11% acquisition (`₹36,915 Cr`)** in Jan 2018 funded via liquid reserves + `₹25,592 Cr` short-term bridge debt. |
-| **FY19** | `1,09,655` | `58,367` | `26,716` | `4,53,461` | `30,495` | `$68.19` | `$3.36` | `3,01,554` | `21,594` | Brent recovery (`$68/bbl`); rapid repayment of HPCL acquisition bridge debt (`-₹3,998 Cr`); record pre-COVID standalone PAT. |
-| **FY20** | `96,214` | `45,094` | `13,445` | `3,96,493` | `10,523` | `$58.61` | `$3.69` | `2,98,874` | `22,422` | **COVID-19 Q4 oil crash & Ind-AS 36 Exceptional Impairment (`₹6,685 Cr`)** + adoption of new `25.168%` corporate tax regime (Section 115BAA). |
-| **FY21** | `68,141` | `32,689` | `11,246` | `3,60,572` | `16,249` | `$42.78` | `$1.79` | `3,18,452` | `24,845` | Pandemic demand trough (`$42.78/bbl` crude, `$1.79/MMBTU` APM gas historic low); disciplined opex control + `₹1,375 Cr` impairment reversal. |
-| **FY22** | `1,10,345` | `60,721` | `40,306` | `5,31,793` | `45,522` | `$76.62` | `$2.90` | `3,62,740` | `10,775` | Post-pandemic commodity rebound (`$76.62/bbl`); **record Standalone PAT (`₹40,306 Cr`)** via `₹8,919 Cr` Section 115BAA deferred tax write-back; `₹14,070 Cr` debt paydown. |
-| **FY23** | `1,55,517` | `72,068` | `40,097` | `6,84,829` | `35,440` | `$91.90` | `$8.57` | `3,89,610` | `7,215` | **All-time peak Revenue (`₹1,55,517 Cr`)** on Russia-Ukraine crude spike; **SAED Windfall Tax introduced (July 2022)** driving statutory levies to `₹49,120 Cr` + `₹9,235 Cr` Sakhalin-1/Mozambique provision. |
-| **FY24** | `1,38,402` | `68,856` | `40,526` | `6,43,037` | `49,221` | `$80.77` | `$6.50` | `4,22,190` | `6,629` | **Kirit Parikh Committee `$6.50/MMBTU` APM gas ceiling** stabilized gas revenue; HPCL/MRPL strong GRMs lifted **Consolidated PAT to all-time high `₹49,221 Cr`**. |
-| **FY25** | `1,37,846` | `66,136` | `35,610` | `6,63,262` | `38,329` | `$76.90` | `$6.50` | `4,58,120` | `7,412` | **SAED Windfall Tax abolished (Dec 2, 2024)**; **OPaL `₹18,365 Cr` capital restructuring** (95.69% subsidiary); KG-DWN-98/2 Cluster-2 oil ramp-up led to higher DD&A (`₹22,745 Cr`). |
-| **FY26** | `1,31,492` | `61,320` | `32,894` | `6,41,890` | `36,240` | `$73.80` | `$6.50` | `4,79,850` | `6,890` | Softer Brent (`$73.80/bbl`, `-4.0% YoY`) moderated realization by `-₹6,354 Cr`, cushioned by **full-year zero SAED (`-₹4,606 Cr` levy saving)** and KG-98/2 Cluster-2 M-field production (`0.68 MMT`). |
+This dossier captures the audited year-by-year financial, downstream operational, regulatory, and strategic context from **Indian Oil Corporation Limited (IOCL)** Annual Reports (`FY17–FY26`) and Yahoo Finance (`IOC.NS`) filings. Every figure reconciles 100% with `hrfin_gold.ssot_corporate_annual_360` and `ssot_refinery_economics_360`.
 
 ---
 
-## 2. Year-by-Year Annual Report Deep-Dive & Director (Finance) Context
+## 1. Ten-Year Master Financial & Operational Summary (`FY17–FY26`)
 
-### FY17 — Zero Standalone Debt & Pre-HPCL Baseline
-- **What Happened (Annual Report Context):** Standalone revenue stood at `₹77,908 Cr` with crude realization at `$50.27/bbl` and APM gas at `$2.50/MMBTU`. ONGC maintained a completely debt-free standalone balance sheet (`₹0 Cr` borrowings) with `₹13,014 Cr` in cash and bank balances.
-- **Strategic Milestone:** Board approved the Field Development Plan (FDP) for deepwater block **KG-DWN-98/2 Cluster-2** (`$5.07 Bn` sanctioned capex).
+| FY | Gross Revenue (`₹ Cr`) | Excise Duty (`₹ Cr`) | Net Revenue (`₹ Cr`) | Standalone EBITDA (`₹ Cr`) | Standalone PAT (`₹ Cr`) | Consolidated PAT (`₹ Cr`) | GRM (`$/bbl`) | Throughput (`MMT`) | Net Worth (`₹ Cr`) | Total Debt (`₹ Cr`) | Primary Annual Report Regime & Catalyst |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| **FY17** | `4,45,373.00` | `85,500.00` | `3,59,873.00` | `36,359.40` | `19,106.40` | `20,385.10` | `$10.22` | `65.19` | `99,729.00` | `54,820.00` | Paradip 15 MMTPA commissioning ramp-up; strong inventory gains boosted GRM to `$10.22/bbl`. |
+| **FY18** | `5,06,428.00` | `82,215.00` | `4,24,213.00` | `40,090.00` | `21,346.00` | `22,625.40` | `$8.49` | `69.00` | `1,10,171.00` | `58,030.00` | Highest-ever throughput (`69.00 MMT`) and `1:1` bonus issue; resilient marketing & petchem profits. |
+| **FY19** | `6,05,924.00` | `78,523.00` | `5,27,401.00` | `35,654.15` | `16,894.15` | `17,376.70` | `$5.41` | `71.92` | `1,08,658.00` | `86,359.00` | Gross Revenue crossed `₹6.05 Lakh Cr`; H2 gasoline crack compression lowered GRM to `$5.41/bbl`. |
+| **FY20** | `5,66,354.00` | `81,992.00` | `4,84,362.00` | `28,658.00` | `1,313.23` | `1,876.40` | `$0.08` | `69.41` | `93,769.00` | `1,16,545.00` | **COVID-19 Q4 crude crash (`₹11,305 Cr` exceptional inventory write-down)** compressed GRM to `$0.08/bbl` (Core `$4.10/bbl`); Ind AS 116 adoption. |
+| **FY21** | `5,14,890.00` | `1,36,832.00` | `3,78,058.00` | `42,475.04` | `21,836.04` | `21,762.15` | `$5.64` | `62.35` | `1,10,500.00` | `94,413.00` | Peak Central Excise (`₹1,36,832 Cr`), sharp crude inventory recovery, and record petchem margins lifted PAT `16.6x` to `₹21,836.04 Cr`. |
+| **FY22** | `7,28,445.00` | `1,30,281.00` | `5,98,164.00` | `47,590.10` | `24,184.10` | `25,102.30` | `$11.25` | `67.67` | `1,31,286.00` | `1,10,799.00` | Post-COVID demand recovery, `$11.25/bbl` GRM, and **record `₹2,64,436 Cr` Exchequer contribution**. |
+| **FY23** | `9,34,953.00` | `95,481.00` | `8,39,472.00` | `29,424.82` | `8,241.82` | `11,704.20` | `$19.52` | `72.41` | `1,34,758.00` | `1,32,495.00` | **All-time high Revenue (`₹9,34,953 Cr`) & GRM (`$19.52/bbl`)** offset by retail MS/HSD price freeze under-recoveries; included **`₹10,801 Cr` GoI LPG grant**; `1:2` bonus shares. |
+| **FY24** | `8,66,345.00` | `91,639.00` | `7,74,706.00` | `79,570.84` | `39,618.84` | `43,161.15` | `$12.05` | `73.59` | `1,76,715.00` | `1,16,496.00` | **All-time record Standalone PAT (`₹39,618.84 Cr`) & Consolidated PAT (`₹43,161.15 Cr`)** on strong marketing spreads + `$12.05/bbl` GRM. |
+| **FY25** | `8,45,513.00` | `89,562.99` | `7,55,950.01` | `41,780.58` | `12,961.57` | `13,598.40` | `$4.80` | `71.56` | `1,78,677.00` | `1,34,120.00` | Cyclical diesel crack moderation (`$4.80/bbl` GRM) and LPG buffer absorption tempered PAT to `₹12,961.57 Cr`. |
+| **FY26** | `8,86,224.41` | `1,02,066.54` | `7,84,157.87` | `74,243.42` | `36,802.42` | `39,639.54` | `$10.85` | `75.451` | `2,04,544.34` | `1,10,668.00` | **Record `75.451 MMT` throughput (`107.4%` util across 9 refineries), `105.556 MMT` pipeline & `105.117 MMT` sales**, `$10.85/bbl` GRM, and `0.54x` D/E deleveraging. |
 
-### FY18 — Acquisition of 51.11% Stake in HPCL (`₹36,915 Cr`)
-- **What Happened (Annual Report Context):** On January 31, 2018, ONGC acquired the Government of India's `51.11%` equity stake in **Hindustan Petroleum Corporation Ltd (HPCL)** for **`₹36,915 Cr`** in an all-cash transaction to build an integrated upstream-to-downstream energy major.
-- **Balance Sheet Impact:** Non-Current Investments (Note 8) surged by `+₹38,242 Cr` (from `₹48,910 Cr` to `₹87,152 Cr`), Cash & Bank dropped from `₹13,014 Cr` to `₹1,013 Cr`, and Short-Term Borrowings jumped from `₹0 Cr` to `₹25,592 Cr`.
+---
 
-### FY19 — Post-HPCL De-leveraging & Pre-COVID Earnings Peak
-- **What Happened (Annual Report Context):** Higher crude realization (`$68.19/bbl`) lifted Standalone Revenue `+29.0%` to `₹1,09,655 Cr` and PAT `+33.9%` to `₹26,716 Cr`. Full-year consolidation of HPCL propelled Consolidated Revenue to `₹4,53,461 Cr`.
-- **Finance Director Action Executed:** Applied `₹12,500+ Cr` of free cash flow to prepay commercial paper and bank bridge loans, reducing standalone debt to `₹21,594 Cr`.
+## 2. Year-by-Year Annual Report MD&A Deep-Dive
 
-### FY20 — COVID-19 Crude Crash & `₹6,685 Cr` Ind-AS 36 Exceptional Impairment
-- **What Happened (Annual Report Context):** Following the March 2020 COVID-19 demand collapse and Brent crash, ONGC tested its cash-generating units (CGUs) under **Ind-AS 36 (Impairment of Assets)** using downwardly revised forward crude curves, booking a pre-tax **Exceptional Impairment Loss of `₹6,685 Cr`** (Note 32). Simultaneously, ONGC elected to transition to the new **Section 115BAA corporate tax regime (`25.168%`)**.
-- **P&L Impact:** PAT fell `-49.7%` from `₹26,716 Cr` to `₹13,445 Cr`.
+### FY17–FY19 — Paradip Commissioning, Throughput Expansion & Excise Structuring
+- **FY17 (`PAT ₹19,106.40 Cr`):** Paradip Refinery (`15.00 MMTPA`) stabilized, pushing corporate throughput to `65.19 MMT` and GRM to `$10.22/bbl`. Under Ind-AS Schedule III, revenue is disclosed Gross (`₹4,45,373 Cr`) inclusive of Central Excise Duty (`₹85,500 Cr`), yielding Net Revenue of `₹3,59,873 Cr`.
+- **FY18 (`PAT ₹21,346.00 Cr`):** Highest utilization across coastal and inland refineries lifted throughput to `69.00 MMT` and Net Revenue `+17.9% YoY` to `₹4,24,213 Cr`. Board approved a `1:1` bonus issue.
+- **FY19 (`PAT ₹16,894.15 Cr`):** Higher Brent crude lifted Gross Revenue `+19.6% YoY` to `₹6,05,924 Cr`, while narrowing light-distillate cracks compressed GRM from `$8.49` to `$5.41/bbl`. Working capital absorption and share buyback lifted Total Debt to `₹86,359 Cr`.
 
-### FY21 — Pandemic Realization Trough (`$42.78/bbl`) & Opex Discipline
-- **What Happened (Annual Report Context):** FY21 marked the lowest commodity price environment of the decade (`$42.78/bbl` crude and `$1.79/MMBTU` domestic gas). Standalone Revenue contracted `-29.2%` to `₹68,141 Cr`.
-- **Finance Director Action Executed:** Deferred non-critical exploratory drilling (Exploration Write-Offs cut to `₹5,220 Cr`), renegotiated offshore rig charter rates, and recorded a `₹1,375 Cr` impairment reversal as crude recovered in Q4 FY21, protecting `₹11,246 Cr` PAT.
+### FY20 — COVID-19 Crude Crash & `₹11,305 Cr` Exceptional Inventory Write-Down
+- **What Happened:** Brent crude collapsed below `$23/bbl` in March 2020 during nationwide lockdown, compelling an NRV (Net Realizable Value) write-down on crude and finished product inventories, including **`₹11,305.00 Cr` classified as Exceptional Loss** (Schedule III Line VI). Reported GRM fell to **`$0.08/bbl`**, even though underlying **Core GRM stood resilient at `$4.10/bbl`**.
+- **Accounting & Tax Shifts:** IOCL adopted **Ind AS 116 (Leases)** (`₹6,180 Cr` non-current lease liabilities) and transitioned to Section **115BAA** (`25.168%` corporate tax rate), enabling `₹1,313.23 Cr` positive Standalone PAT despite severe inventory shock.
 
-### FY22 — Commodity Rebound, `₹40,306 Cr` Record PAT & `₹14,070 Cr` Debt Paydown
-- **What Happened (Annual Report Context):** Crude realization surged `+79.1%` to `$76.62/bbl`, driving Standalone Revenue up `+61.9%` to `₹1,10,345 Cr` and EBITDA up `+85.8%` to `₹60,721 Cr`. Re-measurement of net deferred tax liabilities under Section 115BAA produced a **`₹8,919 Cr` deferred tax credit (Note 36)**, reducing effective tax rate to `6.8%` and lifting Standalone PAT to `₹40,306 Cr`.
-- **Balance Sheet Impact:** Repaid `₹14,070 Cr` of short-term debt, cutting total borrowings from `₹24,845 Cr` to `₹10,775 Cr` and restoring Cash & Bank to `₹6,840 Cr`.
+### FY21 — Excise Peak (`₹1,36,832 Cr`), Inventory Recovery & Debt Paydown
+- Central Excise Duty increased sharply to **`₹1,36,832.00 Cr`** (`26.6%` of Gross Revenue) even as lockdowns trimmed refinery throughput to `62.35 MMT`. Rising crude prices from `$23` to `$64/bbl` generated substantial inventory holding gains, boosting EBITDA to `₹42,475.04 Cr` and PAT to **`₹21,836.04 Cr`**, funding `₹22,132 Cr` of debt reduction (`Total Debt ₹94,413 Cr`).
 
-### FY23 — All-Time Peak Revenue (`₹1,55,517 Cr`), SAED Windfall Tax & Sakhalin-1 Provision
-- **What Happened (Annual Report Context):** Geopolitical supply shocks pushed crude realization to `$91.90/bbl` and APM gas to `$8.57/MMBTU`, generating ONGC's highest-ever Standalone Revenue (`₹1,55,517 Cr`) and Consolidated Revenue (`₹6,84,829 Cr`).
-- **Two Major Headwinds:**
-  1. **Special Additional Excise Duty (SAED / Windfall Tax):** Introduced by Govt of India on July 1, 2022 on domestic crude, causing **Statutory Levies (Note 26)** to surge `+60.8%` to **`₹49,120 Cr`**.
-  2. **Geopolitical Impairment (`₹9,235 Cr`):** Exceptional provision recorded against ONGC Videsh (OVL) investments/advances in **Sakhalin-1 (Russia)** and **Area-1 Rovuma (Mozambique)**.
+### FY22 — Demand Rebound, `$11.25/bbl` GRM & `₹2.64 Lakh Cr` Exchequer
+- Post-pandemic transport demand drove Net Revenue `+58.2%` to `₹5,98,164.00 Cr`. Reported GRM doubled to **`$11.25/bbl`** (`$2.60/bbl` over Singapore benchmark), delivering `₹24,184.10 Cr` PAT alongside IOCL's decade-high **`₹2,64,436.00 Cr` Contribution to Exchequer**.
 
-### FY24 — Kirit Parikh `$6.50/MMBTU` Gas Ceiling & Record Consolidated PAT (`₹49,221 Cr`)
-- **What Happened (Annual Report Context):** Effective April 8, 2023, Govt implemented the Kirit Parikh Committee formula (10% of Indian Crude Basket subject to a `$4.00/MMBTU` floor and **`$6.50/MMBTU` ceiling** for legacy APM gas, with a 20% premium for new-well gas). Lower SAED rates reduced Statutory Levies by `-₹9,662 Cr` to `₹39,458 Cr`, lifting Standalone PAT to an all-time high of **`₹40,526 Cr`**.
-- **Group Impact:** HPCL (`₹16,014 Cr` PAT) and MRPL (`₹3,596 Cr` PAT) delivered record refining margins, driving Consolidated PAT to **`₹49,221 Cr`**.
+### FY23 — Record `$19.52/bbl` GRM vs. Auto-Fuel Under-Recovery & `₹10,801 Cr` LPG Grant
+- Geopolitical dislocation spiked global diesel/ATF cracks, pushing IOCL's GRM to an all-time record **`$19.52/bbl`** (`72.41 MMT` throughput) and Gross Revenue to **`₹9,34,953.00 Cr`**. However, retail petrol/diesel pump prices remained frozen despite `$95+/bbl` Brent, creating sharp Marketing Division margin compression.
+- **One-Time GoI Grant:** Government of India sanctioned a **`₹10,801.00 Cr` one-time LPG compensation grant** recognized in Revenue from Operations, protecting `₹8,241.82 Cr` Standalone PAT while CPCL (`$12.48/bbl` GRM, `₹3,527.4 Cr` PAT) lifted Consolidated PAT to `₹11,704.20 Cr`. Shares doubled-plus via a `1:2` bonus issue (`1,412.1238 Cr` shares).
 
-### FY25 — SAED Windfall Tax Abolition (Dec 2024) & OPaL `₹18,365 Cr` Capital Restructuring
-- **What Happened (Annual Report Context):**
-  1. **SAED Abolition:** Govt of India formally abolished the SAED windfall tax on domestic crude effective **December 2, 2024**, reducing Note 26 Statutory Levies to `₹36,448 Cr`.
-  2. **OPaL Equity Conversion (Note 8):** Following Cabinet approval, ONGC converted Compulsorily Convertible Debentures (CCDs) and infused equity totaling **`₹18,365 Cr`** into **ONGC Petro additions Ltd (OPaL)**, raising ONGC's stake to `95.69%` and lifting Non-Current Investments from `₹99,845 Cr` to `₹1,14,920 Cr`.
-  3. **KG-DWN-98/2 Capitalization (Notes 5, 6, 30):** Commissioning of Cluster-2 FPSO *Armada Sterling V* transferred `₹14,200 Cr` from CWIP to producing Oil & Gas Assets, increasing DD&A to `₹22,745 Cr`.
+### FY24 — All-Time Record `₹39,618.84 Cr` Standalone & `₹43,161.15 Cr` Consolidated PAT
+- Normalized retail marketing margins paired with strong `$12.05/bbl` GRM (`73.59 MMT` throughput) generated IOCL's highest-ever Standalone EBITDA (`₹79,570.84 Cr`) and Standalone PAT (**`₹39,618.84 Cr`**). Total Debt fell by `-₹15,999 Cr` to `₹1,16,496 Cr`.
 
-### FY26 — Present Year Performance (`₹1,31,492 Cr` Revenue, `₹32,894 Cr` PAT) & Action Priorities
-- **What Happened (Annual Report Context):**
-  1. **Revenue Moderation (`-4.6% YoY` to `₹1,31,492 Cr`, Note 24):** Nominated crude oil realization moderated `-4.0% YoY` from `$76.90/bbl` to **`$73.80/bbl`**, while Western Onshore mature fields (Mehsana, Ankleshwar, Cambay) experienced natural decline, only partially offset by **`0.68 MMT` incremental crude from KG-DWN-98/2 Cluster-2 (M-field)** and **`24.1%` share of NWG (New Well Gas) priced at `$7.80/MMBTU`**.
-  2. **Statutory Levy Relief (`-12.6% YoY` to `₹31,842 Cr`, Note 26):** Full-year benefit of zero SAED windfall tax saved **`₹3,240 Cr`**, while ad-valorem Royalty fell `-₹1,126 Cr` and OIDB Cess fell `-₹240 Cr`, cushioning EBITDA (`₹61,320 Cr`, `46.6%` margin).
-  3. **Higher DD&A (`+6.3% YoY` to `₹24,180 Cr`, Note 30) & Exploration Write-Offs (`+7.4% YoY` to `₹7,320 Cr`, Note 28):** Full-year unit-of-production depletion on KG-98/2 Cluster-2 subsea infrastructure and dry-well write-offs in KG Offshore (`3` wells, `₹2,840 Cr`) and Kutch-Saurashtra (`2` wells, `₹1,490 Cr`) reduced PAT by `-₹2,716 Cr` (`-7.6% YoY`) to **`₹32,894 Cr`**.
+### FY25 — Cyclical Refining Compression (`$4.80/bbl` GRM) & Heavy Expansion Capex
+- Global refining capacity additions and softer middle-distillate cracks pared GRM to **`$4.80/bbl`**, while domestic LPG buffer under-recoveries tempered Standalone PAT to `₹12,961.57 Cr` on `₹8,45,513.00 Cr` Gross Revenue (`₹89,562.99 Cr` Excise; `₹7,55,950.01 Cr` Net). Capex stayed elevated at `₹36,910 Cr` across Panipat P-25 (`15 -> 25 MMTPA`), Koyali (`13.7 -> 18 MMTPA`), and Barauni (`6 -> 9 MMTPA`) brownfield expansions.
+
+### FY26 — Record `75.451 MMT` Throughput (`107.4%` Util), `₹36,802.42 Cr` PAT & `0.54x` De-leveraging
+- Rebounding refining spreads (**`$10.85/bbl` GRM**, Core GRM `$9.95/bbl`) and peak asset reliability (`75.451 MMT` refinery crude processed = **`107.4%` capacity utilization** across 9 refineries; **`105.556 MMT`** pipelines; **`105.117 MMT`** total product sales) expanded Gross Revenue to **`₹8,86,224.41 Cr`** (Excise **`₹1,02,066.54 Cr`**, Net Revenue **`₹7,84,157.87 Cr`**) and Standalone PAT `+183.9% YoY` to **`₹36,802.42 Cr`** (Consolidated PAT **`₹39,639.54 Cr`**).
+- Strong operating cash flow (`₹66,480 Cr`) trimmed Total Debt by `₹23,452 Cr` to **`₹1,10,668.00 Cr`** against Net Worth **`₹2,04,544.34 Cr`** (**D/E `0.54x`**).

@@ -9,6 +9,6 @@ SELECT
     clause_ref,
     heading,
     REGEXP_EXTRACT(text, r'\n\n([\s\S]*?) \(\d+\.1\)') AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE (doc_id = 'JRTP' AND clause_ref = 'Clause 11.0') OR (doc_id = 'HR Manual' AND clause_ref = 'Clause 5.0')
 ORDER BY doc_id DESC, clause_ref;

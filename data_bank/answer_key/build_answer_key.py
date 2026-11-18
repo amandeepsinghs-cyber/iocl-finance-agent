@@ -1,7 +1,7 @@
 """build_answer_key.py — Complete builder for Phase 5 steps 5.1 and 5.2.
 
 Executes all 89 root questions and 267 follow-up questions against BigQuery
-(ongc-hr-finance-agent: hrfin_gold, hrfin_silver, hrfin_docs) using job labels
+(yukti-finance-iocl: hrfin_gold, hrfin_silver, hrfin_docs) using job labels
 {"datacloud": "ai-agent"}.
 
 Rebuilt per Lead review:
@@ -28,7 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 import yaml
 from google.cloud import bigquery
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "asia-south1"
 DATA_BANK_DIR = Path(__file__).resolve().parent.parent
 QUESTIONS_PATH = DATA_BANK_DIR / "world_bible" / "reference" / "questions.yaml"
@@ -54,7 +54,7 @@ REFUSAL_MAP = {
     pay_scale_min_inr,
     pay_scale_max_inr,
     typical_residency_years
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_grade`
+FROM `yukti-finance-iocl.hrfin_silver.dim_grade`
 WHERE LOWER(cadre) = 'executive'
 ORDER BY level_order;"""
     },
@@ -68,7 +68,7 @@ ORDER BY level_order;"""
     grade_id,
     discipline_id,
     COUNT(DISTINCT emp_id) AS mumbai_executives_due_rotation
-FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
 WHERE is_current_stay = TRUE
   AND cluster_id = 'CL-MUM'
   AND grade_id LIKE 'E%'
@@ -88,7 +88,7 @@ ORDER BY grade_id, discipline_id;"""
     typical_residency_years,
     promotion_mode,
     dpc_evaluation_type
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_grade`
+FROM `yukti-finance-iocl.hrfin_silver.dim_grade`
 WHERE LOWER(cadre) = 'executive'
 ORDER BY level_order;"""
     },
@@ -103,7 +103,7 @@ ORDER BY level_order;"""
     gross_revenue_inr_cr,
     total_capex_spent_inr_cr,
     pat_inr_cr
-FROM `ongc-hr-finance-agent.hrfin_gold.mart_corporate_performance`
+FROM `yukti-finance-iocl.hrfin_gold.mart_corporate_performance`
 WHERE fiscal_year IS NOT NULL
 GROUP BY fiscal_year, gross_revenue_inr_cr, total_capex_spent_inr_cr, pat_inr_cr
 ORDER BY fiscal_year DESC
@@ -118,7 +118,7 @@ LIMIT 5;"""
         "sql": """SELECT
     grade_id,
     COUNT(DISTINCT emp_id) AS executives_ge_5yr_count
-FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
 WHERE is_current_stay = TRUE
   AND wc_id = 'WC-DEL'
   AND grade_id LIKE 'E%'
@@ -137,7 +137,7 @@ ORDER BY grade_id;"""
     clause_ref,
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id IN ('P2-01', 'Whistle Blower Policy') OR questions_served LIKE '%D6%'
 ORDER BY doc_id, clause_ref
 LIMIT 5;"""
@@ -153,7 +153,7 @@ LIMIT 5;"""
     clause_ref,
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'JRTP' AND clause_ref IN ('Clause 3.0', 'Clause 9.0', 'Clause 11.0')
 ORDER BY clause_ref;"""
     },
@@ -168,7 +168,7 @@ ORDER BY clause_ref;"""
     clause_ref,
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'BDP summary' AND clause_ref IN ('Clause 2.0', 'Clause 3.0')
 ORDER BY clause_ref;"""
     },
@@ -183,7 +183,7 @@ ORDER BY clause_ref;"""
     clause_ref,
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id IN ('G-07', 'BDP summary') OR questions_served LIKE '%P20%'
 ORDER BY doc_id, clause_ref
 LIMIT 5;"""
@@ -200,7 +200,7 @@ LIMIT 5;"""
     pay_scale_min_inr,
     pay_scale_max_inr,
     typical_residency_years
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_grade`
+FROM `yukti-finance-iocl.hrfin_silver.dim_grade`
 WHERE LOWER(cadre) = 'executive'
 ORDER BY level_order;"""
     },
@@ -215,7 +215,7 @@ ORDER BY level_order;"""
     gross_revenue_inr_cr,
     ebitda_inr_cr,
     pat_inr_cr
-FROM `ongc-hr-finance-agent.hrfin_gold.mart_corporate_performance`
+FROM `yukti-finance-iocl.hrfin_gold.mart_corporate_performance`
 WHERE fiscal_year IS NOT NULL
 GROUP BY fiscal_year, gross_revenue_inr_cr, ebitda_inr_cr, pat_inr_cr
 ORDER BY fiscal_year DESC
@@ -231,7 +231,7 @@ CUSTOM_QUERIES = {
     COUNT(DISTINCT emp_id) AS delhi_executives_ge_5yr,
     COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) AS exempt_retiring_3yr,
     COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) AS non_exempt_due_transfer
-FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
 WHERE is_current_stay = TRUE
   AND wc_id = 'WC-DEL'
   AND grade_id LIKE 'E%'
@@ -243,7 +243,7 @@ ORDER BY grade_id, discipline_id;""",
     grade_id,
     discipline_id,
     COUNT(DISTINCT emp_id) AS delhi_executives_ge_5yr
-FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
 WHERE is_current_stay = TRUE
   AND wc_id = 'WC-DEL'
   AND grade_id IN ('E5', 'E6', 'E7')
@@ -256,8 +256,8 @@ ORDER BY grade_id, discipline_id;""",
     COUNT(DISTINCT CASE WHEN v.continuous_stay_months >= 60 THEN v.emp_id END) AS executives_ge_5yr,
     COUNT(DISTINCT v.emp_id) AS total_active_executives,
     ROUND(COUNT(DISTINCT CASE WHEN v.continuous_stay_months >= 60 THEN v.emp_id END) * 100.0 / NULLIF(COUNT(DISTINCT v.emp_id), 0), 2) AS pct_stay_ge_5yr
-FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` w ON v.wc_id = w.wc_id
+FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
+JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` w ON v.wc_id = w.wc_id
 WHERE v.is_current_stay = TRUE
   AND v.grade_id LIKE 'E%'
   AND w.city IN ('Delhi', 'Dehradun', 'Mumbai')
@@ -269,8 +269,8 @@ ORDER BY pct_stay_ge_5yr DESC;""",
     ROUND(AVG(pnl.manpower_cost_per_boe_usd), 2) AS avg_manpower_cost_usd_boe,
     ROUND(SUM(pnl.allocated_manpower_cost_inr_cr), 2) AS total_manpower_cost_cr,
     ROUND(SUM(pnl.total_production_boe), 2) AS total_production_boe
-FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` pnl
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` w ON pnl.asset_wc_id = w.wc_id
+FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual` pnl
+JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` w ON pnl.asset_wc_id = w.wc_id
 WHERE pnl.fiscal_year IN ('FY26', '2026') AND pnl.total_production_boe > 0
 GROUP BY w.onshore_offshore
 ORDER BY avg_manpower_cost_usd_boe DESC;""",
@@ -280,7 +280,7 @@ ORDER BY avg_manpower_cost_usd_boe DESC;""",
     ROUND(gross_revenue_inr_cr, 2) AS gross_revenue_cr,
     ROUND(operating_expenses_total_inr_cr, 2) AS opex_cr,
     ROUND(lifting_cost_average_usd_boe, 2) AS lifting_cost_usd_boe
-FROM `ongc-hr-finance-agent.hrfin_silver.corporate_financials`
+FROM `yukti-finance-iocl.hrfin_silver.corporate_financials`
 WHERE fiscal_year IS NOT NULL
 ORDER BY fiscal_year DESC;""",
 
@@ -291,8 +291,8 @@ ORDER BY fiscal_year DESC;""",
     COALESCE(SUM(sp.vacancy_count), 0) AS vacancy_deficit,
     200 AS planned_executives_relocated,
     6.50 AS estimated_cta_outlay_cr
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` wc
-LEFT JOIN `ongc-hr-finance-agent.hrfin_silver.sanctioned_posts` sp ON wc.wc_id = sp.wc_id AND sp.fiscal_year IN ('FY26', '2026')
+FROM `yukti-finance-iocl.hrfin_silver.dim_work_centre` wc
+LEFT JOIN `yukti-finance-iocl.hrfin_silver.sanctioned_posts` sp ON wc.wc_id = sp.wc_id AND sp.fiscal_year IN ('FY26', '2026')
 WHERE wc.hard_station_cat IN ('B', 'C') AND wc.wc_id IN ('WC-ASM', 'WC-TRI', 'WC-CAM', 'WC-RAJ')
 GROUP BY wc.short_name
 ORDER BY vacancy_deficit DESC;""",
@@ -301,9 +301,9 @@ ORDER BY vacancy_deficit DESC;""",
     wc.short_name AS asset_name,
     wc.hard_station_cat,
     COUNT(DISTINCT e.emp_id) AS technical_officers_count
-FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` e
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` wc ON e.current_wc_id = wc.wc_id
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
+FROM `yukti-finance-iocl.hrfin_silver.employee_master` e
+JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` wc ON e.current_wc_id = wc.wc_id
+JOIN `yukti-finance-iocl.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
 WHERE LOWER(d.function) = 'technical' AND wc.hard_station_cat IN ('B', 'C')
   AND (e.employment_status = 'Active' OR e.separation_date IS NULL)
 GROUP BY wc.short_name, wc.hard_station_cat
@@ -313,8 +313,8 @@ LIMIT 10;""",
     "C13__why": """SELECT
     wc.city,
     COUNT(DISTINCT p.emp_id) AS corporate_headcount_fy26
-FROM `ongc-hr-finance-agent.hrfin_silver.posting_history` p
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` wc ON p.wc_id = wc.wc_id
+FROM `yukti-finance-iocl.hrfin_silver.posting_history` p
+JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` wc ON p.wc_id = wc.wc_id
 WHERE wc.wc_id IN ('WC-DEL', 'WC-DDN')
   AND p.to_date IS NULL
   AND p.grade_id LIKE 'E%'
@@ -331,7 +331,7 @@ ORDER BY corporate_headcount_fy26 DESC;""",
     asset_name,
     ROUND(AVG(lifting_cost_per_boe_usd), 2) AS avg_lifting_cost_usd_boe,
     ROUND(AVG(lifting_cost_per_boe_inr), 2) AS avg_lifting_cost_inr_boe
-FROM `ongc-hr-finance-agent.hrfin_gold.v_lifting_cost`
+FROM `yukti-finance-iocl.hrfin_gold.v_lifting_cost`
 WHERE fiscal_year IN ('FY26', '2026')
 GROUP BY asset_name
 ORDER BY avg_lifting_cost_usd_boe DESC;""",
@@ -340,107 +340,107 @@ ORDER BY avg_lifting_cost_usd_boe DESC;""",
     onshore_offshore,
     ROUND(AVG(lifting_cost_per_boe_usd), 2) AS avg_lifting_cost_usd_boe,
     11.5 AS company_average_usd_boe
-FROM `ongc-hr-finance-agent.hrfin_gold.v_lifting_cost`
+FROM `yukti-finance-iocl.hrfin_gold.v_lifting_cost`
 WHERE fiscal_year IN ('FY26', '2026')
 GROUP BY onshore_offshore
 ORDER BY avg_lifting_cost_usd_boe DESC;""",
 
     "H7__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P1-16' AND clause_ref = 'Part 1'
 ORDER BY doc_id, clause_ref;""",
 
     "H9__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'JRTP' AND clause_ref = 'Clause 13.0'
 ORDER BY doc_id, clause_ref;""",
 
     "H10__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'JRTP' AND clause_ref = 'Clause 10.0'
 ORDER BY doc_id, clause_ref;""",
 
     "F4__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'G-01' AND clause_ref = 'Part 1'
 ORDER BY doc_id, clause_ref;""",
 
     "P6": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'G-06' AND clause_ref = '12. Gifts'
 ORDER BY doc_id, clause_ref;""",
 
     "P6__drill_down": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'G-06' AND clause_ref = '16. Movable, Immovable and valuable property'
 ORDER BY doc_id, clause_ref;""",
 
     "P6__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'G-06' AND clause_ref = '5. Misconduct'
 ORDER BY doc_id, clause_ref;""",
 
     "P6__compare_or_so_what": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'G-06' AND clause_ref = '4. General'
 ORDER BY doc_id, clause_ref;""",
 
     "P7": """SELECT grade_id, designation, ta_da_travel_class, daily_lodging_limit_cat_a_inr
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_grade`
+FROM `yukti-finance-iocl.hrfin_silver.dim_grade`
 WHERE grade_id = 'E2';""",
 
     "P7__drill_down": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P1-16' AND clause_ref = 'Part 1'
 ORDER BY doc_id, clause_ref;""",
 
     "P7__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P1-16' AND clause_ref = 'Part 2'
 ORDER BY doc_id, clause_ref;""",
 
     "P7__compare_or_so_what": """SELECT grade_id, designation, ta_da_travel_class, daily_lodging_limit_cat_a_inr
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_grade`
+FROM `yukti-finance-iocl.hrfin_silver.dim_grade`
 WHERE grade_id IN ('E1', 'E2', 'E3', 'E4')
 ORDER BY level_order;""",
 
     "P8": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P2-01' AND clause_ref = 'Part 1'
 ORDER BY doc_id, clause_ref;""",
 
     "P8__drill_down": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P2-01' AND clause_ref = 'Part 2'
 ORDER BY doc_id, clause_ref;""",
 
     "P8__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P2-01' AND clause_ref = 'Part 3'
 ORDER BY doc_id, clause_ref;""",
 
     "P8__compare_or_so_what": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P2-01' AND clause_ref = 'Part 4'
 ORDER BY doc_id, clause_ref;""",
 
     "P10": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'R&P/Promotion' AND clause_ref = 'Clause 2.0'
 ORDER BY doc_id, clause_ref;""",
 
     "P10__drill_down": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'R&P/Promotion' AND clause_ref = 'Clause 3.0'
 ORDER BY doc_id, clause_ref;""",
 
     "P10__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'R&P/Promotion' AND clause_ref = 'Clause 1.0'
 ORDER BY doc_id, clause_ref;""",
 
     "P10__compare_or_so_what": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'R&P/Promotion' AND clause_ref = 'Clause 4.0'
 ORDER BY doc_id, clause_ref;""",
 
@@ -449,7 +449,7 @@ ORDER BY doc_id, clause_ref;""",
     COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap THEN emp_id END) AS total_breached_10yr_cap,
     COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) AS exempt_retiring_within_3yr,
     COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) AS due_transfer_non_exempt
-FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
 WHERE cluster_id = 'CL-DEL' AND is_currently_in_cluster;""",
 
     "P11__drill_down": """SELECT
@@ -457,13 +457,13 @@ WHERE cluster_id = 'CL-DEL' AND is_currently_in_cluster;""",
     COUNT(DISTINCT emp_id) AS officers_breached_cap,
     COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) AS exempt_retiring_3yr,
     COUNT(DISTINCT CASE WHEN DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) AS due_transfer_action
-FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
 WHERE cluster_id = 'CL-DEL' AND is_currently_in_cluster AND has_breached_cluster_10yr_cap
 GROUP BY current_grade_id
 ORDER BY current_grade_id;""",
 
     "P11__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'JRTP' AND clause_ref IN ('Clause 4.0', 'Clause 7.0')
 ORDER BY clause_ref;""",
 
@@ -472,28 +472,28 @@ ORDER BY clause_ref;""",
     COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap THEN emp_id END) AS breached_10yr_cap,
     COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN emp_id END) AS exempt_retiring_3yr,
     COUNT(DISTINCT CASE WHEN has_breached_cluster_10yr_cap AND DATE_DIFF(retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25 THEN emp_id END) AS non_exempt_due_transfer
-FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
 WHERE is_currently_in_cluster
 GROUP BY cluster_name
 ORDER BY non_exempt_due_transfer DESC;""",
 
     "E5": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P1-16' AND clause_ref = 'Part 1'
 ORDER BY doc_id, clause_ref;""",
 
     "E5__drill_down": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P1-16' AND clause_ref = 'Part 2'
 ORDER BY doc_id, clause_ref;""",
 
     "E5__why": """SELECT doc_id, clause_ref, heading, SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE doc_id = 'P1-16' AND clause_ref = 'Part 3'
 ORDER BY doc_id, clause_ref;""",
 
     "E5__compare_or_so_what": """SELECT grade_id, designation, ta_da_travel_class, daily_lodging_limit_cat_a_inr
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_grade`
+FROM `yukti-finance-iocl.hrfin_silver.dim_grade`
 WHERE cadre = 'executive'
 ORDER BY level_order;""",
 
@@ -503,7 +503,7 @@ ORDER BY level_order;""",
     total_capex_spent_inr_cr,
     total_dividend_payout_inr_cr,
     dividend_payout_ratio_pct
-FROM `ongc-hr-finance-agent.hrfin_silver.corporate_financials`
+FROM `yukti-finance-iocl.hrfin_silver.corporate_financials`
 WHERE fiscal_year IN ('FY24', 'FY25', 'FY26')
 ORDER BY fiscal_year DESC;""",
 
@@ -513,7 +513,7 @@ ORDER BY fiscal_year DESC;""",
         AVG(brent_usd_bbl) AS avg_brent,
         AVG(ongc_crude_net_realisation_usd_bbl) AS avg_realisation,
         AVG(brent_usd_bbl - ongc_crude_net_realisation_usd_bbl) AS avg_discount
-    FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+    FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
     WHERE fiscal_year IN ('FY26', '2026')
 ),
 sim_brent60 AS (
@@ -527,8 +527,8 @@ sim_brent60 AS (
         (pnl.oil_revenue_inr_cr * ((60.0 - params.avg_discount) / params.avg_realisation) + pnl.gas_revenue_inr_cr) AS sim_gross_rev_cr,
         SAFE_DIVIDE(pnl.statutory_royalty_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0)) AS eff_royalty_rate,
         SAFE_DIVIDE(pnl.statutory_cess_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0)) AS eff_cess_rate
-    FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` pnl
-    JOIN `ongc-hr-finance-agent.hrfin_silver.dim_field` f ON pnl.field_id = f.field_id
+    FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual` pnl
+    JOIN `yukti-finance-iocl.hrfin_silver.dim_field` f ON pnl.field_id = f.field_id
     CROSS JOIN price_params params
     WHERE pnl.fiscal_year IN ('FY26', '2026') AND pnl.line_type = 'field'
 )
@@ -550,7 +550,7 @@ ORDER BY sim_pbt_inr_cr ASC;""",
         AVG(brent_usd_bbl) AS avg_brent,
         AVG(ongc_crude_net_realisation_usd_bbl) AS avg_realisation,
         AVG(brent_usd_bbl - ongc_crude_net_realisation_usd_bbl) AS avg_discount
-    FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+    FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
     WHERE fiscal_year IN ('FY26', '2026')
 ),
 sim_brent60 AS (
@@ -564,8 +564,8 @@ sim_brent60 AS (
         SAFE_DIVIDE(pnl.statutory_cess_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0)) AS eff_cess_rate,
         pnl.total_opex_inr_cr AS base_opex_cr,
         pnl.dda_depreciation_inr_cr AS base_dda_cr
-    FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` pnl
-    JOIN `ongc-hr-finance-agent.hrfin_silver.dim_field` f ON pnl.field_id = f.field_id
+    FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual` pnl
+    JOIN `yukti-finance-iocl.hrfin_silver.dim_field` f ON pnl.field_id = f.field_id
     CROSS JOIN price_params params
     WHERE pnl.fiscal_year IN ('FY26', '2026') AND pnl.line_type = 'field'
 )
@@ -584,15 +584,15 @@ ORDER BY sim_pbt_cr ASC;""",
         AVG(brent_usd_bbl) AS avg_brent,
         AVG(ongc_crude_net_realisation_usd_bbl) AS avg_realisation,
         AVG(brent_usd_bbl - ongc_crude_net_realisation_usd_bbl) AS avg_discount
-    FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+    FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
     WHERE fiscal_year IN ('FY26', '2026')
 )
 SELECT
     w.onshore_offshore,
     ROUND(AVG(pnl.lifting_cost_per_boe_usd), 2) AS avg_lifting_cost_usd_boe,
     ROUND(SUM(pnl.oil_revenue_inr_cr * ((60.0 - params.avg_discount) / params.avg_realisation) + pnl.gas_revenue_inr_cr) - SUM(pnl.gross_revenue_inr_cr), 2) AS revenue_contraction_cr
-FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` pnl
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` w ON pnl.asset_wc_id = w.wc_id
+FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual` pnl
+JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` w ON pnl.asset_wc_id = w.wc_id
 CROSS JOIN price_params params
 WHERE pnl.fiscal_year IN ('FY26', '2026') AND pnl.line_type = 'field'
 GROUP BY w.onshore_offshore, params.avg_discount, params.avg_realisation
@@ -603,7 +603,7 @@ ORDER BY avg_lifting_cost_usd_boe DESC;""",
         AVG(brent_usd_bbl) AS avg_brent,
         AVG(ongc_crude_net_realisation_usd_bbl) AS avg_realisation,
         AVG(brent_usd_bbl - ongc_crude_net_realisation_usd_bbl) AS avg_discount
-    FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+    FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
     WHERE fiscal_year IN ('FY26', '2026')
 ),
 totals AS (
@@ -612,7 +612,7 @@ totals AS (
         ROUND(SUM(pnl.ebitda_inr_cr), 2) AS actual_ebitda_cr,
         ROUND(SUM(pnl.oil_revenue_inr_cr * ((60.0 - params.avg_discount) / params.avg_realisation) + pnl.gas_revenue_inr_cr), 2) AS sim_gross_revenue_cr,
         ROUND(SUM((pnl.oil_revenue_inr_cr * ((60.0 - params.avg_discount) / params.avg_realisation) + pnl.gas_revenue_inr_cr) * (1.0 - SAFE_DIVIDE(pnl.statutory_royalty_inr_cr + pnl.statutory_cess_inr_cr, NULLIF(pnl.gross_revenue_inr_cr, 0)))) - SUM(pnl.total_opex_inr_cr), 2) AS sim_ebitda_cr
-    FROM `ongc-hr-finance-agent.hrfin_silver.field_pnl_annual` pnl
+    FROM `yukti-finance-iocl.hrfin_silver.field_pnl_annual` pnl
     CROSS JOIN price_params params
     WHERE pnl.fiscal_year IN ('FY26', '2026') AND pnl.line_type = 'field'
 )
@@ -632,8 +632,8 @@ FROM totals;""",
     COUNT(DISTINCT e.emp_id) AS current_headcount_2026,
     COUNT(DISTINCT CASE WHEN e.retirement_date <= DATE_ADD(DATE '2026-10-19', INTERVAL 2 YEAR) THEN e.emp_id END) AS retirements_next_2yr,
     COUNT(DISTINCT e.emp_id) - COUNT(DISTINCT CASE WHEN e.retirement_date <= DATE_ADD(DATE '2026-10-19', INTERVAL 2 YEAR) THEN e.emp_id END) AS projected_headcount_2028
-FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` e
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
+FROM `yukti-finance-iocl.hrfin_silver.employee_master` e
+JOIN `yukti-finance-iocl.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
 WHERE e.current_grade_id LIKE 'E%'
   AND (e.employment_status = 'Active' OR e.separation_date IS NULL)
 GROUP BY d.discipline_id, d.name
@@ -645,8 +645,8 @@ ORDER BY current_headcount_2026 DESC;""",
     COUNT(DISTINCT e.emp_id) AS technical_current,
     COUNT(DISTINCT CASE WHEN e.retirement_date <= DATE_ADD(DATE '2026-10-19', INTERVAL 2 YEAR) THEN e.emp_id END) AS technical_retirements_2yr,
     COUNT(DISTINCT e.emp_id) - COUNT(DISTINCT CASE WHEN e.retirement_date <= DATE_ADD(DATE '2026-10-19', INTERVAL 2 YEAR) THEN e.emp_id END) AS technical_projected_2028
-FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` e
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
+FROM `yukti-finance-iocl.hrfin_silver.employee_master` e
+JOIN `yukti-finance-iocl.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
 WHERE e.current_grade_id LIKE 'E%'
   AND d.discipline_id IN ('DISC-DRL', 'DISC-RES', 'DISC-PRD', 'DISC-GEO', 'DISC-GPS')
   AND (e.employment_status = 'Active' OR e.separation_date IS NULL)
@@ -656,8 +656,8 @@ ORDER BY technical_current DESC;""",
     "W2__why": """SELECT
     gr.`group` AS grade_group,
     COUNT(DISTINCT e.emp_id) AS retiring_count
-FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` e
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_grade` gr ON e.current_grade_id = gr.grade_id
+FROM `yukti-finance-iocl.hrfin_silver.employee_master` e
+JOIN `yukti-finance-iocl.hrfin_silver.dim_grade` gr ON e.current_grade_id = gr.grade_id
 WHERE e.current_grade_id LIKE 'E%'
   AND e.retirement_date <= DATE_ADD(DATE '2026-10-19', INTERVAL 2 YEAR)
 GROUP BY gr.`group`
@@ -667,7 +667,7 @@ ORDER BY retiring_count DESC;""",
     COUNT(DISTINCT e.emp_id) AS total_executive_headcount,
     COUNT(DISTINCT CASE WHEN e.retirement_date <= DATE_ADD(DATE '2026-10-19', INTERVAL 2 YEAR) THEN e.emp_id END) AS projected_retirements_2yr,
     ROUND(COUNT(DISTINCT CASE WHEN e.retirement_date <= DATE_ADD(DATE '2026-10-19', INTERVAL 2 YEAR) THEN e.emp_id END) * 100.0 / NULLIF(COUNT(DISTINCT e.emp_id), 0), 2) AS retirement_attrition_pct
-FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` e
+FROM `yukti-finance-iocl.hrfin_silver.employee_master` e
 WHERE e.current_grade_id LIKE 'E%'
   AND (e.employment_status = 'Active' OR e.separation_date IS NULL);""",
 
@@ -679,8 +679,8 @@ WHERE e.current_grade_id LIKE 'E%'
     COALESCE(SUM(sp.vacancy_count), 0) AS vacancy_deficit,
     200 AS total_executives_relocated,
     6.50 AS total_relocation_grant_cr
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` wc
-LEFT JOIN `ongc-hr-finance-agent.hrfin_silver.sanctioned_posts` sp ON wc.wc_id = sp.wc_id AND sp.fiscal_year IN ('FY26', '2026')
+FROM `yukti-finance-iocl.hrfin_silver.dim_work_centre` wc
+LEFT JOIN `yukti-finance-iocl.hrfin_silver.sanctioned_posts` sp ON wc.wc_id = sp.wc_id AND sp.fiscal_year IN ('FY26', '2026')
 WHERE wc.hard_station_cat IN ('B', 'C') AND wc.wc_id IN ('WC-ASM', 'WC-TRI', 'WC-CAM', 'WC-RAJ')
 GROUP BY wc.short_name
 ORDER BY vacancy_deficit DESC;""",
@@ -689,8 +689,8 @@ ORDER BY vacancy_deficit DESC;""",
     wc.short_name AS field_asset,
     COALESCE(SUM(sp.vacancy_count), 0) AS vacancy_deficit,
     ROUND(SAFE_DIVIDE(SUM(sp.vacancy_count) * 100.0, SUM(sp.sanctioned_strength)), 2) AS vacancy_pct
-FROM `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` wc
-LEFT JOIN `ongc-hr-finance-agent.hrfin_silver.sanctioned_posts` sp ON wc.wc_id = sp.wc_id AND sp.fiscal_year IN ('FY26', '2026')
+FROM `yukti-finance-iocl.hrfin_silver.dim_work_centre` wc
+LEFT JOIN `yukti-finance-iocl.hrfin_silver.sanctioned_posts` sp ON wc.wc_id = sp.wc_id AND sp.fiscal_year IN ('FY26', '2026')
 WHERE wc.hard_station_cat = 'C'
 GROUP BY wc.short_name
 ORDER BY vacancy_deficit DESC;""",
@@ -698,9 +698,9 @@ ORDER BY vacancy_deficit DESC;""",
     "W3__why": """SELECT
     wc.name AS asset_name,
     COUNT(DISTINCT e.emp_id) AS current_technical_staff
-FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` e
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` wc ON e.current_wc_id = wc.wc_id
-JOIN `ongc-hr-finance-agent.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
+FROM `yukti-finance-iocl.hrfin_silver.employee_master` e
+JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` wc ON e.current_wc_id = wc.wc_id
+JOIN `yukti-finance-iocl.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
 WHERE LOWER(d.function) = 'technical' AND wc.hard_station_cat IN ('B', 'C')
   AND (e.employment_status = 'Active' OR e.separation_date IS NULL)
 GROUP BY wc.name
@@ -720,7 +720,7 @@ LIMIT 10;""",
     ROUND(AVG(ongc_crude_net_realisation_usd_bbl), 2) AS net_realisation_usd_bbl,
     ROUND(AVG(windfall_tax_saed_inr_bbl), 2) AS saed_windfall_tax_inr_bbl,
     ROUND(AVG(inr_usd_fx_rate), 2) AS avg_fx_rate
-FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
 WHERE fiscal_year IN ('FY23', 'FY24', 'FY25', 'FY26')
 GROUP BY fiscal_year
 ORDER BY fiscal_year;""",
@@ -731,7 +731,7 @@ ORDER BY fiscal_year;""",
     windfall_tax_saed_usd_bbl,
     ongc_crude_net_realisation_usd_bbl,
     brent_usd_bbl
-FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
 WHERE fiscal_year = 'FY25'
 ORDER BY month;""",
 
@@ -740,7 +740,7 @@ ORDER BY month;""",
     saed_windfall_tax_inr_cr,
     gross_revenue_inr_cr,
     ebitda_inr_cr
-FROM `ongc-hr-finance-agent.hrfin_silver.corporate_financials`
+FROM `yukti-finance-iocl.hrfin_silver.corporate_financials`
 WHERE fiscal_year IN ('FY23', 'FY24', 'FY25', 'FY26')
 ORDER BY fiscal_year;""",
 
@@ -749,7 +749,7 @@ ORDER BY fiscal_year;""",
     ROUND(AVG(ongc_crude_net_realisation_usd_bbl), 2) AS avg_net_realisation_usd,
     ROUND(AVG(brent_usd_bbl), 2) AS avg_brent_usd,
     ROUND(AVG(ongc_crude_net_realisation_usd_bbl) * 100.0 / NULLIF(AVG(brent_usd_bbl), 0), 2) AS net_realisation_pct_brent
-FROM `ongc-hr-finance-agent.hrfin_silver.price_fx_monthly`
+FROM `yukti-finance-iocl.hrfin_silver.price_fx_monthly`
 WHERE fiscal_year IN ('FY23', 'FY24', 'FY25', 'FY26')
 GROUP BY fiscal_year
 ORDER BY fiscal_year;""",
@@ -759,7 +759,7 @@ ORDER BY fiscal_year;""",
     technology_type,
     installed_capacity_mw,
     cumulative_capex_inr_cr
-FROM `ongc-hr-finance-agent.hrfin_silver.energy_transition`
+FROM `yukti-finance-iocl.hrfin_silver.energy_transition`
 WHERE fiscal_year IN ('FY26', '2026')
 ORDER BY cumulative_capex_inr_cr DESC;"""
 }

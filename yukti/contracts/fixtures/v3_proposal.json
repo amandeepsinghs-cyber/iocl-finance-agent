@@ -3,8 +3,8 @@
   "turn_id": "turn-v3-proposal-001",
   "language": "en",
   "persona": "CMD",
-  "spoken_summary": "Can I run the DCF valuation agent on ONGC Standalone? It takes about 15 seconds.",
-  "display_text": "Can I run the DCF valuation agent on ONGC Standalone (FY26 base, 10-year forecast FY27–FY36)?",
+  "spoken_summary": "Can I run the DCF valuation agent on IOCL Standalone? It takes about 15 seconds.",
+  "display_text": "Can I run the DCF valuation agent on IOCL Standalone (FY26 base, 10-year forecast FY27–FY36)?",
   "visual": {
     "type": "none",
     "mode": "replace"
@@ -17,7 +17,7 @@
     {
       "kind": "data",
       "object": "v_fin_statement_line",
-      "title": "ONGC Standalone Financials (FY17–FY26)"
+      "title": "IOCL Standalone Financials (FY17–FY26)"
     }
   ],
   "suggestions": [

@@ -138,7 +138,7 @@ out.append("")
 out.append("## 4. Verification Methodology & Audit Guarantee")
 out.append("1. **Zero High-Similarity Collisions**: Evaluated against all 356 planned reference prompts in `world_bible/reference/questions.yaml` (difflib score < 0.80 across all prompts).")
 out.append("2. **Strict Answerability Standard**: A prompt is marked `ANSWERABLE` if and only if `row_count > 0` AND the result directly answers the user's business question. Zero-row queries and errors are strictly classified as GAPs or PARTIALs.")
-out.append("3. **Live GCP Execution**: Every single SQL query was executed against BigQuery (`ongc-hr-finance-agent`) in `asia-south1` with label `{'datacloud': 'ai-agent'}`. Unstructured queries were run via Vertex AI Discovery Engine search and `hrfin_docs.silver_chunks`.")
+out.append("3. **Live GCP Execution**: Every single SQL query was executed against BigQuery (`yukti-finance-iocl`) in `asia-south1` with label `{'datacloud': 'ai-agent'}`. Unstructured queries were run via Vertex AI Discovery Engine search and `hrfin_docs.silver_chunks`.")
 
 with open('reports/stress_test.md', 'w') as f:
     f.write("\n".join(out))

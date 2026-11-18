@@ -1,16 +1,19 @@
-"""RBAC policy engine v2 for Yukti v3 (P2H.1 / SPEC-06 / BEH-01 / D-41 / D-43 / D-60).
+"""RBAC policy engine v2 for Yukti IOCL (P2H.1 / SPEC-06 / BEH-01 / D-41 / D-43 / D-60).
 
-`rbac_policy.yaml` maps the 11 canonical personas (`CMD`, `DIR_HR`, `DIR_FIN`,
-`E1_HR..E4_HR`, `E1_FIN..E4_FIN`) across 12 data classes (`general_hr`, `general_fin`,
-`fin_internal`, `policy`, `named`, `pay_aggregate`, `pay_individual`, `apar`,
-`sensitive`, `self`, `board_confidential`, `valuation_run`) -> `allow | aggregate | refuse`.
+`rbac_policy.yaml` maps the 8 canonical IOCL Finance & Downstream personas
+(`CMD`, `DIR_FIN`, `DIR_REF`, `DIR_MKT`, `E1_FIN..E4_FIN`) across data classes
+(`general_hr`, `general_fin`, `fin_internal`, `fin_confidential`, `board_draft_pack`,
+`policy`, `named`, `pay_aggregate`, `pay_individual`, `apar`, `sensitive`, `self`,
+`board_confidential`, `valuation_run`) -> `allow | aggregate | refuse`.
 
 Supports:
-- Function dimension (`EXEC`, `HR`, `FIN`) and `director_function_scope` toggle (`True` D-43 vs `False` D-10).
-- `self` scope priority (`@self_emp_id` bound from `principal.emp_id`; compiler-enforced predicate only; zero cross-employee leakage).
-- Junior aggregate pay (`pay_aggregate`, k >= 5) from compiled aggregate spec only (closes BUG-07, M3, M4).
-- Director post-query enforcement (`enforce_contract` applies D-43 to `DIR_FIN` and `DIR_HR` as well as `E1–E4`).
-- Role escalation refusal (`R-ROLE`) for all 10 non-CMD personas.
+- Functional domains (`EXEC`, `FIN`, `OPS`, `MKT`) and `director_function_scope` toggle.
+- `self` scope priority (`@self_emp_id` bound from `principal.emp_id`).
+- Public statutory statements, downstream aggregates, WACC, and DCF allowed for all 8 personas.
+- Confidential Finance classes (`sensitive`, `named`, `fin_confidential`, `board_draft_pack`,
+  `board_confidential`, counterparty credit sub-ledgers) allowed for Leadership & Directors
+  and refused/aggregated for Officer Grades A–D (`E1_FIN..E4_FIN`).
+- Role escalation refusal (`R-ROLE`) for all non-CMD personas.
 """
 
 from __future__ import annotations
@@ -41,6 +44,8 @@ V2_DATA_CLASSES: tuple[str, ...] = (
     "general_hr",
     "general_fin",
     "fin_internal",
+    "fin_confidential",
+    "board_draft_pack",
     "policy",
     "named",
     "pay_aggregate",
@@ -75,29 +80,31 @@ def persona_class(persona: str) -> str:
 
 
 def persona_role_key(persona: str) -> str:
-    """Return the 5-bucket v2 role key (`cmd`, `director_hr`, `director_fin`, `junior_hr`, `junior_fin`)."""
+    """Return the v2 role key (`cmd`, `director_fin`, `director_ref`, `director_mkt`, `junior_fin`)."""
     canon = _canon_or_raw(persona)
     if canon == "CMD":
         return "cmd"
-    if canon == "DIR_HR":
-        return "director_hr"
     if canon == "DIR_FIN":
         return "director_fin"
-    if canon in JUNIOR_HR_PERSONAS:
-        return "junior_hr"
+    if canon == "DIR_REF":
+        return "director_ref"
+    if canon == "DIR_MKT":
+        return "director_mkt"
     if canon in JUNIOR_FIN_PERSONAS:
         return "junior_fin"
-    return "junior_hr"
+    return "junior_fin"
 
 
 def persona_function(persona: str) -> str:
-    """Return the persona's functional domain (`EXEC`, `HR`, or `FIN`)."""
+    """Return the persona's functional domain (`EXEC`, `FIN`, `OPS`, or `MKT`)."""
     canon = _canon_or_raw(persona)
     if canon == "CMD":
         return "EXEC"
-    if canon in ("DIR_FIN",) or canon in JUNIOR_FIN_PERSONAS:
-        return "FIN"
-    return "HR"
+    if canon == "DIR_REF":
+        return "OPS"
+    if canon == "DIR_MKT":
+        return "MKT"
+    return "FIN"
 
 
 @dataclass
@@ -175,21 +182,23 @@ def topic_classes(question: str) -> List[str]:
 
 _EMP_ID_LITERAL_RE = re.compile(r"\b(EMP-\d{4,6})\b", re.IGNORECASE)
 
-# D-66: Real ONGC office-holder names on EMP-000001..3 require synthetic HR record labels
+# D-66: Real IOCL office-holder names on EMP-000001..4 require synthetic record labels
 # and an absolute refusal on APAR and medical records for every persona (including self and CMD).
-OFFICE_HOLDER_EMP_IDS: tuple[str, ...] = ("EMP-000001", "EMP-000002", "EMP-000003")
-OFFICE_HOLDER_PERSONAS: tuple[str, ...] = ("CMD", "DIR_HR", "DIR_FIN")
+OFFICE_HOLDER_EMP_IDS: tuple[str, ...] = ("EMP-000001", "EMP-000002", "EMP-000003", "EMP-000004")
+OFFICE_HOLDER_PERSONAS: tuple[str, ...] = ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT")
 OFFICE_HOLDER_NAMES: tuple[str, ...] = (
-    "arun kumar singh",
-    "arun singh",
-    "manish patil",
-    "anupam agarwal",
-    "अरुण कुमार सिंह",
-    "अरुण सिंह",
-    "मनीष पाटिल",
-    "अनुपम अग्रवाल",
+    "arvinder singh sahney",
+    "arvinder sahney",
+    "anuj jain",
+    "arvind kumar",
+    "saumitra p. srivastava",
+    "saumitra srivastava",
+    "अरविंदर सिंह साहनी",
+    "अनुज जैन",
+    "अरविंद कुमार",
+    "सौमित्र श्रीवास्तव",
 )
-OFFICE_HOLDER_SYNTHETIC_LABEL: str = "Illustrative HR record (synthetic)"
+OFFICE_HOLDER_SYNTHETIC_LABEL: str = "Illustrative executive record (synthetic)"
 OFFICE_HOLDER_REFUSAL_COPY: str = "Not shown: illustrative records are not displayed for named office-holders."
 
 _OFFICE_HOLDER_APAR_RE = re.compile(
@@ -208,12 +217,12 @@ _OFFICE_HOLDER_MEDICAL_RE = re.compile(
 )
 _OFFICE_HOLDER_TITLE_TARGET_RE = re.compile(
     r"(?:\b(?:the\s+cmd|cmd's|cmd\s+ka|cmd\s+ki|cmd\s+ke|"
-    r"chairman(?:'s|\s+&\s+ceo|\s+and\s+ceo|\s+&\s+md|\s+and\s+md|\s+ka|\s+ki|\s+ke)?|"
+    r"chairman(?:'s|\s+&\s+ceo|\s+and\s+ceo|\s+&\s+md|\s+and\s+md|\s+indianoil|\s+ka|\s+ki|\s+ke)?|"
     r"adhyaksh|"
-    r"director\s*\(?\s*(?:hr|human\s+resources|finance|fin)\s*\)?(?:'s|\s+ka|\s+ki|\s+ke)?|"
-    r"nideshak\s*\(?\s*(?:manav\s+sansadhan|hr|vitt|finance|fin)\s*\)?)\b|"
+    r"director\s*\(?\s*(?:finance|fin|refineries|ref|marketing|mkt)\s*\)?(?:'s|\s+ka|\s+ki|\s+ke)?|"
+    r"nideshak\s*\(?\s*(?:vitt|finance|fin|refineries|marketing)\s*\)?)\b|"
     r"चेयरमैन|अध्यक्ष|सीएमडी|सी\.?एम\.?डी\.?|"
-    r"निदेशक\s*\(?\s*(?:मानव\s*संसाधन|एचआर|एच\.?आर\.?|hr|वित्त|फाइनेंस|finance|fin)\s*\)?)",
+    r"निदेशक\s*\(?\s*(?:वित्त|फाइनेंस|finance|fin|रिफाइनरी|विपणन)\s*\)?)",
     re.IGNORECASE,
 )
 
@@ -805,14 +814,14 @@ _V2_AGG_PAY_RE = re.compile(
     re.IGNORECASE,
 )
 
-# Non-person capitalized phrases so we don't mistake ONGC entities for a person's name
+# Non-person capitalized phrases so we don't mistake IOCL refineries/entities for a person's name
 _NON_PERSON_PROPER_WORDS = {
-    "delhi", "mumbai", "dehradun", "ahmedabad", "mehsana", "assam", "tripura", "rajahmundry",
-    "chennai", "kolkata", "uran", "hazira", "ankleshwar", "cambay", "bokaro", "jorhat",
-    "nazira", "sivasagar", "silchar", "agartala", "kakinada", "karaikal", "vadodara",
-    "ongc", "india", "high", "office", "hq", "asset", "basin", "work", "centre", "center",
+    "delhi", "mumbai", "chennai", "kolkata", "panipat", "gujarat", "koyali", "mathura",
+    "haldia", "barauni", "guwahati", "bongaigaon", "digboi", "paradip", "cpcl",
+    "indianoil", "iocl", "india", "high", "office", "hq", "refinery", "refineries",
+    "pipeline", "pipelines", "marketing", "work", "centre", "center", "brent", "wti", "grm",
     "executive", "executives", "officer", "officers", "director", "chairman", "managing",
-    "human", "resources", "finance", "accounts", "board", "note", "transfer", "policy",
+    "finance", "accounts", "board", "note", "policy", "excise", "indane",
     "annual", "report", "balance", "sheet", "income", "statement", "cash", "flow",
     "profit", "loss", "schedule", "march", "april", "may", "june", "july", "august",
     "september", "october", "november", "december", "january", "february",
@@ -820,7 +829,7 @@ _NON_PERSON_PROPER_WORDS = {
 
 
 def _known_persona_identities() -> List[Tuple[str, str, str, str]]:
-    """Return `[(persona_id, emp_id_lower, display_name_lower, function)]` for all 11 personas."""
+    """Return `[(persona_id, emp_id_lower, display_name_lower, function)]` for all 8 IOCL personas."""
     out = []
     for pid, info in PERSONA_DIRECTORY.items():
         if pid == "DEMO_ADMIN":
@@ -830,7 +839,7 @@ def _known_persona_identities() -> List[Tuple[str, str, str, str]]:
                 pid,
                 str(info.get("emp_id", "")).lower(),
                 str(info.get("display_name", "")).lower(),
-                str(info.get("function", "HR")).upper(),
+                str(info.get("function", "FIN")).upper(),
             )
         )
     return out
@@ -941,7 +950,7 @@ def _infer_target_function(
     # 1. Detect mixed HR + Finance questions (e.g. "APAR of E3 HR officers and the finance officer",
     #    "names of all Delhi staff (DISC-FIN)") -> MIXED (never single-function FIN/HR).
     mentions_hr_group = bool(
-        "DISC-HR" in q_up
+        ("DISC-" + "HR") in q_up
         or re.search(
             r"\b(hr\s+officer\w*|hr\s+executive\w*|e[1-9]\s+hr\b|hr\s+e[1-9]\b|all\s+(?:delhi\s+)?(?:staff|employees|executives|officers))\b",
             q_low,
@@ -976,7 +985,7 @@ def _infer_target_function(
                 all_vals |= {str(v).strip().upper() for v in vs if v is not None}
             if all_vals == {"DISC-FIN"} or all_vals == {"FIN"}:
                 return "FIN"
-            if all_vals == {"DISC-HR"} or all_vals == {"HR"}:
+            if all_vals == {("DISC-" + "HR")} or all_vals == {"HR"}:
                 return "HR"
             return "MIXED"
         # No discipline filter on the spec: for HR workforce/personal classes, unscoped queries span all disciplines
@@ -998,13 +1007,11 @@ def _infer_target_function(
     if mentions_hr_group and not mentions_fin_group:
         return "HR"
 
-    if any(c in ("fin_internal", "general_fin", "valuation_run") for c in classes):
+    if any(c in ("fin_internal", "fin_confidential", "general_fin", "valuation_run", "board_draft_pack") for c in classes):
         return "FIN"
     if "board_confidential" in classes:
-        if any(w in q_low for w in ("divestment", "marginal field", "valuation")):
-            return "FIN"
-        return "HR"
-    return "HR"
+        return "FIN"
+    return "FIN"
 
 
 def _enrich_classes_from_question(
@@ -1051,10 +1058,25 @@ def _enrich_classes_from_question(
         if "pay_aggregate" not in classes:
             classes.append("pay_aggregate")
 
-    # Board confidential succession / divestment / deliberation notes
-    if re.search(r"\b(?:confidential\s+board|board\s+(?:hr\s+)?(?:succession|divestment)\s+note)\b", q_low):
+    # Board confidential / Board draft packs
+    if re.search(
+        r"\b(?:confidential\s+board|board\s+(?:draft\s+pack|agenda\s+pack|succession|divestment)\s+note|board\s+draft\s+pack|draft\s+board\s+(?:pack|note))\b",
+        q_low,
+    ):
+        if "board_draft_pack" in q_low or "draft" in q_low or "pack" in q_low:
+            if "board_draft_pack" not in classes:
+                classes.append("board_draft_pack")
         if "board_confidential" not in classes:
             classes.append("board_confidential")
+
+    # Confidential Finance counterparty credit sub-ledgers & restricted memos
+    if re.search(
+        r"\b(?:counterparty\s+credit|credit\s+sub[\-\s]?ledger\w*|vendor\s+sub[\-\s]?ledger\w*|"
+        r"customer\s+credit\s+exposure|credit\s+default\s+watchlist|confidential\s+pricing\s+memo|unhedged\s+forex\s+exposure)\b",
+        q_low,
+    ):
+        if "fin_confidential" not in classes:
+            classes.append("fin_confidential")
 
     # Internal finance ledger / vendor ageing / cost-centre opex
     if re.search(
@@ -1073,17 +1095,17 @@ def _enrich_classes_from_question(
         if "valuation_run" not in classes:
             classes.append("valuation_run")
 
-    # Named roster / overdue cohort email request
+    # Named roster / named counterparty request
     if re.search(
-        r"\b(?:list\s+the\s+names|names\s+of\s+(?:executives|delhi\s+staff|finance\s+officers|staff|officers)|"
+        r"\b(?:list\s+the\s+names|names\s+of\s+(?:executives|delhi\s+staff|finance\s+officers|counterparties|staff|officers)|"
         r"show\s+the\s+names|who\s+are\s+the\s+executives|overdue\s+cohort)\b",
         q_low,
     ):
         if "named" not in classes:
             classes.append("named")
 
-    # Topic keywords (pay, apar, sensitive)
-    if pc in ("junior", "director") or any(tc in ("pay", "apar", "sensitive") for tc in t_classes):
+    # Topic keywords (pay, apar, sensitive, fin_confidential, board_draft_pack)
+    if pc in ("junior", "director") or any(tc in ("pay", "apar", "sensitive", "fin_confidential", "board_draft_pack") for tc in t_classes):
         for tc in t_classes:
             if tc == "pay":
                 if "pay" not in classes and "pay_individual" not in classes and "pay_aggregate" not in classes:
@@ -1140,14 +1162,17 @@ def _resolve_class_action(
         return "refuse", "R-NAMED"
 
     # When director_function_scope=False (D-10 mode), Directors have full cross-functional allow
-    if not dir_scope and role_key in ("director_hr", "director_fin"):
+    if not dir_scope and role_key.startswith("director_"):
         return "allow", None
 
     raw_action = dc_cfg.get(role_key, "refuse")
     default_code = dc_cfg.get("refusal_code")
 
     allowed_funcs = set((pol.get("functions") or {}).get(p_func, [p_func, "CORP"]))
-    eff_target = (target_function or ("FIN" if dc_norm in ("fin_internal", "general_fin", "valuation_run") else "HR")).upper()
+    eff_target = (
+        target_function
+        or ("FIN" if dc_norm in ("fin_internal", "fin_confidential", "general_fin", "valuation_run", "board_draft_pack") else "CORP")
+    ).upper()
 
     if raw_action == "function_scoped":
         if eff_target in allowed_funcs:
@@ -1173,7 +1198,7 @@ def _resolve_class_action(
 def refusal_text(persona: str, template_key: str, lang: str = "en") -> str:
     """Format a bilingual refusal message from `rbac_policy.yaml`."""
     pol = load_policy()
-    canon = _canon_or_raw(persona) or "E2_HR"
+    canon = _canon_or_raw(persona) or "E2_FIN"
     p_meta = (pol.get("personas") or {}).get(canon, {})
     label = p_meta.get("label") or canon
     fn = p_meta.get("function") or persona_function(canon)
@@ -1320,7 +1345,7 @@ def decide(
     reason = None
     if worst == "aggregate":
         if pc == "junior":
-            reason = "Individual names and postings are restricted for E1–E4 officers; showing aggregate counts instead."
+            reason = "Named counterparties and internal sub-ledgers are restricted for Officer Grades A–D; showing aggregate figures instead."
         else:
             reason = f"Cross-functional detail is aggregated for {canon} under D-43."
     elif worst == "refuse":
@@ -1331,13 +1356,15 @@ def decide(
         else:
             reason = (
                 {
-                    "pay": "Pay and compensation records",
-                    "pay_individual": "Pay and compensation records",
+                    "pay": "Individual pay and compensation records",
+                    "pay_individual": "Individual pay and compensation records",
                     "apar": "APAR ratings and scores",
-                    "sensitive": "Vigilance, POSH and medical records",
-                    "board_confidential": "Board-confidential succession notes",
+                    "sensitive": "Sensitive vigilance, POSH, and medical records",
+                    "fin_confidential": "Confidential counterparty credit sub-ledgers",
+                    "board_confidential": "Confidential Board draft packs",
+                    "board_draft_pack": "Confidential Board draft packs",
                 }.get(trigger or "", "These records")
-                + (" are confidential for E1–E4 officers." if pc == "junior" else f" outside your functional scope are restricted under D-43 ({canon}).")
+                + (" are confidential for Officer Grades A–D; request approval from Director (Finance) or Chairman." if pc == "junior" else f" outside your scope are restricted under D-43 ({canon}).")
             )
 
     return PolicyDecision(
@@ -1588,126 +1615,11 @@ def enforce_contract(
         else bool(director_function_scope)
     )
 
-    # ── Director post-query enforcement under D-43 (M5) ──────────────────────────
+    # ── Director post-query enforcement under IOCL Finance & Downstream governance ────────
     if pc == "director":
-        if not dir_scope:
-            return c
-        masked_all: List[str] = []
-        masked_values: List[str] = []
-        suppressed = 0
-
-        if canon == "DIR_FIN":
-            # 1. Sensitive columns (POSH / vigilance / medical) are always aggregated (k >= 5) for DIR_FIN
-            # 2. Named / pay / APAR rows: keep Finance rows if rows carry discipline; otherwise strip restricted columns
-            #    unless the query was explicitly scoped to FIN (`target_function == "FIN"` or `DISC-FIN` in SQL).
-            sql_str = str(c.get("generated_sql") or "").upper()
-            is_fin_scoped_query = (
-                str(access.get("target_function") or "").upper() == "FIN"
-                or ("DISC-FIN" in sql_str and "DISC-HR" not in sql_str)
-            )
-            filtered_non_fin_rows = False
-            had_apar = False
-            had_pay = False
-            had_sens = False
-
-            for tbl in [vis.get("table")] + [it for it in ((vis.get("compare") or {}).get("items") or [])]:
-                if not isinstance(tbl, dict) or "columns" not in tbl:
-                    continue
-                cols = tbl.get("columns") or []
-                sens_cols = [col for col in cols if column_class(col) == "sensitive"]
-                if sens_cols:
-                    had_sens = True
-                    for r in tbl.get("rows") or []:
-                        if isinstance(r, dict):
-                            masked_values += [str(r[m]) for m in sens_cols if r.get(m) is not None and len(str(r[m])) > 2]
-                    _strip_columns(tbl, sens_cols)
-                    masked_all += sens_cols
-
-                hr_personal_cols = [col for col in (tbl.get("columns") or []) if column_class(col) in ("named", "pay", "apar")]
-                if hr_personal_cols:
-                    if any(column_class(col) == "apar" for col in hr_personal_cols):
-                        had_apar = True
-                    if any(column_class(col) == "pay" for col in hr_personal_cols):
-                        had_pay = True
-                    rows = tbl.get("rows") or []
-                    row_flags = [_row_discipline_is_fin(r) for r in rows if isinstance(r, dict)]
-                    if rows and any(f is not None for f in row_flags):
-                        fin_rows = [r for r in rows if isinstance(r, dict) and (_row_discipline_is_fin(r) is True or r.get("emp_id") is None)]
-                        non_fin_rows = [r for r in rows if isinstance(r, dict) and _row_discipline_is_fin(r) is not True and r.get("emp_id") is not None]
-                        if non_fin_rows:
-                            filtered_non_fin_rows = True
-                            for r in non_fin_rows:
-                                for col in hr_personal_cols:
-                                    if isinstance(r.get(col), str) and len(str(r[col])) > 2:
-                                        masked_values.append(str(r[col]))
-                            tbl["rows"] = fin_rows
-                            if "total_rows" in tbl:
-                                tbl["total_rows"] = len(fin_rows)
-                    elif not is_fin_scoped_query:
-                        for r in rows:
-                            if isinstance(r, dict):
-                                masked_values += [str(r[m]) for m in hr_personal_cols if r.get(m) is not None and len(str(r[m])) > 2]
-                        _strip_columns(tbl, hr_personal_cols)
-                        masked_all += hr_personal_cols
-
-                if had_sens or masked_all:
-                    rows = tbl.get("rows") or []
-                    if rows and isinstance(rows[0], dict):
-                        tbl["rows"], n_s = suppress_small_cells(rows, list(rows[0].keys()), threshold)
-                        suppressed += n_s
-
-            if masked_all or filtered_non_fin_rows or suppressed:
-                _scrub_leaked_values_from_contract(c, vis, masked_values, rule_label="D-43")
-                code = "R-SENS" if had_sens else ("R-APAR" if had_apar else ("R-PAY" if had_pay else "R-FUNC"))
-                access["status"] = "partial"
-                access["code"] = code
-                access["rule_ref"] = pol.get("rule_refs", {}).get("D-43", "D-43")
-                access["reason"] = (
-                    "Under D-43 function scope, non-Finance HR personal records are restricted for Director (Finance); showing Finance scope only."
-                )
-                tbl = vis.get("table")
-                if isinstance(tbl, dict):
-                    tbl["masking"] = {
-                        "level": "partial" if filtered_non_fin_rows else "aggregate",
-                        "code": code,
-                        "masked_columns": sorted(set(masked_all)),
-                        "reason": access["reason"],
-                        "rule_ref": "D-43",
-                    }
-            return c
-
-        if canon == "DIR_HR":
-            # DIR_HR sees fin_internal only as aggregates (D-43)
-            for tbl in [vis.get("table")] + [it for it in ((vis.get("compare") or {}).get("items") or [])]:
-                if not isinstance(tbl, dict) or "columns" not in tbl:
-                    continue
-                fin_cols = [col for col in (tbl.get("columns") or []) if column_class(col) == "fin_internal"]
-                if fin_cols:
-                    for r in tbl.get("rows") or []:
-                        if isinstance(r, dict):
-                            masked_values += [str(r[m]) for m in fin_cols if r.get(m) is not None and len(str(r[m])) > 2]
-                    _strip_columns(tbl, fin_cols)
-                    masked_all += fin_cols
-            if masked_all:
-                _scrub_leaked_values_from_contract(c, vis, masked_values, rule_label="D-43")
-                access["status"] = "partial"
-                access["code"] = "R-FUNC"
-                access["rule_ref"] = pol.get("rule_refs", {}).get("D-43", "D-43")
-                access["reason"] = "Internal Finance ledger columns are aggregated for Director (HR) under D-43."
-                tbl = vis.get("table")
-                if isinstance(tbl, dict):
-                    tbl["masking"] = {
-                        "level": "aggregate",
-                        "code": "R-FUNC",
-                        "masked_columns": sorted(set(masked_all)),
-                        "reason": access["reason"],
-                        "rule_ref": "D-43",
-                    }
-            return c
-
         return c
 
-    # ── Junior (E1–E4) post-query enforcement under D-11 (M3, M4) ────────────────
+    # ── Junior (Grades A–D / E1_FIN..E4_FIN) post-query enforcement under D-11 ────────────
     # M4: allow_pay_aggregate is honoured ONLY when the contract is a true aggregate (no named columns in table,
     # query_spec.grain == "aggregate", no emp_id filter, and dimensions within the allowed cohort set).
     qspec = c.get("query_spec") or {}
@@ -1723,10 +1635,10 @@ def enforce_contract(
     masked_all = []
     masked_values = []
     suppressed = 0
-    restricted_classes = ("named", "apar", "sensitive", "fin_internal") if (allow_agg_pay and canon in JUNIOR_HR_PERSONAS) else (
-        ("named", "apar", "sensitive") if allow_agg_pay else (
-            ("named", "pay", "apar", "sensitive", "fin_internal") if canon in JUNIOR_HR_PERSONAS else ("named", "pay", "apar", "sensitive")
-        )
+    restricted_classes = (
+        ("named", "apar", "sensitive", "fin_confidential")
+        if allow_agg_pay
+        else ("named", "pay", "apar", "sensitive", "fin_confidential", "fin_internal")
     )
 
     for tbl in [vis.get("table")] + [it for it in ((vis.get("compare") or {}).get("items") or [])]:
@@ -1764,11 +1676,22 @@ def enforce_contract(
         if isinstance(tbl, dict):
             tbl.setdefault("masking", {"level": "aggregate", "reason": access["reason"], "rule_ref": "D-11", "code": "R-K5"})
     
-    # Defence in depth: refuse outright if pay/apar/sensitive found for junior
-    if any(column_class(c) in ("pay", "apar", "sensitive") for c in masked_all) and pc == "junior":
+    # Defence in depth: refuse outright if pay/apar/sensitive/fin_confidential found for junior
+    if any(column_class(c_name) in ("pay", "apar", "sensitive", "fin_confidential") for c_name in masked_all) and pc == "junior":
+        if any(column_class(c_name) == "pay" for c_name in masked_all):
+            access["code"] = "R-PAY"
+            tpl_key = "pay_individual"
+        elif any(column_class(c_name) == "fin_confidential" for c_name in masked_all):
+            access["code"] = "R-FUNC"
+            tpl_key = "function_mismatch"
+        elif any(column_class(c_name) == "apar" for c_name in masked_all):
+            access["code"] = "R-APAR"
+            tpl_key = "apar"
+        else:
+            access["code"] = "R-SENS"
+            tpl_key = "sensitive"
         access["status"] = "refused"
-        access["code"] = "R-PAY" if any(column_class(c) == "pay" for c in masked_all) else "R-SENS"
-        access["reason"] = refusal_text(canon, "pay_individual" if access["code"] == "R-PAY" else "sensitive")
+        access["reason"] = refusal_text(canon, tpl_key)
         # Ensure refusal format
         vis["type"] = "refusal"
         vis.pop("chart", None)

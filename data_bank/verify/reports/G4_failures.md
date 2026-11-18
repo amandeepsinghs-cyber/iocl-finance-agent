@@ -7,7 +7,7 @@
 ---
 
 ## 1. Corrected OCR Page Counts (Item c)
-Live BigQuery audit of `ongc-hr-finance-agent.hrfin_docs.bronze_doc_text` confirms **1,103 Document AI OCR pages** across scanned documents:
+Live BigQuery audit of `yukti-finance-iocl.hrfin_docs.bronze_doc_text` confirms **1,103 Document AI OCR pages** across scanned documents:
 
 | Document Category | Ingestion Processor | Pages Count | OCR Engine / Source |
 |---|---|---|---|

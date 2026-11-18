@@ -4,8 +4,8 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
-const PORT = 3200;
-const BACKEND_PORT = 8095;
+const PORT = 3400;
+const BACKEND_PORT = 8195;
 const SCREENSHOTS_DIR = path.join(__dirname, '../screenshots');
 
 function waitForUrl(url, timeoutMs = 25000) {
@@ -35,7 +35,7 @@ async function runLiveE2E() {
   console.log('   YUKTI AI: GENUINE PLAYWRIGHT E2E AGAINST LIVE BACKEND (ADK)  ');
   console.log('================================================================');
 
-  // Verify backend on port 8095
+  // Verify backend on port 8195
   console.log(`Checking backend health on port ${BACKEND_PORT}...`);
   try {
     await waitForUrl(`http://localhost:${BACKEND_PORT}/health`, 5000);
@@ -93,7 +93,7 @@ async function runLiveE2E() {
       }
     });
 
-    console.log('Navigating to http://localhost:3200 in Live Mode...');
+    console.log(`Navigating to http://localhost:${PORT} in Live Mode...`);
     await page.goto(`http://localhost:${PORT}`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(1500);
 

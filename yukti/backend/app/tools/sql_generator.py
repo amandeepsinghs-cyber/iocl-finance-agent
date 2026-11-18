@@ -81,7 +81,7 @@ class DedicatedSQLGenerator:
     ) -> str:
         """Generates a clean BigQuery SQL query using gemini-3.8-flash thinking."""
         prompt_parts = [
-            f"You are the senior BigQuery SQL engineer for ONGC enterprise data ({self.project_id}).",
+            f"You are the senior BigQuery SQL engineer for IOCL Finance & Downstream enterprise data ({self.project_id}).",
             f"Generate a single, clean, highly-optimized BigQuery SQL query to answer the question.",
             SEMANTIC_LAYER_PROMPT,
         ]
@@ -123,7 +123,7 @@ class DedicatedSQLGenerator:
 
     def repair_sql(self, sql: str, error_message: str) -> str:
         """Performs 1 silent self-repair on a query that failed BigQuery validation."""
-        repair_prompt = f"""You are the senior BigQuery SQL engineer for ONGC enterprise data ({self.project_id}).
+        repair_prompt = f"""You are the senior BigQuery SQL engineer for IOCL Finance & Downstream enterprise data ({self.project_id}).
 The following SQL query failed during BigQuery execution:
 
 FAILED SQL:

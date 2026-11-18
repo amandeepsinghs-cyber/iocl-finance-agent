@@ -12,7 +12,7 @@ SELECT
     COUNT(DISTINCT IF(v.cumulative_cluster_years >= 5, v.emp_id, NULL)) AS over_5yr_in_cluster,
     ROUND(MAX(v.cumulative_cluster_years), 2) AS max_cumulative_years,
     COUNT(DISTINCT IF(DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25, v.emp_id, NULL)) AS retiring_within_3yr
-FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure` v
+FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure` v
 JOIN dim_grade g ON g.grade_id = v.current_grade_id
 WHERE v.cluster_id = 'CL-DEL' AND v.is_currently_in_cluster AND LOWER(g.cadre) = 'executive'
 GROUP BY v.current_grade_id

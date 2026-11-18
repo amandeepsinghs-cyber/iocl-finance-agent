@@ -4,6 +4,7 @@ Saves the vectors to certified/embeddings.json so runtime routing is instant (<1
 """
 
 import json
+import os
 from pathlib import Path
 import time
 from google import genai
@@ -14,7 +15,7 @@ CERTIFIED_DIR = BACKEND_DIR / "certified"
 LIBRARY_PATH = CERTIFIED_DIR / "library.yaml"
 OUTPUT_PATH = CERTIFIED_DIR / "embeddings.json"
 
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or "yukti-finance-iocl"
 LOCATION = "us-central1"
 MODEL_NAME = "text-embedding-004"
 

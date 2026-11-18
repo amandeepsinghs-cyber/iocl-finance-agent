@@ -13,17 +13,15 @@ from app.tools.chart_rules import select_chart_kind
 
 def test_title_and_subtitle_b1_2_mumbai():
     title, subtitle = make_clean_title_and_subtitle("Mumbai mein 5 saal se zyada kitne executives hain?")
-    assert title.startswith("Mumbai: Executives with ≥5 Years' Continuous Stay")
-    assert "Mumbai High Asset" in subtitle
-    assert "RO Mumbai" in subtitle
+    assert "Mumbai" in title or "Mumbai" in subtitle
+    assert "IndianOil Bhavan, Marketing HQ Mumbai" in subtitle
     assert "WC-" not in title
     assert "WC-" not in subtitle
 
 
-def test_title_and_subtitle_b1_2_tripura_params():
-    title, subtitle = make_clean_title_and_subtitle("executives with long stay", params={"wc_id": "WC-TRI"})
-    assert title.startswith("Tripura Asset:")
-    assert "Station Category C" in subtitle
+def test_title_and_subtitle_b1_2_paradip_params():
+    title, subtitle = make_clean_title_and_subtitle("refinery throughput performance", params={"wc_id": "WC-PRD"})
+    assert "Paradip" in subtitle
     assert "WC-" not in title
     assert "WC-" not in subtitle
 
@@ -141,16 +139,16 @@ def test_no_duplicate_maps():
 # G4 B1 review r1 regressions (added by Opus)
 # ---------------------------------------------------------------------------
 def test_normaliser_runs_in_live_query_path():
-    """F-1: apply_query_craft_rules must case-correct literals for bare and qualified table names."""
+    """F-1: apply_query_craft_rules must case-correct literals for bare and qualified IOCL table names."""
     from app.tools.semantic_layer import SemanticLayer
     sl = SemanticLayer()
     for sql in (
-        "SELECT COUNT(*) FROM hrfin_gold.ssot_workforce_employee WHERE employment_status = 'active'",
-        "SELECT COUNT(*) FROM `ongc-hr-finance-agent`.hrfin_gold.ssot_workforce_employee WHERE employment_status = 'active'",
-        "SELECT COUNT(*) FROM `ongc-hr-finance-agent.hrfin_gold.ssot_workforce_employee` WHERE employment_status = 'active'",
+        "SELECT COUNT(*) FROM hrfin_gold.fact_mou_scorecard WHERE fiscal_year = 'fy26'",
+        "SELECT COUNT(*) FROM `yukti-finance-iocl`.hrfin_gold.fact_mou_scorecard WHERE fiscal_year = 'fy26'",
+        "SELECT COUNT(*) FROM `yukti-finance-iocl.hrfin_gold.fact_mou_scorecard` WHERE fiscal_year = 'fy26'",
     ):
         out = sl.apply_query_craft_rules(sql)
-        assert "employment_status = 'Active'" in out, out
+        assert "fiscal_year = 'FY26'" in out, out
 
 
 def test_in_rewrite_guards_foreign_functions_and_lowers_literals():
@@ -172,17 +170,17 @@ def test_fy_dash_forms_and_over_n_years():
     assert resolve_fy("over the last 5 years") == {"from": "FY22", "to": "FY26", "n_years": 5}
 
 
-def test_western_offshore_is_a_region_not_the_basin_office():
+def test_coastal_refineries_region_vs_work_centres():
     from app.semantic.entities import get_entities
     e = get_entities()
-    assert e.resolve_wc("Western Offshore vacancies") is None
-    name, codes = e.resolve_region("Western Offshore vacancies")
-    assert name == "western offshore" and set(codes) == {"WC-MUM", "WC-NEH", "WC-BAS"}
-    assert e.resolve_wc("Western Offshore Basin office") == "WC-WOB"
+    assert e.resolve_wc("coastal refineries throughput") is None
+    name, codes = e.resolve_region("coastal refineries throughput")
+    assert name == "coastal refineries" and set(codes) == {"WC-PRD", "WC-HLD"}
+    assert e.resolve_wc("Paradip Refinery") == "WC-PRD"
 
 
 def test_devanagari_alias_has_word_boundary():
     from app.semantic.entities import get_entities
     e = get_entities()
-    assert e.resolve_wc("असम में कर्मचारी") == "WC-ASM"
+    assert e.resolve_wc("पानीपत में कर्मचारी") == "WC-PNP"
     assert e.resolve_wc("असमानता पर रिपोर्ट") is None

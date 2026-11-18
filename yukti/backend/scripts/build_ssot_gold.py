@@ -17,14 +17,14 @@ def main() -> None:
 
     # 1. Build ssot_workforce_employee (exact 1 row per emp_id)
     q_ssot_emp = """
-    CREATE OR REPLACE TABLE `ongc-hr-finance-agent.hrfin_gold.ssot_workforce_employee`
+    CREATE OR REPLACE TABLE `yukti-finance-iocl.hrfin_gold.ssot_workforce_employee`
     CLUSTER BY current_wc_id, current_grade_id, discipline_id
     AS
     WITH cs AS (
       SELECT
         emp_id,
         ARRAY_AGG(STRUCT(continuous_from_date, continuous_stay_months, continuous_stay_years, is_continuous_5yr_plus, is_superannuation_exempt) ORDER BY continuous_stay_months DESC LIMIT 1)[OFFSET(0)] AS stay
-      FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay`
+      FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay`
       WHERE is_current_stay = TRUE
       GROUP BY emp_id
     ),
@@ -32,7 +32,7 @@ def main() -> None:
       SELECT
         emp_id,
         ARRAY_AGG(STRUCT(cluster_id, cluster_name, cumulative_cluster_years, has_breached_cluster_10yr_cap) ORDER BY cumulative_cluster_years DESC LIMIT 1)[OFFSET(0)] AS cl
-      FROM `ongc-hr-finance-agent.hrfin_gold.v_cluster_cumulative_tenure`
+      FROM `yukti-finance-iocl.hrfin_gold.v_cluster_cumulative_tenure`
       WHERE is_currently_in_cluster = TRUE
       GROUP BY emp_id
     ),
@@ -40,7 +40,7 @@ def main() -> None:
       SELECT
         emp_id,
         ARRAY_AGG(STRUCT(numerical_score, final_rating, is_dpc_eligible) ORDER BY fiscal_year DESC LIMIT 1)[OFFSET(0)] AS ap
-      FROM `ongc-hr-finance-agent.hrfin_silver.apar_ratings`
+      FROM `yukti-finance-iocl.hrfin_silver.apar_ratings`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY emp_id
     ),
@@ -50,7 +50,7 @@ def main() -> None:
         SUM(COALESCE(training_hours, 0)) AS fy26_training_hours,
         SUM(COALESCE(training_days, 0)) AS fy26_training_days,
         COUNT(DISTINCT programme_id) AS fy26_programmes_completed
-      FROM `ongc-hr-finance-agent.hrfin_silver.training_records`
+      FROM `yukti-finance-iocl.hrfin_silver.training_records`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY emp_id
     ),
@@ -63,7 +63,7 @@ def main() -> None:
         SUM(COALESCE(overtime_amount_inr, 0)) AS fy26_overtime_amount_inr,
         SUM(COALESCE(prp_inr, 0)) AS fy26_prp_inr,
         AVG(COALESCE(gross_salary_inr, 0)) AS avg_monthly_gross_inr
-      FROM `ongc-hr-finance-agent.hrfin_silver.payroll_monthly`
+      FROM `yukti-finance-iocl.hrfin_silver.payroll_monthly`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY emp_id
     ),
@@ -73,7 +73,7 @@ def main() -> None:
         MAX(IF(UPPER(leave_type) = "EL", closing_balance_days, NULL)) AS el_balance_days,
         MAX(IF(UPPER(leave_type) = "EL", encashable_balance_days, NULL)) AS el_encashable_days,
         MAX(IF(UPPER(leave_type) = "HPL", closing_balance_days, NULL)) AS hpl_balance_days
-      FROM `ongc-hr-finance-agent.hrfin_silver.leave_ledger`
+      FROM `yukti-finance-iocl.hrfin_silver.leave_ledger`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY emp_id
     )
@@ -152,10 +152,10 @@ def main() -> None:
       COALESCE(lv.hpl_balance_days, 0) AS hpl_balance_days,
       IF(LOWER(e.employment_status) = "active", 1, 0) AS active_headcount,
       IF(LOWER(e.employment_status) = "active", 1, 0) AS in_position_strength
-    FROM `ongc-hr-finance-agent.hrfin_silver.employee_master` e
-    LEFT JOIN `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` w ON e.current_wc_id = w.wc_id
-    LEFT JOIN `ongc-hr-finance-agent.hrfin_silver.dim_grade` g ON e.current_grade_id = g.grade_id
-    LEFT JOIN `ongc-hr-finance-agent.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
+    FROM `yukti-finance-iocl.hrfin_silver.employee_master` e
+    LEFT JOIN `yukti-finance-iocl.hrfin_silver.dim_work_centre` w ON e.current_wc_id = w.wc_id
+    LEFT JOIN `yukti-finance-iocl.hrfin_silver.dim_grade` g ON e.current_grade_id = g.grade_id
+    LEFT JOIN `yukti-finance-iocl.hrfin_silver.dim_discipline` d ON e.discipline_id = d.discipline_id
     LEFT JOIN cs ON e.emp_id = cs.emp_id
     LEFT JOIN ct ON e.emp_id = ct.emp_id
     LEFT JOIN apar ON e.emp_id = apar.emp_id
@@ -168,7 +168,7 @@ def main() -> None:
 
     # 2. Build ssot_work_centre_360 (1 row per wc_id)
     q_ssot_wc = """
-    CREATE OR REPLACE TABLE `ongc-hr-finance-agent.hrfin_gold.ssot_work_centre_360`
+    CREATE OR REPLACE TABLE `yukti-finance-iocl.hrfin_gold.ssot_work_centre_360`
     CLUSTER BY wc_id, state, onshore_offshore
     AS
     WITH emp AS (
@@ -194,7 +194,7 @@ def main() -> None:
         ROUND(SUM(fy26_training_hours), 0) AS training_hours_fy26,
         COUNTIF(fy26_training_hours > 0) AS trained_employees_fy26,
         ROUND(AVG(IF(active_headcount = 1, fy26_apar_score, NULL)), 2) AS avg_apar_score_fy26
-      FROM `ongc-hr-finance-agent.hrfin_gold.ssot_workforce_employee`
+      FROM `yukti-finance-iocl.hrfin_gold.ssot_workforce_employee`
       GROUP BY wc_id
     ),
     sp AS (
@@ -205,7 +205,7 @@ def main() -> None:
         SUM(vacancy_count) AS vacancy_count_fy26,
         ROUND(SAFE_DIVIDE(SUM(vacancy_count) * 100.0, NULLIF(SUM(sanctioned_strength), 0)), 2) AS vacancy_rate_pct_fy26,
         SUM(COALESCE(backlog_vacancies, 0)) AS backlog_vacancies_fy26
-      FROM `ongc-hr-finance-agent.hrfin_silver.sanctioned_posts`
+      FROM `yukti-finance-iocl.hrfin_silver.sanctioned_posts`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY wc_id
     ),
@@ -214,14 +214,14 @@ def main() -> None:
         wc_id,
         SUM(IF(month = "2026-03", contractor_headcount, 0)) AS contractor_headcount_fy26,
         ROUND(SUM(IF(fiscal_year IN ("FY26", "2026"), monthly_cost_inr, 0)) / 10000000.0, 2) AS contractor_annual_cost_inr_cr_fy26
-      FROM `ongc-hr-finance-agent.hrfin_silver.contract_workforce`
+      FROM `yukti-finance-iocl.hrfin_silver.contract_workforce`
       GROUP BY wc_id
     ),
     app AS (
       SELECT
         wc_id,
         COUNT(DISTINCT apprentice_id) AS apprentices_engaged_fy26
-      FROM `ongc-hr-finance-agent.hrfin_silver.apprentices`
+      FROM `yukti-finance-iocl.hrfin_silver.apprentices`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY wc_id
     ),
@@ -232,7 +232,7 @@ def main() -> None:
         COUNTIF(lost_time_injury_flag = TRUE) AS lti_count_fy26,
         SUM(COALESCE(days_lost, 0)) AS days_lost_fy26,
         ROUND(SAFE_DIVIDE(COUNTIF(lost_time_injury_flag = TRUE) * 1000000.0, NULLIF(SUM(total_manhours_worked), 0)), 3) AS ltifr_fy26
-      FROM `ongc-hr-finance-agent.hrfin_silver.hse_incidents`
+      FROM `yukti-finance-iocl.hrfin_silver.hse_incidents`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY wc_id
     ),
@@ -241,7 +241,7 @@ def main() -> None:
         wc_id,
         COUNT(*) AS env_incidents_fy26,
         ROUND(SUM(COALESCE(penalty_inr_lakh, 0)), 2) AS env_penalty_inr_lakh_fy26
-      FROM `ongc-hr-finance-agent.hrfin_silver.env_incidents`
+      FROM `yukti-finance-iocl.hrfin_silver.env_incidents`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY wc_id
     ),
@@ -250,14 +250,14 @@ def main() -> None:
         wc_id,
         COUNT(*) AS total_grievances_litigation,
         COUNTIF(LOWER(status) IN ("pending", "open", "in_progress", "sub_judice")) AS active_grievances_count
-      FROM `ongc-hr-finance-agent.hrfin_silver.grievances_litigation`
+      FROM `yukti-finance-iocl.hrfin_silver.grievances_litigation`
       GROUP BY wc_id
     ),
     posh AS (
       SELECT
         wc_id,
         COUNT(*) AS posh_cases_fy26
-      FROM `ongc-hr-finance-agent.hrfin_silver.posh_cases`
+      FROM `yukti-finance-iocl.hrfin_silver.posh_cases`
       WHERE fiscal_year IN ("FY26", "2026")
       GROUP BY wc_id
     ),
@@ -272,14 +272,14 @@ def main() -> None:
         ebitda_inr_cr AS ebitda_inr_cr_fy26,
         manpower_cost_per_boe_usd AS manpower_cost_per_boe_usd_fy26,
         boe_per_employee AS boe_per_employee_fy26
-      FROM `ongc-hr-finance-agent.hrfin_gold.mart_asset_productivity`
+      FROM `yukti-finance-iocl.hrfin_gold.mart_asset_productivity`
       WHERE fiscal_year IN ("FY26", "2026")
     ),
     lc AS (
       SELECT
         asset_wc_id AS wc_id,
         lifting_cost_per_boe_usd AS lifting_cost_per_boe_usd_fy26
-      FROM `ongc-hr-finance-agent.hrfin_gold.agg_lifting_cost_summary`
+      FROM `yukti-finance-iocl.hrfin_gold.agg_lifting_cost_summary`
       WHERE fiscal_year IN ("FY26", "2026")
     ),
     cpx AS (
@@ -291,7 +291,7 @@ def main() -> None:
         ROUND(SAFE_DIVIDE(SUM(actual_spend_inr_cr) * 100.0, NULLIF(SUM(revised_estimate_re_inr_cr), 0)), 2) AS capex_utilisation_pct_fy26
       FROM (
         SELECT DISTINCT budget_id, asset_wc_id, budget_estimate_be_inr_cr, revised_estimate_re_inr_cr, actual_spend_inr_cr
-        FROM `ongc-hr-finance-agent.hrfin_silver.capex_budget`
+        FROM `yukti-finance-iocl.hrfin_silver.capex_budget`
         WHERE fiscal_year IN ("FY26", "2026")
       )
       GROUP BY asset_wc_id
@@ -356,7 +356,7 @@ def main() -> None:
       COALESCE(cpx.capex_re_inr_cr_fy26, 0) AS capex_re_inr_cr_fy26,
       COALESCE(cpx.capex_actual_inr_cr_fy26, 0) AS capex_actual_inr_cr_fy26,
       cpx.capex_utilisation_pct_fy26
-    FROM `ongc-hr-finance-agent.hrfin_silver.dim_work_centre` w
+    FROM `yukti-finance-iocl.hrfin_silver.dim_work_centre` w
     LEFT JOIN emp ON w.wc_id = emp.wc_id
     LEFT JOIN sp ON w.wc_id = sp.wc_id
     LEFT JOIN cw ON w.wc_id = cw.wc_id
@@ -374,7 +374,7 @@ def main() -> None:
 
     # 3. Build ssot_field_economics_360 (1 row per field_id x fiscal_year)
     q_ssot_fld = """
-    CREATE OR REPLACE TABLE `ongc-hr-finance-agent.hrfin_gold.ssot_field_economics_360`
+    CREATE OR REPLACE TABLE `yukti-finance-iocl.hrfin_gold.ssot_field_economics_360`
     CLUSTER BY fiscal_year, onshore_offshore, field_id
     AS
     WITH pm AS (
@@ -388,7 +388,7 @@ def main() -> None:
         SUM(COALESCE(well_downtime_hours, 0)) AS total_well_downtime_hours,
         ROUND(AVG(gas_utilisation_pct), 2) AS avg_gas_utilisation_pct,
         MAX(active_producing_wells) AS active_producing_wells
-      FROM `ongc-hr-finance-agent.hrfin_silver.production_monthly`
+      FROM `yukti-finance-iocl.hrfin_silver.production_monthly`
       GROUP BY field_id, fiscal_year
     ),
     res AS (
@@ -401,7 +401,7 @@ def main() -> None:
         MAX(reserve_replacement_ratio_rrr_2p) AS reserve_replacement_ratio_rrr_2p,
         MAX(finding_cost_usd_per_boe) AS finding_cost_usd_per_boe,
         MAX(development_cost_usd_per_boe) AS development_cost_usd_per_boe
-      FROM `ongc-hr-finance-agent.hrfin_silver.reserves_annual`
+      FROM `yukti-finance-iocl.hrfin_silver.reserves_annual`
       GROUP BY field_id, fiscal_year
     ),
     wl AS (
@@ -413,7 +413,7 @@ def main() -> None:
         COUNTIF(LOWER(well_type) LIKE "%dev%") AS development_wells_count,
         COUNTIF(LOWER(result_status) = "dry_hole") AS dry_holes_count,
         ROUND(SUM(COALESCE(drilling_cost_inr_cr, 0)), 2) AS drilling_cost_inr_cr
-      FROM `ongc-hr-finance-agent.hrfin_silver.wells_drilled`
+      FROM `yukti-finance-iocl.hrfin_silver.wells_drilled`
       GROUP BY field_id, fiscal_year
     )
     SELECT
@@ -469,8 +469,8 @@ def main() -> None:
       COALESCE(wl.development_wells_count, 0) AS development_wells_count,
       COALESCE(wl.dry_holes_count, 0) AS dry_holes_count,
       COALESCE(wl.drilling_cost_inr_cr, 0) AS drilling_cost_inr_cr
-    FROM `ongc-hr-finance-agent.hrfin_gold.agg_field_pnl_summary` p
-    LEFT JOIN `ongc-hr-finance-agent.hrfin_silver.dim_field` f ON p.field_id = f.field_id
+    FROM `yukti-finance-iocl.hrfin_gold.agg_field_pnl_summary` p
+    LEFT JOIN `yukti-finance-iocl.hrfin_silver.dim_field` f ON p.field_id = f.field_id
     LEFT JOIN pm ON p.field_id = pm.field_id AND p.fiscal_year = pm.fiscal_year
     LEFT JOIN res ON p.field_id = res.field_id AND p.fiscal_year = res.fiscal_year
     LEFT JOIN wl ON p.field_id = wl.field_id AND p.fiscal_year = wl.fiscal_year
@@ -481,36 +481,36 @@ def main() -> None:
 
     # 4. Build ssot_corporate_annual_360 (1 row per fiscal_year)
     q_ssot_corp = """
-    CREATE OR REPLACE TABLE `ongc-hr-finance-agent.hrfin_gold.ssot_corporate_annual_360`
+    CREATE OR REPLACE TABLE `yukti-finance-iocl.hrfin_gold.ssot_corporate_annual_360`
     AS
     WITH csr AS (
       SELECT fiscal_year, ROUND(SUM(actual_disbursed_inr_cr), 2) AS csr_disbursed_inr_cr, SUM(beneficiaries_count) AS csr_beneficiaries
-      FROM `ongc-hr-finance-agent.hrfin_silver.csr_projects`
+      FROM `yukti-finance-iocl.hrfin_silver.csr_projects`
       GROUP BY fiscal_year
     ),
     mou AS (
       SELECT fiscal_year, ROUND(MAX(composite_score), 2) AS mou_composite_score, MAX(achieved_rating) AS mou_rating
-      FROM `ongc-hr-finance-agent.hrfin_silver.mou_targets`
+      FROM `yukti-finance-iocl.hrfin_silver.mou_targets`
       GROUP BY fiscal_year
     ),
     ar AS (
       SELECT fiscal_year, ROUND(SUM(outstanding_amount_inr_cr), 2) AS receivables_outstanding_inr_cr, ROUND(SUM(IF(is_disputed, outstanding_amount_inr_cr, 0)), 2) AS disputed_receivables_inr_cr
-      FROM `ongc-hr-finance-agent.hrfin_silver.receivables`
+      FROM `yukti-finance-iocl.hrfin_silver.receivables`
       GROUP BY fiscal_year
     ),
     bl AS (
       SELECT fiscal_year, ROUND(SUM(actuarial_liability_inr_cr), 2) AS actuarial_liability_inr_cr, ROUND(SUM(net_liability_inr_cr), 2) AS net_benefit_liability_inr_cr
-      FROM `ongc-hr-finance-agent.hrfin_silver.benefit_liabilities`
+      FROM `yukti-finance-iocl.hrfin_silver.benefit_liabilities`
       GROUP BY fiscal_year
     ),
     et AS (
       SELECT fiscal_year, ROUND(SUM(installed_capacity_mw), 2) AS renewable_installed_mw, ROUND(SUM(generation_gwh), 2) AS renewable_generation_gwh, ROUND(SUM(annual_capex_inr_cr), 2) AS green_capex_inr_cr
-      FROM `ongc-hr-finance-agent.hrfin_silver.energy_transition`
+      FROM `yukti-finance-iocl.hrfin_silver.energy_transition`
       GROUP BY fiscal_year
     ),
     app AS (
       SELECT fiscal_year, COUNT(DISTINCT apprentice_id) AS apprentices_engaged
-      FROM `ongc-hr-finance-agent.hrfin_silver.apprentices`
+      FROM `yukti-finance-iocl.hrfin_silver.apprentices`
       GROUP BY fiscal_year
     )
     SELECT
@@ -548,7 +548,7 @@ def main() -> None:
       COALESCE(et.renewable_generation_gwh, 0) AS renewable_generation_gwh,
       COALESCE(et.green_capex_inr_cr, 0) AS green_capex_inr_cr,
       COALESCE(app.apprentices_engaged, 0) AS apprentices_engaged
-    FROM `ongc-hr-finance-agent.hrfin_silver.corporate_financials` cf
+    FROM `yukti-finance-iocl.hrfin_silver.corporate_financials` cf
     LEFT JOIN csr ON cf.fiscal_year = csr.fiscal_year
     LEFT JOIN mou ON cf.fiscal_year = mou.fiscal_year
     LEFT JOIN ar ON cf.fiscal_year = ar.fiscal_year
@@ -573,7 +573,7 @@ def main() -> None:
     # Verify Ahmedabad 360 row
     ahm = list(
         client.query(
-            "SELECT wc_id, wc_name, active_headcount, executive_headcount, non_executive_headcount, sanctioned_strength_fy26, vacancy_count_fy26, contractor_headcount_fy26, payroll_gross_inr_cr_fy26 FROM `ongc-hr-finance-agent.hrfin_gold.ssot_work_centre_360` WHERE wc_id = 'WC-AHM'"
+            "SELECT wc_id, wc_name, active_headcount, executive_headcount, non_executive_headcount, sanctioned_strength_fy26, vacancy_count_fy26, contractor_headcount_fy26, payroll_gross_inr_cr_fy26 FROM `yukti-finance-iocl.hrfin_gold.ssot_work_centre_360` WHERE wc_id = 'WC-AHM'"
         ).result()
     )[0]
     print("Ahmedabad SSOT 360:", dict(ahm))

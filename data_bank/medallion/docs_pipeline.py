@@ -42,12 +42,12 @@ from pypdf import PdfReader
 # ---------------------------------------------------------------------------
 # Configuration & Paths
 # ---------------------------------------------------------------------------
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or "yukti-finance-iocl"
 LOCATION_BQ = "asia-south1"
 LOCATION_DOCAI = "asia-south1"
 LOCATION_DISCO = "global"
 
-DOCS_BUCKET_NAME = "ongc-hr-finance-agent-docs"
+DOCS_BUCKET_NAME = os.getenv("YUKTI_DOCS_BUCKET", "yukti-finance-iocl-docs")
 DATASET_ID = "hrfin_docs"
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -191,7 +191,7 @@ def get_clients():
 # ---------------------------------------------------------------------------
 
 def load_glossary_terms(bq_client: bigquery.Client) -> List[Dict[str, str]]:
-    q = "SELECT term, full_form, definition, domain, category FROM `ongc-hr-finance-agent.hrfin_gold.glossary`"
+    q = f"SELECT term, full_form, definition, domain, category FROM `{PROJECT_ID}.hrfin_gold.glossary`"
     job_cfg = bigquery.QueryJobConfig(labels={"datacloud": "ai-agent"})
     rows = list(bq_client.query(q, job_config=job_cfg).result())
     return [dict(r) for r in rows]

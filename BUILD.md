@@ -170,7 +170,7 @@ A step is **Done** only when: acceptance criteria are met **with numeric evidenc
 - **Snapshot:** branch `wip/pre-v3-snapshot` @ `e7de82f` holds all previously uncommitted work (R11–R16, `financial_build/`, feedback, verbatims 17–22).
 - **Verified working:** conversation feed, floating panel, light/dark, Leda voice (when ADC is valid), the RBAC masking engine for 5 personas (77 offline tests), HR synthetic headcount/diversity calibrated to AR, real ARs FY21–FY26 + 50+ real policies on disk, `tsc` + lint clean.
 - **Known broken:** see [`BUG_REGISTER.md`](BUG_REGISTER.md) (34 items; 13 Blockers). Key items: invented finance components with plug lines; no Yahoo ingestion; no V22; V19 steps 4–5; V20 mostly missing; persona escalation; Cloud Run on baseline rev `00001`.
-- **Environment notes:** ADC must be valid (`gcloud auth application-default login`), then restart the servers. Local URLs: UI `:3200`/`:3300`, backend `:8095`. Cloud Run `yukti-ai` (asia-south1, project `ongc-hr-finance-agent`) is IAM-protected.
+- **Environment notes:** ADC must be valid (`gcloud auth application-default login`), then restart the servers. Local URLs: UI `:3400`, backend `:8195`. Cloud Run `yukti-ai` (asia-south1, project `yukti-finance-iocl`) is IAM-protected.
 
 ---
 
@@ -181,7 +181,7 @@ A step is **Done** only when: acceptance criteria are met **with numeric evidenc
 - Rollback: `git checkout upgrade-H1` (last v2 tag) or the last `v3-*` tag, then rebuild the frontend and restart both servers.
 - Feature flags: `YUKTI_PLANNER=1` (brain), `YUKTI_FIN_SSOT_V3=1` (read `fact_financial_statement_line`; off = legacy tables with a "Local/legacy" badge), `YUKTI_COORDINATOR=1` (agents), `NEXT_PUBLIC_STATEMENT_VISUAL=1`.
 - **BigQuery:** new objects are created alongside the old ones (`fact_*`, `ssot_employee_360`, `ssot_field_economics_360`, `recon_checks`) and never replace in place until P5. DDL is versioned in `yukti/backend/sql/` or Dataform.
-- **Cloud Run rollback:** `gcloud run services update-traffic yukti-ai --project ongc-hr-finance-agent --region asia-south1 --to-revisions=<previous-revision>=100`.
+- **Cloud Run rollback:** `gcloud run services update-traffic yukti-ai --project yukti-finance-iocl --region asia-south1 --to-revisions=<previous-revision>=100`.
 
 ---
 

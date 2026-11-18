@@ -66,7 +66,7 @@ def search_policy(query: str) -> Dict[str, Any]:
     or local rulebooks index for top-3 policy clauses matching the query.
     """
     t0 = time.perf_counter()
-    project_id = "ongc-hr-finance-agent"
+    project_id = "yukti-finance-iocl"
     search_engine_id = "hrfin-doc-search-engine"
     snippets: List[Dict[str, Any]] = []
     source = "vertex_ai_search"

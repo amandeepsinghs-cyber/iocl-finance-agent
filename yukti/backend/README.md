@@ -107,10 +107,10 @@ uv sync
 ```bash
 uv run python run.py
 ```
-The server will start on `http://0.0.0.0:8080`.
-- Health Check: `http://localhost:8080/health`
-- REST Turn Endpoint: `http://localhost:8080/api/turn`
-- WebSocket Bidi Stream: `ws://localhost:8080/ws/live`
+The server will start on `http://0.0.0.0:8195`.
+- Health Check: `http://localhost:8195/health`
+- REST Turn Endpoint: `http://localhost:8195/api/turn`
+- WebSocket Bidi Stream: `ws://localhost:8195/ws/live`
 
 ---
 
@@ -123,7 +123,7 @@ Returns service status, active project, and pre-warmed cache count.
   "status": "healthy",
   "agent": "Yukti AI",
   "version": "1.0.0",
-  "project": "ongc-hr-finance-agent",
+  "project": "yukti-finance-iocl",
   "default_model": "gemini-3.8-live",
   "default_voice": "Leda",
   "cached_entries": 356

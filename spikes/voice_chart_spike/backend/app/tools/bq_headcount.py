@@ -55,7 +55,7 @@ def query_headcount_tenure(
     t0 = time.perf_counter()
     wc_id = LOCATION_MAP.get(location.lower().strip(), "WC-DEL")
     min_months = int(min_years) * 12
-    project_id = os.getenv("TARGET_PROJECT") or "ongc-hr-finance-agent"
+    project_id = os.getenv("TARGET_PROJECT") or "yukti-finance-iocl"
 
     rows: List[Dict[str, Any]] = []
     source = "bigquery"

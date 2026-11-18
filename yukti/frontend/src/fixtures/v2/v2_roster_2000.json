@@ -2,7 +2,7 @@
   "turn_id": "turn_v2_roster_2000",
   "language": "en",
   "persona": "CMD",
-  "spoken_summary": "Across all ONGC work centres, 2,000 executives have completed eight or more continuous years at their current station. Mumbai Western Offshore (440 officers) and Delhi HQ (280 officers) account for the largest clusters of long-stay personnel. Production and Drilling disciplines comprise 40.3% of the population.",
+  "spoken_summary": "Illustrative officer table across enterprise hubs showing 2,000 senior personnel records for UI stress testing.",
   "display_text": "Pan-India query across hrfin_gold.ssot_workforce_employee identifies 2,000 active executives with >= 8.0 years continuous stay across 15 work centres [1]. Mumbai (440) and Delhi (280) form the largest concentrations; technical disciplines account for 40.3%.",
   "contract_version": 2,
   "visual": {
@@ -18031,7 +18031,7 @@
           "label": "Draft transfer note",
           "action": "draft_transfer_note",
           "question_template": "Draft a transfer note for {emp_name} ({emp_id})",
-          "min_role": "DIR_HR"
+          "min_role": "DIR_FIN"
         }
       ]
     },
@@ -18060,7 +18060,7 @@
   },
   "insights_v2": [
     {
-      "text": "2,000 executives across all ONGC assets have completed 8 or more years at their current posting.",
+      "text": "2,000 illustrative enterprise records loaded for virtualized table benchmarking.",
       "kind": "headline",
       "value": 2000,
       "unit": "Executives"

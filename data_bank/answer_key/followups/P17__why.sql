@@ -14,6 +14,6 @@ SELECT
     ROUND(pat_inr_cr + dda_inr_cr - total_dividend_payout_inr_cr - total_capex_spent_inr_cr, 0) AS funding_surplus_cr,
     ROUND(100 * total_capex_spent_inr_cr / (pat_inr_cr + dda_inr_cr), 1) AS capex_pct_of_accruals,
     dividend_payout_ratio_pct
-FROM `ongc-hr-finance-agent.hrfin_silver.corporate_financials`
+FROM `yukti-finance-iocl.hrfin_silver.corporate_financials`
 WHERE fiscal_year BETWEEN 'FY22' AND 'FY26'
 ORDER BY fiscal_year DESC;

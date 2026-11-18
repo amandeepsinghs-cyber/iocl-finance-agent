@@ -199,47 +199,47 @@ async def _run_offline_validation(
     assert cov_f48 is not None and "Yes" in cov_f48["display_text"] and "only up to 2026" not in cov_f48["display_text"].lower()
 
     # 2. Deterministic policy / RBAC checks (H11, H12, H14)
-    sess = sm.get_or_create(f"eval-offline-{time.time_ns()}", persona="E2_HR", language="en")
+    sess = sm.get_or_create(f"eval-offline-{time.time_ns()}", persona="E2_FIN", language="en")
     ui_h11 = handle_ui_control(
         "Switch role to CMD",
         sess,
-        "E2_HR",
+        "E2_FIN",
         "en",
         "turn-h11",
         time.perf_counter(),
         {"command": "set_persona", "value": "CMD"},
     )
     pol_h12 = handle_policy(
-        "How many casual leaves can I take?",
+        "What is the Delegation of Authority limit for spot crude cargo procurement?",
         sess,
-        "E3_HR",
+        "E3_FIN",
         "en",
         "turn-h12",
         time.perf_counter(),
     )
     pol_h14 = handle_policy(
-        "Joining pay of an E1 officer",
+        "What is IOCL's crack spread hedging policy?",
         sess,
-        "DIR_HR",
+        "DIR_FIN",
         "en",
         "turn-h14",
         time.perf_counter(),
     )
     assert ui_h11 is not None and ui_h11.get("access", {}).get("status") == "refused"
-    assert pol_h12 is not None and "12" in pol_h12["display_text"] and "study leave" not in pol_h12["display_text"].lower()
-    assert pol_h14 is not None and "60,000" in pol_h14["display_text"] and "1,80,000" in pol_h14["display_text"]
+    assert pol_h12 is not None and ("IOCL-DOA" in str(pol_h12) or "crude" in pol_h12["display_text"].lower())
+    assert pol_h14 is not None and ("hedg" in pol_h14["display_text"].lower() or "IOCL-HEDGING" in str(pol_h14))
 
     # 3. Grounding drop & Hindi narrator checks
     cleaned_txt, dropped = check_numeric_grounding(
-        "Revenue was ₹1,38,402.13 crore in FY24. We only have data up to 2026.",
-        allowed={138402.13, 2024.0, 24.0},
+        "Revenue was ₹8,66,345.00 crore in FY24. We only have data up to 2026.",
+        allowed={866345.0, 2024.0, 24.0},
     )
     assert "only have data up to 2026" not in cleaned_txt.lower() and len(dropped) == 1
-    hi_txt = translate_to_hindi("ONGC standalone PAT in FY26 was ₹32,894.02 crore.")
+    hi_txt = translate_to_hindi("IOCL standalone PAT in FY26 was ₹36,802.42 crore.")
     assert any("\u0900" <= ch <= "\u097f" for ch in hi_txt)
 
     # 4. Validate all F01..F52 + BEH-03 cases against local SSOT / oracle schema
-    parquet_path = BACKEND_DIR.parents[1] / "financial_ssot" / "out" / "fact_financial_statement_line.parquet"
+    parquet_path = BACKEND_DIR.parents[1] / "financial_ssot" / "out" / "fact_snapshot.parquet"
     assert parquet_path.exists(), f"Missing SSOT parquet: {parquet_path}"
 
     for case in finance_cases:
@@ -411,7 +411,7 @@ def main() -> int:
     parser.add_argument("--offline-subset", action="store_true", help="Run deterministic no-LLM golden suite")
     parser.add_argument("--only", type=str, default=None, help="Run only specific case or chain ID")
     parser.add_argument("--chains", type=str, default=None, help="Optional path to chains.yaml")
-    parser.add_argument("--base-url", type=str, default="http://127.0.0.1:8095")
+    parser.add_argument("--base-url", type=str, default="http://127.0.0.1:8195")
     parser.add_argument("--no-cache", action="store_true")
     parser.add_argument("--report", type=str, default=None)
     parser.add_argument("--json-report", type=str, default=None)

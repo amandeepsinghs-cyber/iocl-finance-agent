@@ -35,9 +35,8 @@ export const ACCESS_REQUESTS_EVENT = 'yukti:access-requests-changed';
 const notify = () => window.dispatchEvent(new Event(ACCESS_REQUESTS_EVENT));
 
 export function approverLabelFor(persona?: string | null): string {
-  return (persona || '').toUpperCase().endsWith('_FIN')
-    ? 'Director (Finance) / Executive Director (Finance)'
-    : 'Director (HR) / Executive Director (HR)';
+  void persona;
+  return 'Director (Finance) / Chairman';
 }
 
 export async function listAccessRequests(): Promise<AccessRequestList | null> {

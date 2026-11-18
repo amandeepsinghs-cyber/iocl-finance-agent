@@ -19,7 +19,7 @@ cost AS (
 ),
 pool AS (
     SELECT COUNT(DISTINCT v.emp_id) AS movable_pool
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
     WHERE v.is_current_stay AND v.wc_id IN ('WC-DEL', 'WC-DDN') AND v.grade_id LIKE 'E%'
       AND v.continuous_stay_months >= 36
       AND DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25

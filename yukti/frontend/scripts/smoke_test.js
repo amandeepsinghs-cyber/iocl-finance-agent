@@ -3,7 +3,7 @@ const { spawn } = require('child_process');
 const http = require('http');
 const path = require('path');
 
-const PORT = 3200;
+const PORT = 3400;
 const SCREENSHOTS_DIR = path.join(__dirname, '../screenshots');
 
 function waitForServer(url, timeoutMs = 30000) {

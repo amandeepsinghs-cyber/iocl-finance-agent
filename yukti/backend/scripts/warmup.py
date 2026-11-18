@@ -14,7 +14,9 @@ import yaml
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 QUESTIONS_PATH = BACKEND_DIR.parent.parent / "data_bank" / "world_bible" / "reference" / "questions.yaml"
 
-BASE_URL = "http://127.0.0.1:8080"
+import os
+
+BASE_URL = os.getenv("YUKTI_BACKEND_URL", "http://127.0.0.1:8195")
 REFUSAL_IDS = {"D1", "D2", "D3", "D4", "D5", "D6", "P18", "P19", "P20", "M3", "M4"}
 
 

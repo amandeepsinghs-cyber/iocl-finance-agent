@@ -102,7 +102,7 @@ def make_clean_title_and_subtitle(
             return f"{label}: Executives with ≥5 Years' Continuous Stay", f"{sub} | {get_semantic_model().anchor_date}"
 
     clean = re.sub(r"^(How many|What is the|What are the|Which|Please show|Tell me about)\s+", "", query, flags=re.IGNORECASE).strip().rstrip("?")
-    return clean[:65].capitalize(), f"ONGC enterprise records (demo data) | {get_semantic_model().anchor_date}"
+    return clean[:65].capitalize(), f"IOCL enterprise records | {get_semantic_model().anchor_date}"
 
 
 def make_clean_title(query: str) -> str:
@@ -380,10 +380,23 @@ class AgentTurnRunner:
 
         from app.market.revenue_drivers import detect_portfolio_mix as _dpm_early, detect_revenue_drivers as _drd_early
 
-        from app.finance.dcf.followup import detect_dcf_followup as _ddf_early
+        from app.finance.dcf.followup import (
+            detect_analyst_consensus as _dac_early,
+            detect_dcf_followup as _ddf_early,
+            detect_extend_to_forecast as _def_early,
+            detect_growth_audit as _dga_early,
+        )
+        from app.knowledge.ar_deep_qa import detect_ar_deep_qa as _dar_early
 
-        if _sc_probe and _sc_probe.get("command") == "set_chart_kind" and (
-            _detect_oil_plot_early(query) or _drd_early(query) or _dpm_early(query) or _ddf_early(query, session_state)
+        if _sc_probe and _sc_probe.get("command") in ("set_chart_kind", "open_screen") and (
+            _detect_oil_plot_early(query)
+            or _drd_early(query)
+            or _dpm_early(query)
+            or _ddf_early(query, session_state)
+            or _dga_early(query, session_state)
+            or _def_early(query, session_state)
+            or _dac_early(query)
+            or _dar_early(query)
         ):
             _sc_probe = None
         if is_role_switch_request(query) or (_sc_probe and _sc_probe.get("command") == "set_persona"):
@@ -494,7 +507,7 @@ class AgentTurnRunner:
             )
             if access_dec.alternative_sql:
                 refusal_contract["sources"].append(
-                    {"kind": "data", "object": "hrfin_silver.dim_grade", "sql": access_dec.alternative_sql}
+                    {"kind": "data", "object": "hrfin_gold.ssot_corporate_annual_360", "sql": access_dec.alternative_sql}
                 )
             self._validate_contract(refusal_contract)
             session_state.record_turn(refusal_contract)
@@ -541,15 +554,36 @@ class AgentTurnRunner:
                 logger.exception(f"Transfer note drafting failed; falling back: {e_tn}")
 
         # Coordinator / Planner
-        # 27-Oct: follow-ups on the DCF run in this conversation (drivers, explanations, what-if re-runs)
-        from app.finance.dcf.followup import answer_dcf_followup_async, detect_dcf_followup
+        # 27-Oct + IOCL-R07..R10: DCF follow-ups, scenario re-runs, verification proof, growth audit, & FY36 stitching
+        from app.finance.dcf.followup import (
+            answer_dcf_followup_async,
+            detect_analyst_consensus,
+            detect_dcf_followup,
+            detect_extend_to_forecast,
+            detect_growth_audit,
+        )
 
         # (runs before the coordinator, which would otherwise propose a NEW DCF run for any 'valuation' question;
-        #  pending confirmations such as 'yes, proceed' are resolved first)
-        dcf_req = None if (spec_patch or getattr(session_state, 'pending_actions', None)) else detect_dcf_followup(query, session_state)
+        #  explicit pending confirmations such as 'yes, proceed' or 'cancel' are resolved first)
+        _is_pending_reply = bool(
+            getattr(session_state, "pending_actions", None)
+            and re.match(
+                r"^\s*(?:yes|yeah|yep|sure|ok|okay|proceed|confirm|go\s+ahead|run(?:\s+it)?|cancel|no|abort|stop|हाँ|हां|चलाओ|रद्द)\s*[.!?]*\s*$",
+                query or "",
+                re.I,
+            )
+        )
+        dcf_req = None if (spec_patch or _is_pending_reply) else (
+            detect_dcf_followup(query, session_state)
+            or detect_extend_to_forecast(query, session_state)
+            or detect_growth_audit(query, session_state)
+            or detect_analyst_consensus(query)
+        )
         if dcf_req:
             try:
-                dcf_contract = await answer_dcf_followup_async(dcf_req, query, norm_persona, turn_id, det_lang, t0)
+                dcf_contract = await answer_dcf_followup_async(
+                    dcf_req, query, norm_persona, turn_id, det_lang, t0, session_state=session_state
+                )
                 return self._finalize_planner_contract({"contract": dcf_contract, "meta": None}, session_state, query, t0)
             except Exception as e_dcf:  # noqa: BLE001 - e.g. an invalid what-if: say so instead of a generic answer
                 logging.getLogger(__name__).warning(f"dcf follow-up failed: {e_dcf}")
@@ -615,11 +649,11 @@ class AgentTurnRunner:
                 pass
                 
         # 26-Oct: direct crude-oil price questions ("plot Brent for the past 5 years") come from the live Yahoo feed;
-        # the data planner only knows ONGC data. If the feed is unavailable, fall through to the normal path.
+        # the data planner only knows IOCL data. If the feed is unavailable, fall through to the normal path.
         from app.market.oil_intent import build_oil_plot_contract, detect_oil_plot
 
         # 27-Oct: "why did revenue hold up while oil fell?" (price / volume / rupee / mix) and "how has the portfolio
-        # changed?" (stacked product mix) are computed answers from ONGC financials + market data.
+        # changed?" (stacked product mix) are computed answers from IOCL financials + market data.
         from app.market.revenue_drivers import (
             build_drivers_contract,
             build_mix_contract,
@@ -644,6 +678,23 @@ class AgentTurnRunner:
             except RuntimeError:
                 pass
 
+        # IOCL-R04: Direct Annual Report disclosure / Note / capex-project Deep-QA route
+        from app.knowledge.ar_deep_qa import (
+            answer_ar_deep_qa_async,
+            detect_ar_deep_qa,
+            should_fallback_to_ar,
+        )
+        ar_direct = detect_ar_deep_qa(query) if not patch_obj else None
+        if ar_direct:
+            try:
+                ar_contract = await answer_ar_deep_qa_async(
+                    query, norm_persona, turn_id, det_lang, t0, fiscal_year=ar_direct.get("fy")
+                )
+                if ar_contract is not None:
+                    return self._finalize_planner_contract({"contract": ar_contract, "meta": None}, session_state, query, t0)
+            except Exception as e_ar:
+                logging.getLogger(__name__).warning(f"AR Deep-QA direct route failed: {e_ar}")
+
         if planner_enabled() and os.getenv("YUKTI_PLANNER", "1") != "0":
             try:
                 planned = await run_planner_turn(query, session_state, norm_persona, turn_id, det_lang, t0,
@@ -653,6 +704,15 @@ class AgentTurnRunner:
             except Exception as e_plan:
                 import logging
                 logging.getLogger(__name__).exception(f"Planner pipeline failed: {e_plan}")
+
+        # IOCL-R04: Post-planner Deep-QA fallback over 10-year AR corpus before generic smalltalk refusal
+        if not patch_obj and should_fallback_to_ar(query):
+            try:
+                ar_fb = await answer_ar_deep_qa_async(query, norm_persona, turn_id, det_lang, t0)
+                if ar_fb is not None:
+                    return self._finalize_planner_contract({"contract": ar_fb, "meta": None}, session_state, query, t0)
+            except Exception as e_ar_fb:
+                logging.getLogger(__name__).warning(f"AR Deep-QA fallback failed: {e_ar_fb}")
 
         session_state.spec_history.append({})
         session_state.spec_history[:] = session_state.spec_history[-20:]
@@ -908,7 +968,7 @@ class AgentTurnRunner:
         Handles multi-tool turns (e.g. policy search + data query for P11-style questions).
         """
         if not tool_responses:
-            return {"type": "none", "mode": visual_mode}, [{"kind": "data", "object": "ONGC Enterprise Data Bank"}]
+            return {"type": "none", "mode": visual_mode}, [{"kind": "data", "object": "IOCL Enterprise Data Bank"}]
 
         sources = []
         clause_obj = None
@@ -1058,7 +1118,7 @@ class AgentTurnRunner:
             scen = resp.get("scenario", "what_if")
             sources.append({
                 "kind": "data",
-                "object": "hrfin_gold.v_field_pnl",
+                "object": "hrfin_gold.ssot_refinery_economics_360",
                 "sql": sql,
             })
             chart_spec = build_chart_spec(kind="waterfall", columns=columns, rows=rows, title=f"Scenario Simulation: {scen}")
@@ -1077,12 +1137,12 @@ class AgentTurnRunner:
         if draft_resp:
             resp = draft_resp["response"]
             doc_type = resp.get("doc_type", "board_note")
-            title = resp.get("title", "Official ONGC Document Draft")
+            title = resp.get("title", "Official IOCL Document Draft")
             markdown = resp.get("markdown", "")
             version = resp.get("version", 1)
             sources.append({
                 "kind": "document",
-                "title": resp.get("template_id", "ONGC Secretariat Template"),
+                "title": resp.get("template_id", "IOCL Secretariat Template"),
             })
             return {
                 "type": "document",
@@ -1112,7 +1172,7 @@ class AgentTurnRunner:
                 "clause": clause_obj,
             }, sources
 
-        return {"type": "none", "mode": visual_mode}, [{"kind": "data", "object": "ONGC Data Bank"}]
+        return {"type": "none", "mode": visual_mode}, [{"kind": "data", "object": "IOCL Data Bank"}]
 
 
 # Global Turn Runner Singleton

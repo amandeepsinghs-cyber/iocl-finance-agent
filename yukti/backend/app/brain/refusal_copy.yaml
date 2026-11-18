@@ -1,4 +1,4 @@
-# SPEC-06 §4.6 / BEH-01.60–.64 / P2H.2: Refusal & Masking UX Copy (EN + HI)
+# SPEC-06 §4.6 / BEH-01.60–.64 / P2H.2: Refusal & Masking UX Copy (EN + HI) — Yukti IOCL
 # Pattern: acknowledge -> one-line reason (no jargon, no rule IDs in headline) -> allowed alternative (auto-answer or chip).
 # Rule ID goes in the "Why?" disclosure (`rule_ref`). Never "Access denied". Same language as the question.
 
@@ -6,111 +6,111 @@ version: 1
 codes:
   R-NAMED:
     code: R-NAMED
-    trigger: "junior asks for names"
+    trigger: "junior asks for named counterparty sub-ledger or individual record"
     rule_ref: "D-11"
     auto_answer: true
-    en: "I can't share individual names at your access level. Here is the same group as counts by grade (groups under 5 shown as '<5')."
-    hi: "आपके एक्सेस स्तर पर व्यक्तिगत नाम साझा नहीं किए जा सकते। यही समूह ग्रेड-वार संख्या में दिखा रही हूँ (5 से कम को '<5' लिखा है)।"
+    en: "I can't share counterparty-named sub-ledgers or individual officer records at your access level. Here is the anonymised aggregate summary instead."
+    hi: "आपके एक्सेस स्तर पर व्यक्तिगत नाम या प्रतिपक्ष नाम साझा नहीं किए जा सकते। इसके बजाय अनाम समग्र सारांश दिखा रही हूँ।"
     alternative:
-      label: "Counts by grade"
-      label_hi: "ग्रेड-वार संख्या"
-      question: "Show counts by grade"
-      question_hi: "ग्रेड-वार संख्या दिखाएँ"
+      label: "Refinery 360 aggregates"
+      label_hi: "रिफाइनरी 360 आँकड़े"
+      question: "Show FY26 refinery throughput and GRM by refinery"
+      question_hi: "FY26 के लिए रिफाइनरी-वार थ्रूपुट और GRM दिखाएँ"
     alternatives:
-      - label: "Export counts to Excel"
+      - label: "Export summary to Excel"
         label_hi: "एक्सेल में निर्यात करें"
-        question: "Export counts by grade to Excel"
-        question_hi: "ग्रेड-वार संख्या एक्सेल में निर्यात करें"
+        question: "Export refinery summary to Excel"
+        question_hi: "रिफाइनरी सारांश एक्सेल में निर्यात करें"
 
   R-PAY:
     code: R-PAY
-    trigger: "junior asks another person's pay"
+    trigger: "junior asks another officer's pay"
     rule_ref: "D-11"
     auto_answer: false
-    en: "Individual pay is confidential. I can show the average pay for that grade, or your own payslip."
-    hi: "किसी व्यक्ति का वेतन गोपनीय है। मैं उस ग्रेड का औसत वेतन या आपकी अपनी वेतन पर्ची दिखा सकती हूँ।"
+    en: "Individual pay is confidential. I can show company-wide employee benefit expense trends from Schedule III or aggregate grade benchmarks."
+    hi: "किसी व्यक्ति का वेतन गोपनीय है। मैं शेड्यूल III से कंपनी-स्तरीय कर्मचारी लाभ व्यय या ग्रेड बेंचमार्क दिखा सकती हूँ।"
     alternative:
-      label: "Average E{n} pay"
-      label_hi: "E{n} का औसत वेतन"
-      question: "Average monthly basic pay of E{n} officers"
-      question_hi: "E{n} अधिकारियों का औसत मासिक मूल वेतन क्या है?"
+      label: "Schedule III employee cost"
+      label_hi: "कर्मचारी लाभ व्यय"
+      question: "Show 10-year employee benefit expense trend"
+      question_hi: "10-वर्षीय कर्मचारी लाभ व्यय प्रवृत्ति दिखाएँ"
     alternatives:
-      - label: "My payslip"
-        label_hi: "मेरी वेतन पर्ची"
-        question: "Show my payslip for September"
-        question_hi: "सितंबर की मेरी वेतन पर्ची दिखाएँ"
+      - label: "My role overview"
+        label_hi: "मेरी भूमिका विवरण"
+        question: "What can you do?"
+        question_hi: "आप क्या कर सकती हैं?"
 
   R-APAR:
     code: R-APAR
     trigger: "junior asks APAR of others"
     rule_ref: "D-11"
     auto_answer: false
-    en: "Appraisal ratings are confidential. I can show your own APAR history."
-    hi: "मूल्यांकन रेटिंग गोपनीय हैं। मैं आपका अपना APAR इतिहास दिखा सकती हूँ।"
+    en: "Appraisal ratings are confidential and restricted to Chairman and Functional Directors. I can show the MoU scorecard targets instead."
+    hi: "मूल्यांकन रेटिंग गोपनीय हैं और केवल चेयरमैन तथा कार्यात्मक निदेशकों के लिए सुलभ हैं। मैं MoU स्कोरकार्ड लक्ष्य दिखा सकती हूँ।"
     alternative:
-      label: "My APAR"
-      label_hi: "मेरा APAR"
-      question: "Show my APAR history"
-      question_hi: "मेरा APAR इतिहास दिखाएँ"
+      label: "MoU Scorecard FY26"
+      label_hi: "MoU स्कोरकार्ड FY26"
+      question: "How is IndianOil tracking on MoPNG MoU targets?"
+      question_hi: "IndianOil MoPNG MoU लक्ष्यों पर कैसा प्रदर्शन कर रहा है?"
     alternatives:
-      - label: "My APAR"
-        label_hi: "मेरा APAR"
-        question: "Show my APAR history"
-        question_hi: "मेरा APAR इतिहास दिखाएँ"
+      - label: "MoU Scorecard FY26"
+        label_hi: "MoU स्कोरकार्ड FY26"
+        question: "How is IndianOil tracking on MoPNG MoU targets?"
+        question_hi: "IndianOil MoPNG MoU लक्ष्यों पर कैसा प्रदर्शन कर रहा है?"
 
   R-SENS:
     code: R-SENS
     trigger: "vigilance/POSH/medical"
     rule_ref: "D-11"
     auto_answer: false
-    en: "Case records like these are restricted to the CMD and Director (HR). I can explain the policy and the reporting process."
-    hi: "ऐसे मामलों के रिकॉर्ड केवल CMD और निदेशक (मानव संसाधन) देख सकते हैं। मैं नीति और शिकायत प्रक्रिया बता सकती हूँ।"
+    en: "Sensitive case and vigilance records are restricted to Chairman and Functional Directors. I can explain published governance policies and reporting processes."
+    hi: "संवेदनशील और सतर्कता मामलों के रिकॉर्ड केवल चेयरमैन और कार्यात्मक निदेशक देख सकते हैं। मैं नीति और शिकायत प्रक्रिया बता सकती हूँ।"
     alternative:
-      label: "POSH policy"
-      label_hi: "POSH नीति"
-      question: "What is the POSH policy and reporting process?"
-      question_hi: "POSH नीति और शिकायत प्रक्रिया क्या है?"
+      label: "Delegation of Authority policy"
+      label_hi: "अधिकार प्रत्यायोजन नीति"
+      question: "Summarise IndianOil Finance and DoA governance policy"
+      question_hi: "IndianOil की वित्त और अधिकार प्रत्यायोजन नीति का सारांश दें"
     alternatives:
-      - label: "POSH policy"
-        label_hi: "POSH नीति"
-        question: "What is the POSH policy and reporting process?"
-        question_hi: "POSH नीति और शिकायत प्रक्रिया क्या है?"
+      - label: "Delegation of Authority policy"
+        label_hi: "अधिकार प्रत्यायोजन नीति"
+        question: "Summarise IndianOil Finance and DoA governance policy"
+        question_hi: "IndianOil की वित्त और अधिकार प्रत्यायोजन नीति का सारांश दें"
 
   R-FUNC:
     code: R-FUNC
-    trigger: "out-of-function microdata (e.g. E_HR -> GL lines)"
+    trigger: "confidential counterparty credit sub-ledgers / restricted finance packs for Grade A-D"
     rule_ref: "D-43"
-    auto_answer: true
-    en: "Ledger-level finance data is available to the Finance team. Here are the company-level totals instead."
-    hi: "लेजर-स्तर का वित्त डेटा वित्त टीम के लिए है। इसके बजाय कंपनी-स्तर के कुल आँकड़े दिखा रही हूँ।"
+    auto_answer: false
+    en: "Confidential counterparty credit sub-ledgers and restricted finance packs require Director (Finance) or Chairman approval. You can view published Schedule III statements, refinery aggregates, WACC, and DCF valuation."
+    hi: "गोपनीय प्रतिपक्ष क्रेडिट उप-खातों के लिए निदेशक (वित्त) या चेयरमैन का अनुमोदन आवश्यक है। आप प्रकाशित वित्तीय विवरण, रिफाइनरी आँकड़े, WACC और DCF देख सकते हैं।"
     alternative:
-      label: "Company-level totals"
-      label_hi: "कंपनी-स्तर के कुल आँकड़े"
-      question: "Show the income statement for FY25"
-      question_hi: "FY25 का आय विवरण दिखाएँ"
+      label: "FY26 Income Statement"
+      label_hi: "FY26 आय विवरण"
+      question: "Show the income statement for FY26"
+      question_hi: "FY26 का आय विवरण दिखाएँ"
     alternatives:
       - label: "Company-level totals"
         label_hi: "कंपनी-स्तर के कुल आँकड़े"
-        question: "Show the income statement for FY25"
-        question_hi: "FY25 का आय विवरण दिखाएँ"
+        question: "Show 10-year gross vs net revenue and PAT trend"
+        question_hi: "10-वर्षीय राजस्व और PAT प्रवृत्ति दिखाएँ"
 
   R-BOARD:
     code: R-BOARD
-    trigger: "board_confidential"
+    trigger: "board_confidential / board_draft_pack"
     rule_ref: "D-43"
     auto_answer: false
-    en: "That Board note is restricted. I can summarise the published Annual Report position."
-    hi: "वह बोर्ड नोट प्रतिबंधित है। मैं प्रकाशित वार्षिक रिपोर्ट की स्थिति बता सकती हूँ।"
+    en: "That Board draft pack is restricted to Chairman and Functional Directors. I can summarise the published Annual Report position or you can request access from Director (Finance)."
+    hi: "वह बोर्ड ड्राफ्ट पैक चेयरमैन और कार्यात्मक निदेशकों के लिए प्रतिबंधित है। मैं प्रकाशित वार्षिक रिपोर्ट की स्थिति बता सकती हूँ।"
     alternative:
       label: "AR summary"
       label_hi: "वार्षिक रिपोर्ट सारांश"
-      question: "Summarise the published Annual Report position"
-      question_hi: "प्रकाशित वार्षिक रिपोर्ट की स्थिति का सारांश दें"
+      question: "Summarise the published Annual Report position for FY26"
+      question_hi: "FY26 की प्रकाशित वार्षिक रिपोर्ट की स्थिति का सारांश दें"
     alternatives:
       - label: "AR summary"
         label_hi: "वार्षिक रिपोर्ट सारांश"
-        question: "Summarise the published Annual Report position"
-        question_hi: "प्रकाशित वार्षिक रिपोर्ट की स्थिति का सारांश दें"
+        question: "Summarise the published Annual Report position for FY26"
+        question_hi: "FY26 की प्रकाशित वार्षिक रिपोर्ट की स्थिति का सारांश दें"
 
   R-ROLE:
     code: R-ROLE
@@ -135,18 +135,18 @@ codes:
     trigger: "every cell < 5 after AGG"
     rule_ref: "D-11"
     auto_answer: false
-    en: "This group is too small to show without identifying people. Try a wider filter, e.g. all Delhi executives."
-    hi: "यह समूह इतना छोटा है कि संख्या दिखाने से लोग पहचाने जा सकते हैं। कृपया दायरा बढ़ाएँ।"
+    en: "This slice has fewer than 5 records and is suppressed for privacy. Try a wider aggregate, e.g. across all 9 IndianOil refineries."
+    hi: "इस समूह में 5 से कम प्रविष्टियाँ हैं। कृपया सभी 9 IndianOil रिफाइनरियों का समग्र दृश्य देखें।"
     alternative:
-      label: "All Delhi executives"
-      label_hi: "सभी दिल्ली अधिकारी"
-      question: "How many employees are in Delhi by level?"
-      question_hi: "दिल्ली में स्तर-वार कितने कर्मचारी हैं?"
+      label: "All 9 IOCL Refineries"
+      label_hi: "सभी 9 IOCL रिफाइनरियां"
+      question: "Compare FY26 throughput and GRM across all IndianOil refineries"
+      question_hi: "सभी IndianOil रिफाइनरियों का FY26 थ्रूपुट और GRM तुलना करें"
     alternatives:
-      - label: "All Delhi executives"
-        label_hi: "सभी दिल्ली अधिकारी"
-        question: "How many employees are in Delhi by level?"
-        question_hi: "दिल्ली में स्तर-वार कितने कर्मचारी हैं?"
+      - label: "All 9 IOCL Refineries"
+        label_hi: "सभी 9 IOCL रिफाइनरियां"
+        question: "Compare FY26 throughput and GRM across all IndianOil refineries"
+        question_hi: "सभी IndianOil रिफाइनरियों का FY26 थ्रूपुट और GRM तुलना करें"
 
   E-AUTH:
     code: E-AUTH

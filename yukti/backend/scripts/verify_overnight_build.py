@@ -17,7 +17,7 @@ import json
 import sys
 import urllib.request
 
-BASE_URL = "http://127.0.0.1:3200"
+BASE_URL = "http://127.0.0.1:3400"
 
 
 def post_json(path: str, payload: dict) -> dict:

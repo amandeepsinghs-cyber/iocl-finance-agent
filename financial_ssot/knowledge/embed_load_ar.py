@@ -27,7 +27,7 @@ OUT_DIR = PKG_DIR.parent / "out"
 CHUNKS = OUT_DIR / "doc_chunks_ar.jsonl"
 EMB_CACHE = OUT_DIR / "doc_chunks_ar_embeddings.jsonl"
 
-PROJECT = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or "ongc-hr-finance-agent"
+PROJECT = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or "yukti-finance-iocl"
 BQ_LOCATION = os.getenv("BQ_LOCATION", "asia-south1")
 VERTEX_LOCATION = os.getenv("VERTEX_LOCATION", "us-central1")
 DATASET = "hrfin_docs"
@@ -37,7 +37,7 @@ MODEL = "text-embedding-005"
 DIM = 768
 BATCH = 40              # max texts per request
 TOKEN_BUDGET = 11000    # sum of whitespace-token estimates per request (API limit: 20k real tokens)
-JOB_LABELS = {"datacloud": "ai-agent", "packet": "p1-8"}
+JOB_LABELS = {"datacloud": "jetski"}
 
 
 def load_chunks() -> list:
@@ -149,10 +149,10 @@ def load_bq(chunks: list, cache: dict, allow_existing_empty: bool) -> None:
         print(f"{table_id} exists and is empty: loading into it")
     except NotFound:
         t = bq.Table(table_id, schema=schema())
-        t.description = ("P1.8 / SPEC-01 §8.1: real ONGC Annual Report text chunks (FY17-19, FY22-26), "
+        t.description = ("IOCL Annual Report text chunks (FY17-FY26), "
                          "page-bounded, with text-embedding-005 vectors. Source: pdftotext -layout of the AR PDFs.")
         t.clustering_fields = ["fiscal_year", "section"]
-        t.labels = {"datacloud": "ai-agent", "packet": "p1-8"}
+        t.labels = JOB_LABELS
         client.create_table(t)
         print(f"created {table_id}")
 

@@ -1,208 +1,154 @@
 {
-  "turn_id": "turn_map_009",
+  "turn_id": "turn_map_iocl_009",
   "language": "en",
   "persona": "CMD",
-  "spoken_summary": "Geographic deployment across operating work centres from hrfin_gold.v_headcount_asof as of March 31, 2026. Company total headcount is 23,117, with Bassein and Satellite holding 1,855 personnel and Assam Asset holding 1,822.",
-  "display_text": "Pan-India deployment from hrfin_gold.v_headcount_asof as of 31-March-2026 [1]. Total company regular headcount stands at 23,117. Bassein & Satellite (1,855) and Assam Asset (1,822) maintain key operational workforce contingents.",
+  "spoken_summary": "Geographic distribution across IndianOil's 9 standalone refineries and corporate hubs for FY26. Total standalone refinery throughput reached 75.451 million metric tonnes against 70.25 million tonnes per annum installed capacity, led by Panipat at 16.42 million metric tonnes and Paradip at 16.18 million metric tonnes.",
+  "display_text": "Pan-India footprint across IndianOil's 9 standalone refineries (`hrfin_gold_v3.fact_refinery_annual`, FY26) [1]. Standalone throughput reached 75.451 MMT across 70.25 MMTPA capacity (107.4% utilisation), led by Panipat (16.42 MMT, GRM $11.54/bbl), Paradip (16.18 MMT, GRM $12.46/bbl), and Koyali (14.95 MMT, GRM $10.86/bbl).",
   "visual": {
     "type": "map",
     "mode": "replace",
-    "title": "ONGC Asset Workforce Distribution (v_headcount_asof 31-Mar-2026)",
+    "title": "IndianOil Standalone Refineries — FY26 Throughput (MMT) & Hubs",
     "map": {
       "points": [
         {
-          "wc_id": "WC-BAS",
-          "name": "Bassein & Satellite",
-          "lat": 19.3,
-          "lon": 71.85,
-          "value": 1855,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Offshore"
+          "wc_id": "REF-PNP",
+          "name": "Panipat Refinery & Petrochemical Complex",
+          "lat": 29.4765,
+          "lon": 76.8906,
+          "value": 16.42,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "15.0 MMTPA · GRM $11.54/bbl"
         },
         {
-          "wc_id": "WC-ASM",
-          "name": "Assam Asset",
-          "lat": 26.9157,
-          "lon": 94.7314,
-          "value": 1822,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Hard Station"
+          "wc_id": "REF-PRD",
+          "name": "Paradip Refinery",
+          "lat": 20.2644,
+          "lon": 86.6114,
+          "value": 16.18,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "15.0 MMTPA · GRM $12.46/bbl"
         },
         {
-          "wc_id": "WC-NEH",
-          "name": "Neelam & Heera",
-          "lat": 18.75,
-          "lon": 72.3,
-          "value": 1728,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Offshore"
+          "wc_id": "REF-KYL",
+          "name": "Koyali (Gujarat) Refinery",
+          "lat": 22.3692,
+          "lon": 73.1128,
+          "value": 14.95,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "13.7 MMTPA · GRM $10.86/bbl"
         },
         {
-          "wc_id": "WC-MEH",
-          "name": "Mehsana Asset",
-          "lat": 23.588,
-          "lon": 72.3693,
-          "value": 1559,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Onshore"
+          "wc_id": "REF-MTR",
+          "name": "Mathura Refinery",
+          "lat": 27.3924,
+          "lon": 77.6844,
+          "value": 8.64,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "8.0 MMTPA · GRM $9.86/bbl"
         },
         {
-          "wc_id": "WC-MUM",
-          "name": "Mumbai High",
-          "lat": 18.922,
-          "lon": 72.8347,
-          "value": 1359,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Offshore"
+          "wc_id": "REF-HLD",
+          "name": "Haldia Refinery",
+          "lat": 22.0497,
+          "lon": 88.1069,
+          "value": 8.29,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "8.0 MMTPA · GRM $9.56/bbl"
         },
         {
-          "wc_id": "WC-JOR",
-          "name": "Jorhat Asset",
-          "lat": 26.7509,
-          "lon": 94.2037,
-          "value": 1325,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Hard Station"
+          "wc_id": "REF-BRN",
+          "name": "Barauni Refinery",
+          "lat": 25.4397,
+          "lon": 86.0869,
+          "value": 6.48,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "6.0 MMTPA · GRM $9.16/bbl"
         },
         {
-          "wc_id": "WC-AHM",
-          "name": "Ahmedabad Asset",
-          "lat": 23.0225,
-          "lon": 72.5714,
-          "value": 1223,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Onshore"
+          "wc_id": "REF-BNG",
+          "name": "Bongaigaon Refinery",
+          "lat": 26.4716,
+          "lon": 90.5177,
+          "value": 2.61,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "2.7 MMTPA · GRM $9.96/bbl"
         },
         {
-          "wc_id": "WC-EAS",
-          "name": "Eastern Offshore (Kakinada)",
-          "lat": 16.9891,
-          "lon": 82.2475,
-          "value": 1011,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Offshore"
+          "wc_id": "REF-GHY",
+          "name": "Guwahati Refinery",
+          "lat": 26.1886,
+          "lon": 91.7975,
+          "value": 1.181,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "1.2 MMTPA · GRM $8.31/bbl"
+        },
+        {
+          "wc_id": "REF-DGB",
+          "name": "Digboi Refinery",
+          "lat": 27.3886,
+          "lon": 95.6292,
+          "value": 0.7,
+          "metricLabel": "FY26 Throughput (MMT)",
+          "status": "0.65 MMTPA · GRM $7.96/bbl"
         },
         {
           "wc_id": "WC-DEL",
-          "name": "Corporate HQ Delhi",
-          "lat": 28.6139,
-          "lon": 77.209,
-          "value": 948,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Corporate"
+          "name": "IndianOil Bhavan (New Delhi HQ)",
+          "lat": 28.5906,
+          "lon": 77.2432,
+          "value": 0,
+          "metricLabel": "Corporate Headquarters",
+          "status": "Corporate HQ (Refining & Finance)"
         },
         {
-          "wc_id": "WC-DDN",
-          "name": "Tel Bhavan Dehradun",
-          "lat": 30.3165,
-          "lon": 78.0322,
-          "value": 948,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Corporate"
-        },
-        {
-          "wc_id": "WC-ANK",
-          "name": "Ankleshwar Asset",
-          "lat": 21.6264,
-          "lon": 73.0033,
-          "value": 925,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Onshore"
-        },
-        {
-          "wc_id": "WC-RAJ",
-          "name": "Rajahmundry Asset",
-          "lat": 17.0005,
-          "lon": 81.804,
-          "value": 845,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Onshore"
-        },
-        {
-          "wc_id": "WC-TRI",
-          "name": "Tripura Asset",
-          "lat": 23.8315,
-          "lon": 91.2868,
-          "value": 844,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Hard Station"
-        },
-        {
-          "wc_id": "WC-CAU",
-          "name": "Cauvery Asset",
-          "lat": 10.9254,
-          "lon": 79.838,
-          "value": 675,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Onshore"
-        },
-        {
-          "wc_id": "WC-BOK",
-          "name": "CBM Bokaro",
-          "lat": 23.6693,
-          "lon": 86.1511,
-          "value": 557,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Onshore"
-        },
-        {
-          "wc_id": "WC-HAZ",
-          "name": "Hazira Gas Plant",
-          "lat": 21.1702,
-          "lon": 72.8311,
-          "value": 515,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Downstream"
-        },
-        {
-          "wc_id": "WC-CAM",
-          "name": "Cambay Asset",
-          "lat": 22.3,
-          "lon": 72.6,
-          "value": 508,
-          "metricLabel": "Headcount (31-Mar-2026)",
-          "status": "Onshore"
+          "wc_id": "WC-MUM",
+          "name": "IndianOil Bhavan (Mumbai HQ)",
+          "lat": 19.0644,
+          "lon": 72.8669,
+          "value": 0,
+          "metricLabel": "Marketing Headquarters",
+          "status": "Marketing & Western Region HQ"
         }
       ]
     },
     "kpis": [
       {
-        "label": "Company Headcount",
-        "value": 23117,
-        "unit": "Employees",
-        "delta": "31-Mar-2026"
+        "label": "Standalone Throughput",
+        "value": 75.451,
+        "unit": "MMT",
+        "delta": "FY26 (107.4% Util)"
       },
       {
-        "label": "Top Asset (Bassein)",
-        "value": 1855,
-        "unit": "Personnel",
-        "delta": "Offshore"
+        "label": "Installed Capacity",
+        "value": 70.25,
+        "unit": "MMTPA",
+        "delta": "9 Standalone Refineries"
       },
       {
-        "label": "Frontier Assam Asset",
-        "value": 1822,
-        "unit": "Personnel",
-        "delta": "Category C"
+        "label": "Top Unit (Panipat)",
+        "value": 16.42,
+        "unit": "MMT",
+        "delta": "GRM $11.54/bbl"
       }
     ]
   },
   "insights": [
-    "Total regular employee headcount across ONGC is 23,117 as of 31-March-2026 (hrfin_gold.v_headcount_asof).",
-    "Bassein & Satellite (1,855), Assam Asset (1,822), and Neelam & Heera (1,728) hold the largest single-snapshot staffing.",
-    "Cambay Asset (508) and Hazira Plant (515) represent downstream and regional onshore operations."
+    "Total FY26 standalone crude throughput across IndianOil's 9 refineries reached 75.451 MMT against 70.25 MMTPA installed capacity (107.4% utilisation).",
+    "Top 3 refineries — Panipat (16.42 MMT), Paradip (16.18 MMT), and Koyali (14.95 MMT) — contributed 63.0% of total standalone throughput.",
+    "Paradip recorded the highest FY26 GRM at $12.46/bbl and PBT of ₹7,661.05 Cr."
   ],
   "sources": [
     {
       "kind": "data",
-      "object": "hrfin_gold.v_headcount_asof",
-      "query_id": "q_headcount_asof_20260331",
-      "sql": "SELECT wc_id, count(*) AS headcount FROM hrfin_gold.v_headcount_asof WHERE snapshot_date = '2026-03-31' GROUP BY 1"
+      "object": "hrfin_gold_v3.fact_refinery_annual",
+      "query_id": "q_iocl_refinery_map_fy26",
+      "sql": "SELECT r.refinery_id AS wc_id, r.refinery_name AS name, ROUND(f.throughput_mmt, 3) AS value, f.installed_capacity_mmtpa, f.grm_usd_bbl FROM hrfin_gold_v3.fact_refinery_annual f JOIN hrfin_gold_v3.dim_refinery r ON f.refinery_id = r.refinery_id WHERE f.fiscal_year = 'FY26' ORDER BY f.throughput_mmt DESC"
     }
   ],
   "suggestions": [
-    "Show Assam Asset detailed vacancy",
-    "Compare Mumbai vs Eastern Offshore productivity",
-    "View station tenure overstay by location"
+    "Compare Paradip vs Panipat GRM over FY22–FY26",
+    "Show FY26 distillate yield and fuel & loss by refinery",
+    "Simulate $1/bbl GRM upside impact on IOCL EBITDA"
   ],
   "access": {
     "status": "allowed"

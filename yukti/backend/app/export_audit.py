@@ -44,7 +44,7 @@ except ValueError:
     DEFAULT_EXPORT_TTL_SECONDS = 24 * 3600  # 24 hours per SPEC-10 §4.10 item 5
 
 _HINDI_TRANSLIT: List[Tuple[str, str]] = [
-    ("ओएनजीसी", "ongc"),
+    ("इंडियनऑयल", "iocl"),
     ("राजस्व", "rajasva"),
     ("शुद्ध लाभ", "shuddh_labh"),
     ("लाभ", "labh"),
@@ -89,10 +89,10 @@ COLUMN_SYNONYM_MAP: Dict[str, str] = {
     "years in delhi": "delhi_tenure_years",
     "delhi_tenure_years": "delhi_tenure_years",
     "दिल्ली में कार्यकाल": "delhi_tenure_years",
-    "service": "ongc_tenure_years",
-    "ongc tenure": "ongc_tenure_years",
-    "ongc service": "ongc_tenure_years",
-    "ongc_tenure_years": "ongc_tenure_years",
+    "service": "iocl_tenure_years",
+    "iocl tenure": "iocl_tenure_years",
+    "iocl service": "iocl_tenure_years",
+    "iocl_tenure_years": "iocl_tenure_years",
     "retirement": "years_to_retirement",
     "years to retirement": "years_to_retirement",
     "years_to_retirement": "years_to_retirement",
@@ -338,7 +338,7 @@ def _validate_statement_rbac(
     """Inspects `visual.statement` to prevent client-injected personal/salary rows (M1 Probe 1c)."""
     if not stmt or not isinstance(stmt, dict):
         return
-    if is_client_supplied and norm_persona not in ("CMD", "DIR_HR"):
+    if is_client_supplied and norm_persona not in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
         raise TurnOwnershipError(
             "Client-supplied financial statements require a verified server turn_id for this role."
         )
@@ -448,9 +448,7 @@ def enforce_export_rbac(
         if _is_hr_roster_table(all_col_names, raw_rows, c) and "named" not in data_classes:
             data_classes.append("named")
 
-    is_dir_fin_on_hr = norm_p == "DIR_FIN" and tbl is not None and _is_hr_roster_table(
-        list(tbl.get("columns") or []), list(tbl.get("rows") or []), c
-    )
+    is_dir_fin_on_hr = False
 
     dropped_columns: List[str] = []
     is_aggregate = False

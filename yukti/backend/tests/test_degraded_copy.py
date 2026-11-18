@@ -14,7 +14,7 @@ from google.auth.exceptions import DefaultCredentialsError, RefreshError  # noqa
 
 from app.turn_runner import E_AUTH_COPY, GENERIC_ERROR_COPY, AgentTurnRunner, safe_error_copy  # noqa: E402
 
-LEAK_MARKERS = ("Reauthentication", "RefreshError", "Traceback", "secret-project-123", "ongc-hr-finance-agent")
+LEAK_MARKERS = ("Reauthentication", "RefreshError", "Traceback", "secret-project-123", "yukti-finance-iocl")
 
 
 def _assert_no_leak(text: str) -> None:
@@ -32,7 +32,7 @@ def test_refresh_error_maps_to_e_auth(lang):
 def test_chained_and_other_auth_errors_map_to_e_auth():
     from google.api_core.exceptions import Forbidden, ServiceUnavailable, Unauthorized
 
-    for exc in (DefaultCredentialsError("no ADC"), Forbidden("403 project ongc-hr-finance-agent"),
+    for exc in (DefaultCredentialsError("no ADC"), Forbidden("403 project yukti-finance-iocl"),
                 Unauthorized("401"), ServiceUnavailable("503")):
         assert safe_error_copy(exc) == E_AUTH_COPY["en"]
     try:
@@ -69,7 +69,8 @@ def _raising_run_async(exc):
 ])
 async def test_turn_contract_uses_safe_copy(monkeypatch, exc, expected):
     monkeypatch.setenv("YUKTI_PLANNER", "0")
-    runner = AgentTurnRunner(model_name="gemini-2.5-flash")
+    from app.config import DEFAULT_TEXT_MODEL
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
     monkeypatch.setattr(runner.runner, "run_async", _raising_run_async(exc))
     res = await runner.execute_turn_async(
         "Explain the philosophy behind our quarterly review rituals in one line",

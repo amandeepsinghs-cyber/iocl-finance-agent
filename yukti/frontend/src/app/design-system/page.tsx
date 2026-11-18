@@ -143,7 +143,7 @@ export default function DesignSystemPage() {
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[var(--hairline)] pb-3">
                 <span className="text-caption font-mono text-[var(--ink-3)] w-32 shrink-0">text-display</span>
                 <span className="text-display font-display text-[var(--ink)]">
-                  Executive Briefing on ONGC HR & Financial Operations
+                  Executive Briefing on IndianOil Refining & Financial Operations
                 </span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-[var(--hairline)] pb-3">

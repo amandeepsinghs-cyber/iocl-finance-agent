@@ -138,9 +138,9 @@ def _extract_meta_tuple(contract: Optional[Dict[str, Any]], persona: str = "CMD"
     stmt = vis.get("statement") if isinstance(vis.get("statement"), dict) else None
     qspec = c.get("query_spec") if isinstance(c.get("query_spec"), dict) else {}
 
-    title = str(vis.get("title") or (stmt.get("title") if stmt else "") or "ONGC Yukti Export")
-    as_of = str(qspec.get("as_of") or "2026-10-19")
-    source = "ONGC Enterprise SSOT"
+    title = str(vis.get("title") or (stmt.get("title") if stmt else "") or "IOCL Yukti Export")
+    as_of = str(qspec.get("as_of") or "2026-03-31")
+    source = "IOCL Enterprise SSOT"
     basis = "verified"
 
     if stmt and isinstance(stmt.get("source"), dict):
@@ -193,13 +193,12 @@ def _add_definition_sheet(wb: openpyxl.Workbook, contract: Dict[str, Any]) -> No
     ws.freeze_panes = "A5"
 
     rule_text = dm.get("rule_text") or (
-        "JRTP Rev 4, clause 3.2: rotation after 3–5 years at a station (Illustrative — ONGC JRTP text is not public)."
+        "IOCL Delegation of Financial Powers (DoA), Clause 2.1: Tender and crude procurement thresholds."
     )
-    ws.append(["Rule Specification", _safe_cell_text(str(rule_text)), "Illustrative"])
+    ws.append(["Rule Specification", _safe_cell_text(str(rule_text)), "Governance Policy"])
 
     citations = dm.get("citations") or [
-        {"id": "JRTP-3.2", "label": "JRTP Rev 4, clause 3.2 (Illustrative — synthetic policy clause)", "illustrative": True},
-        {"id": "J-03", "label": "Delhi High Court LPA 744/2013 (13-Feb-2018), p.14 of 60 (real judicial citation)", "illustrative": False},
+        {"id": "IOCL-DOA-2.1", "label": "IOCL Delegation of Financial Powers (DoA), Clause 2.1", "illustrative": False},
     ]
     for cit in citations:
         if isinstance(cit, dict):
@@ -223,12 +222,12 @@ def _build_dcf_sheets(wb: openpyxl.Workbook, contract: Dict[str, Any], persona: 
     as_of = str(dcf.get("as_of") or "31-Mar-2026")
     basis = str(dcf.get("basis") or "Standalone DCF (Illustrative)")
     assumptions = dcf.get("assumptions") or [
-        {"key": "BASE_FCFF", "name": "Base Year FCFF (FY26)", "value": 34200.0, "unit": "INR_crore", "source": "Synthetic CF Fixture", "as_of": "FY26"},
-        {"key": "WACC", "name": "Weighted Average Cost of Capital (WACC)", "value": 0.105, "unit": "pct", "source": "Illustrative Assumption", "as_of": "FY26"},
-        {"key": "TERM_G", "name": "Terminal Growth Rate", "value": 0.025, "unit": "pct", "source": "Illustrative Assumption", "as_of": "FY26"},
+        {"key": "BASE_FCFF", "name": "Base Year FCFF (FY26)", "value": 32270.0, "unit": "INR_crore", "source": "IOCL AR FY26 CF SSOT", "as_of": "FY26"},
+        {"key": "WACC", "name": "Weighted Average Cost of Capital (WACC)", "value": 0.092534, "unit": "pct", "source": "fact_wacc_annual FY26", "as_of": "FY26"},
+        {"key": "TERM_G", "name": "Terminal Growth Rate", "value": 0.03, "unit": "pct", "source": "Illustrative Assumption", "as_of": "FY26"},
         {"key": "STAGE1_G", "name": "5-Year Explicit FCFF Growth Rate", "value": 0.04, "unit": "pct", "source": "Illustrative Assumption", "as_of": "FY26"},
-        {"key": "NET_DEBT", "name": "Net Debt (Standalone)", "value": 12500.0, "unit": "INR_crore", "source": "Synthetic BS Fixture", "as_of": "FY26"},
-        {"key": "SHARES_CR", "name": "Shares Outstanding (Crore)", "value": 1258.03, "unit": "count", "source": "ONGC Capital Structure", "as_of": "FY26"},
+        {"key": "NET_DEBT", "name": "Net Debt (Standalone)", "value": 109482.6, "unit": "INR_crore", "source": "IOCL AR FY26 BS SSOT", "as_of": "FY26"},
+        {"key": "SHARES_CR", "name": "Shares Outstanding (Crore)", "value": 1412.1238, "unit": "count", "source": "IOCL Capital Structure (NSE:IOC)", "as_of": "FY26"},
     ]
 
     hdr_fill = PatternFill("solid", fgColor="F3F4F6")
@@ -238,7 +237,7 @@ def _build_dcf_sheets(wb: openpyxl.Workbook, contract: Dict[str, Any], persona: 
     # 1. Summary sheet (active sheet)
     ws_sum = wb.active
     ws_sum.title = "Summary"
-    ws_sum["A1"] = "ONGC DCF Valuation Summary (Illustrative)"
+    ws_sum["A1"] = "IndianOil (NSE:IOC) DCF Valuation Summary (Illustrative)"
     ws_sum["A1"].font = Font(bold=True, size=14)
     ws_sum["A2"] = f"As of {as_of} · Source: Synthetic DCF Model · Basis: {basis}"
     ws_sum["A4"] = "Valuation Metric"
@@ -466,8 +465,8 @@ class DocumentExporter:
             return out_path
 
         ws = wb.active
-        raw_sheet_name = sheet_name or vis.get("title") or (stmt.get("title") if stmt else None) or "ONGC_Data"
-        ws.title = _clean_sheet_title(raw_sheet_name, default="ONGC_Data")
+        raw_sheet_name = sheet_name or vis.get("title") or (stmt.get("title") if stmt else None) or "IOCL_Data"
+        ws.title = _clean_sheet_title(raw_sheet_name, default="IOCL_Data")
 
         # Title block (SPEC-10 §4.1: Row 1 title bold 14, Row 2 As of / Source / Basis, Row 3 blank/banner, Header Row 4)
         ws["A1"] = _safe_cell_text(doc_title)
@@ -804,10 +803,10 @@ class DocumentExporter:
 
         # Email draft letter mode (SPEC-10 §4.5)
         if edraft and isinstance(edraft, dict):
-            doc.add_heading("ONGC Executive Correspondence (Draft)", level=1)
+            doc.add_heading("IOCL Executive Correspondence (Draft)", level=1)
             from_info = edraft.get("from") or {}
             from_str = (
-                f"{from_info.get('name', persona)} <{from_info.get('email', 'noreply@ongc.example')}>"
+                f"{from_info.get('name', persona)} <{from_info.get('email', 'noreply@iocl.example')}>"
                 if isinstance(from_info, dict)
                 else str(from_info or persona)
             )
@@ -1008,13 +1007,13 @@ class DocumentExporter:
         c = contract or {}
         edraft = email_draft or (c.get("email_draft") if isinstance(c.get("email_draft"), dict) else {}) or {}
 
-        from_info = edraft.get("from") or {"name": f"ONGC {persona}", "email": f"{persona.lower()}@ongc.example"}
+        from_info = edraft.get("from") or {"name": f"IOCL {persona}", "email": f"{persona.lower()}@iocl.example"}
         from_hdr = (
-            formataddr((str(from_info.get("name") or persona), str(from_info.get("email") or "noreply@ongc.example")))
+            formataddr((str(from_info.get("name") or persona), str(from_info.get("email") or "noreply@iocl.example")))
             if isinstance(from_info, dict)
             else str(from_info)
         )
-        to_list = edraft.get("to") or [{"name": "Director (HR)", "email": "director.hr@ongc.example"}]
+        to_list = edraft.get("to") or [{"name": "Director (Finance)", "email": "director.finance@iocl.example"}]
         to_hdr = ", ".join(
             formataddr((str(t.get("name") or ""), str(t.get("email") or ""))) if isinstance(t, dict) else str(t)
             for t in to_list
@@ -1027,7 +1026,7 @@ class DocumentExporter:
         subject = str(
             edraft.get("subject")
             or (c.get("visual") or {}).get("title")
-            or "ONGC Yukti AI Review Draft"
+            or "IOCL Yukti AI Review Draft"
         )
         body_md = str(edraft.get("body_md") or c.get("display_text") or "Please find the requested cohort review attached.")
 

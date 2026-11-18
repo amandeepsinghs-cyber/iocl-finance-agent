@@ -180,7 +180,7 @@
   <rect x="255" y="22" width="990" height="596" rx="14" fill="#E8F1FF" fill-opacity="0.5" stroke="#1A56DB" stroke-width="2" filter="url(#shadow-md)"/>
   <path d="M 255 36 Q 255 22 269 22 L 1231 22 Q 1245 22 1245 36 L 1245 58 L 255 58 Z" fill="#E8F1FF"/>
   <use href="#icon-google-cloud" x="272" y="28" width="24" height="24"/>
-  <text x="304" y="45" font-size="14.5" font-weight="700" fill="#1A56DB">Google Cloud · ongc-hr-finance-agent (asia-south1)</text>
+  <text x="304" y="45" font-size="14.5" font-weight="700" fill="#1A56DB">Google Cloud · yukti-finance-iocl (asia-south1)</text>
 <g id="card-iap">
   <rect x="275" y="132" width="195" height="76" rx="12" fill="#FFFFFF" stroke="#3186FF" stroke-width="1.8" filter="url(#shadow-sm)"/>
   <use href="#icon-iap" x="287" y="151.0" width="36" height="36"/>

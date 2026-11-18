@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-PROJECT_ID="ongc-hr-finance-agent"
+PROJECT_ID="${TARGET_PROJECT:-${YUKTI_GCP_PROJECT:-${GOOGLE_CLOUD_PROJECT:-yukti-finance-iocl}}}"
 LOCATION="asia-south1"
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SQL_DIR="$DIR/sql/materialize"

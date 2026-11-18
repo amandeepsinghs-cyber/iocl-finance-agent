@@ -1,7 +1,7 @@
 """
 audit_gate_g4.py — Gate G4 Medallion Integrity Audit
 
-Audits BigQuery ongc-hr-finance-agent:
+Audits BigQuery yukti-finance-iocl:
  1. Provenance: BigQuery table row counts, bytes, and last modified timestamps across hrfin_bronze, hrfin_silver, hrfin_gold.
  2. Landing <-> Bronze: Row counts per bronze table vs bronze_tables.yaml / upload_manifest.csv.
  3. Silver: Schema alignment with world_bible/schema_silver.yaml, Dataform assertion failure counts (0 failing rows),
@@ -28,7 +28,7 @@ import pandas as pd
 import yaml
 
 DATA_BANK_DIR = Path(__file__).resolve().parent.parent
-PROJECT_ID = "ongc-hr-finance-agent"
+PROJECT_ID = "yukti-finance-iocl"
 LOCATION = "asia-south1"
 
 BRONZE_DATASET = "hrfin_bronze"

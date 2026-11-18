@@ -8,6 +8,6 @@ SELECT
     clause_ref,
     heading,
     SUBSTR(TRIM(REGEXP_REPLACE(REGEXP_REPLACE(text, r'(?s)^.*?Glossary Terms:[^\n]*\n', ''), r'\s+', ' ')), 1, 400) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE (doc_id = 'P1-16' AND clause_ref = 'Part 10') OR (doc_id = 'R&P/Promotion' AND clause_ref = 'Clause 5.0')
 ORDER BY doc_id, clause_ref;

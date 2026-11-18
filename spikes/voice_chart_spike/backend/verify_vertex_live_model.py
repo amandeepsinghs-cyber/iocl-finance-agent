@@ -9,7 +9,7 @@ import sys
 from google import genai
 from google.genai import types
 
-PROJECT_ID = os.getenv("TARGET_PROJECT", "ongc-hr-finance-agent")
+PROJECT_ID = os.getenv("TARGET_PROJECT", "yukti-finance-iocl")
 LOCATION = os.getenv("TARGET_LOCATION", "us-central1")
 
 CANDIDATES = [

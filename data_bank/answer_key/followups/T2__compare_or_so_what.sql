@@ -6,7 +6,7 @@
 
 WITH movable AS (
     SELECT v.discipline_id, COUNT(DISTINCT v.emp_id) AS movable
-    FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+    FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
 WHERE v.is_current_stay AND v.wc_id = 'WC-DEL' AND v.grade_id LIKE 'E%' AND v.continuous_stay_months >= 60
       AND DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) > 3 * 365.25
     GROUP BY v.discipline_id

@@ -15,7 +15,7 @@ SELECT
     COUNT(DISTINCT CASE WHEN p.exemption_valid_until >= DATE '2026-10-19' THEN v.emp_id END) AS valid_as_of_2026_10_19,
     COUNT(DISTINCT CASE WHEN DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 THEN v.emp_id END) AS retiring_within_3yr,
     ROUND(COUNT(DISTINCT v.emp_id) * 100.0 / SUM(COUNT(DISTINCT v.emp_id)) OVER (), 1) AS pct_of_delhi_5yr_plus
-FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
 LEFT JOIN posting_history p
     ON p.emp_id = v.emp_id
    AND p.is_current_posting = TRUE

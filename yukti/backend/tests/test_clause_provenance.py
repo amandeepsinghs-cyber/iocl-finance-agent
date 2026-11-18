@@ -20,51 +20,55 @@ def _rows():
         return list(csv.DictReader(f))
 
 
-def test_csv_every_row_has_provenance_and_no_jrtp_is_real():
+def test_csv_every_row_has_provenance_and_no_hr_or_jrtp():
     rows = _rows()
-    assert len(rows) == 68
+    assert len(rows) == 40
     assert all(r.get("provenance") in ("real", "illustrative") for r in rows), "missing/invalid provenance"
-    assert not [r for r in rows if r["doc_id"] == "JRTP" and r["provenance"] == "real"]
-    # R16 Gemini-generated rows (source_basis = generic "ONGC HR/Finance Policy Documents") are illustrative
-    r16 = [r for r in rows if r["source_basis"] == "ONGC HR/Finance Policy Documents"]
-    assert len(r16) == 12 and all(r["provenance"] == "illustrative" for r in r16)
+    assert not [r for r in rows if r["doc_id"] in ("JRTP", "Leave Rules", "HR Manual", "R&P/Promotion")]
+    assert len([r for r in rows if r["doc_id"] == "IOCL-ACCT" and r["provenance"] == "real"]) == 8
+    assert not [r for r in rows if r["doc_id"] == "IOCL-DOA" and r["provenance"] == "real"]
 
 
-def test_jrtp_clause_payload_is_illustrative():
+def test_iocl_doa_clause_payload_is_illustrative():
     eng = PolicySearchEngine()
-    hits = eng.search_local("JRTP clause 3.0 minimum station tenure rotation", top_k=3)
-    assert hits, "no JRTP clause found"
-    jrtp = [h for h in hits if "Clause 3.0" in h["clause_ref"]]
-    assert jrtp and all(h["provenance"] == "illustrative" for h in jrtp)
-    assert "3.2" in jrtp[0]["text"]  # JRTP Rev 4 cl. 3.2 lives in Clause 3.0
+    hits = eng.search_local("IOCL-DOA spot crude oil cargo procurement threshold", top_k=3)
+    assert hits, "no IOCL-DOA clause found"
+    doa = [h for h in hits if "Delegation of Financial Powers" in h["doc_id"] and "2.1" in h["clause_ref"]]
+    assert doa and all(h["provenance"] == "illustrative" for h in doa)
+    assert "2,500" in doa[0]["text"]
 
 
 def test_search_results_always_carry_provenance():
     eng = PolicySearchEngine()
-    for q in ("casual leave entitlement", "PRBS pension contribution", "post retirement medical 15 years",
-              "promotion DPC norms", "delegation of powers"):
+    for q in ("spot crude oil cargo procurement threshold", "crack-spread hedging band",
+              "Ind AS 115 Central Excise Duty", "stage-gate equity IRR hurdle rate", "DPE Maharatna MoU"):
         for h in eng.search_local(q, top_k=3):
             assert h.get("provenance") in ("real", "illustrative"), (q, h.get("clause_ref"))
 
 
 @pytest.mark.asyncio
-async def test_casual_leave_answer_is_illustrative_and_has_no_jrtp_footer(monkeypatch):
+async def test_iocl_doa_policy_answer_is_illustrative_and_has_no_hr_footer(monkeypatch):
     monkeypatch.setenv("YUKTI_PLANNER", "0")
+    from app.config import DEFAULT_TEXT_MODEL
     from app.turn_runner import AgentTurnRunner
 
-    runner = AgentTurnRunner(model_name="gemini-2.5-flash")
-    c = await runner.execute_turn_async("How many casual leaves can I take?", session_id="p07-casual-leave",
-                                        persona="CMD")
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
+    c = await runner.execute_turn_async(
+        "What are the IOCL-DOA approval thresholds for spot crude oil cargo procurement?",
+        session_id="p07-iocl-doa",
+        persona="CMD",
+    )
     vis = c.get("visual") or {}
     assert vis.get("type") == "clause", f"expected a clause card, got {vis.get('type')}"
     clause = vis["clause"]
     assert clause["provenance"] == "illustrative"
-    assert "JRTP" not in (clause.get("doc_title") or "") and "Job Rotation" not in (clause.get("doc_title") or "")
+    assert "Delegation of Financial Powers" in (clause.get("doc_title") or "")
+    assert "JRTP" not in (clause.get("doc_title") or "") and "ONGC" not in (clause.get("text") or "")
     assert "Statutory" not in (vis.get("subtitle") or "")
 
 
 def test_clause_renderer_has_badge_and_no_hardcoded_jrtp_footer():
     src = (FRONTEND / "components" / "renderers" / "ClauseRenderer.tsx").read_text(encoding="utf-8")
     assert "'Job Rotation & Transfer Policy (JRTP)'" not in src  # the old hard-coded fallback title/footer
-    assert "Illustrative" in src and "Synthetic clause for demo; ONGC's text is not public." in src
+    assert "Illustrative" in src and "Illustrative policy clause for IOCL demo; internal rulebook text is not public." in src
     assert "clause.provenance !== 'real'" in src  # default-safe: unknown provenance renders as Illustrative

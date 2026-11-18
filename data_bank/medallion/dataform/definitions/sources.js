@@ -57,7 +57,7 @@ const sfx = dataform.projectConfig.schemaSuffix ? `_${dataform.projectConfig.sch
 
 bronzeTables.forEach(tableName => {
   declare({
-    database: "ongc-hr-finance-agent",
+    database: "yukti-finance-iocl",
     schema: `hrfin_bronze${sfx}`,
     name: tableName,
   });
@@ -80,7 +80,7 @@ const refDims = [
 
 refDims.forEach(tableName => {
   declare({
-    database: "ongc-hr-finance-agent",
+    database: "yukti-finance-iocl",
     schema: `hrfin_silver${sfx}`,
     name: tableName,
   });
@@ -93,7 +93,7 @@ const hrfinRefDims = [
 
 hrfinRefDims.forEach(tableName => {
   declare({
-    database: "ongc-hr-finance-agent",
+    database: "yukti-finance-iocl",
     schema: `hrfin_ref${sfx}`,
     name: tableName,
   });

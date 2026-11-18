@@ -26,7 +26,7 @@ import pandas as pd
 import yaml
 from google.cloud import bigquery
 
-PROJECT_ID = os.getenv("GCP_PROJECT", "ongc-hr-finance-agent")
+PROJECT_ID = os.getenv("TARGET_PROJECT") or os.getenv("YUKTI_GCP_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT") or "yukti-finance-iocl"
 ALLOWED_SILVER_DATASETS = {"hrfin_silver", "hrfin_silver_v3"}
 ALLOWED_REF_DATASETS = {"hrfin_ref", "hrfin_ref_v3"}
 DATASET_ID = os.getenv("YUKTI_SILVER_DATASET", "hrfin_silver").strip()

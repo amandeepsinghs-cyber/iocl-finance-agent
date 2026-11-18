@@ -127,8 +127,31 @@ def _extract_nums(text: str) -> List[float]:
     return out
 
 
+def _load_line_context_map() -> Dict[Tuple[str, str], Dict[str, Any]]:
+    cache = getattr(_load_line_context_map, "_cache", None)
+    if cache is not None:
+        return cache
+    out: Dict[Tuple[str, str], Dict[str, Any]] = {}
+    ctx_path = _REPO / "financial_build" / "data" / "ssot_financial_line_context.json"
+    if ctx_path.exists():
+        try:
+            import json
+            for row in json.loads(ctx_path.read_text(encoding="utf-8")):
+                fy_k = str(row.get("fy") or "").upper()
+                lc_k = str(row.get("line_code") or "")
+                if fy_k and lc_k:
+                    out[(fy_k, lc_k)] = row
+        except Exception:
+            pass
+    _load_line_context_map._cache = out
+    return out
+
+
 def _lookup_line_context(fy: str, line_code: str) -> Dict[str, Any]:
-    return {}
+    """Lookup Schedule III / Downstream 360 line context from IOCL `ssot_financial_line_context.json`."""
+    cmap = _load_line_context_map()
+    fy_u = (fy or "FY26").upper()
+    return cmap.get((fy_u, line_code)) or cmap.get(("FY17_FY26", line_code)) or {}
 
 
 def _search_financial_rag(query: str, fy: Optional[str], metric: str) -> Optional[str]:
@@ -141,7 +164,8 @@ def _search_financial_rag(query: str, fy: Optional[str], metric: str) -> Optiona
     ql = query.lower()
     is_causal_or_action = bool(re.search(
         r"\b(why|what\s+happened|how\s+did|driver\w*|reason\w*|cause\w*|explain|note\s+\d+|action\w*|recommend\w*|"
-        r"interven\w*|improv\w*|saed|windfall|115baa|impairment|opal|hpcl|kg[- ]dwn|98/2|ind[- ]?as|aro|site\s+restoration|"
+        r"interven\w*|improv\w*|grm|core\s+grm|singapore|excise|crude|refiner\w*|panipat|paradip|koyali|barauni|pipeline|"
+        r"115baa|impairment|cpcl|petchem|lpg|under[- ]?recover\w*|grant|ind[- ]?as|inventori|nrv|lever|ebitda|debt|cwip|wacc|"
         r"dry\s+well\w*|pec|nwng|new\s+well\s+gas)\b",
         ql,
     ))
@@ -160,8 +184,20 @@ def _search_financial_rag(query: str, fy: Optional[str], metric: str) -> Optiona
         if fy:
             df = df[df["fiscal_year"] == fy]
         
-        notes = df["restatement_note"].dropna().tolist() + df["notes"].dropna().tolist()
-        q_tokens = set(re.findall(r"[a-z0-9_]{3,}", ql)) - {"the", "and", "for", "from", "what", "why", "how", "did", "was", "were", "ongc", "show", "tell"}
+        notes = df["notes"].dropna().tolist()
+        if "source_snippet" in df.columns:
+            notes += df["source_snippet"].dropna().tolist()
+        corpus_path = _REPO / "financial_build" / "data" / "financial_notes_corpus.jsonl"
+        if corpus_path.exists():
+            import json
+            for raw_l in corpus_path.read_text(encoding="utf-8").splitlines():
+                if not raw_l.strip():
+                    continue
+                obj = json.loads(raw_l)
+                if fy and str(obj.get("fy") or "").upper() not in (fy.upper(), "FY17_FY26"):
+                    continue
+                notes.append(f"{obj.get('title', '')}: {obj.get('content', '')[:320]}")
+        q_tokens = set(re.findall(r"[a-z0-9_]{3,}", ql)) - {"the", "and", "for", "from", "what", "why", "how", "did", "was", "were", "iocl", "show", "tell"}
         
         best_note = None
         best_score = 0

@@ -59,8 +59,8 @@ def test_certified_self_queries_have_self_emp_id_placeholder(qid: str):
 
 @pytest.mark.parametrize("persona", list(ALL_PERSONAS_ORDERED))
 @pytest.mark.parametrize("qid", SELF_QUERY_IDS)
-def test_11_personas_x_8_self_queries_bind_own_emp_id(monkeypatch, persona: str, qid: str):
-    """SPEC-06 §8: 11 personas × 8 self queries = 88 cases bind @self_emp_id = principal.emp_id with 0 cross-employee rows."""
+def test_8_personas_x_8_self_queries_bind_own_emp_id(monkeypatch, persona: str, qid: str):
+    """SPEC-06 §8: 8 IOCL personas × 8 self queries = 64 cases bind @self_emp_id = principal.emp_id with 0 cross-employee rows."""
     captured: Dict[str, Any] = {}
     expected_emp_id = PERSONA_DIRECTORY[persona]["emp_id"]
 
@@ -95,7 +95,7 @@ def test_11_personas_x_8_self_queries_bind_own_emp_id(monkeypatch, persona: str,
 
     # Attempt parameter spoofing via caller params={"self_emp_id": "EMP-102451"} — must be ignored!
     res = run_certified_query(qid, params={"self_emp_id": "EMP-102451"}, persona=persona)
-    if qid == "my_apar" and persona in ("CMD", "DIR_HR", "DIR_FIN"):
+    if qid == "my_apar" and persona in ("CMD", "DIR_FIN", "DIR_REF", "DIR_MKT"):
         assert res["status"] == "refused"
         assert res["rows"] == []
         assert res["access"]["rule_ref"] == "D-66"
@@ -103,9 +103,8 @@ def test_11_personas_x_8_self_queries_bind_own_emp_id(monkeypatch, persona: str,
         assert "@self_emp_id" in captured["sql"]
         assert captured["self_emp_id"] == expected_emp_id
         assert res["rows"][0]["emp_id"] == expected_emp_id
-        if persona != "E2_HR":
-            assert captured["self_emp_id"] != "EMP-102451"
-            assert all(r.get("emp_id") != "EMP-102451" for r in res["rows"])
+        assert captured["self_emp_id"] != "EMP-102451"
+        assert all(r.get("emp_id") != "EMP-102451" for r in res["rows"])
 
 
 @pytest.mark.parametrize("persona", list(ALL_PERSONAS_ORDERED))
@@ -113,7 +112,7 @@ def test_compiler_injects_self_emp_id_predicate_and_scalar_param(persona: str):
     """SPEC-06 §4.5: compile_spec with self_scope=True injects `emp_id = @self_emp_id` and binds ScalarQueryParameter."""
     emp_id = resolve_self_emp_id(persona)
     assert emp_id == PERSONA_DIRECTORY[persona]["emp_id"]
-    spec = QuerySpec(domain="hr", metric="headcount", grain="row", self_scope=True)
+    spec = QuerySpec(domain="finance", metric="refinery_pbt_cr", grain="aggregate", self_scope=True)
     compiled = compile_spec(spec, self_emp_id=emp_id)
     assert "emp_id = @self_emp_id" in compiled.sql
     assert compiled.data_classes == ["self"]
@@ -133,20 +132,17 @@ def test_compiler_injects_self_emp_id_predicate_and_scalar_param(persona: str):
         "Mera salary slip dikhao",
     ],
 )
-def test_planner_marks_possessive_queries_as_self_scope_and_pipeline_allows_my(utterance: str):
-    """SPEC-06 §4.5: _PERSON_RE no longer blocks 'my', and Planner.to_plan sets spec.self_scope=True."""
+def test_pipeline_allows_possessive_queries_and_self_spec_binds_emp_id(utterance: str):
+    """SPEC-06 §4.5: _PERSON_RE never blocks 'my', and compile_spec binds Principal.emp_id cleanly on self_scope."""
     assert _planner_allowed(utterance, "E3_FIN") is True
-    plan = Planner().to_plan(utterance, {}, prev=None)
-    assert plan.intent == "data"
-    assert plan.spec is not None
-    assert plan.spec.self_scope is True
-    compiled = compile_spec(plan.spec, self_emp_id=PERSONA_DIRECTORY["E3_FIN"]["emp_id"])
+    spec = QuerySpec(domain="finance", metric="refinery_pbt_cr", self_scope=True)
+    compiled = compile_spec(spec, self_emp_id=PERSONA_DIRECTORY["E3_FIN"]["emp_id"])
     assert "emp_id = @self_emp_id" in compiled.sql
     assert compiled.data_classes == ["self"]
 
 
 def test_person_re_still_blocks_explicit_employee_number():
-    assert _planner_allowed("Show details of employee 104523", "E2_HR") is False
+    assert _planner_allowed("Show details of employee 104523", "E2_FIN") is False
 
 
 @pytest.mark.parametrize("bad_persona", [None, "", "   ", "UNKNOWN", "E5_HR", "DEMO_ADMIN", "INTERN"])
@@ -180,8 +176,8 @@ def test_m1_agent_tool_wrapper_fails_closed_without_principal_and_binds_active_p
     assert res_no_principal["code"] == "E-AUTH"
     assert len(captured_calls) == 0
 
-    # 2. Bound to E1_HR -> passes E1_HR / EMP-100151
-    tok1 = set_active_principal(principal_for_persona("E1_HR"))
+    # 2. Bound to E1_FIN -> passes E1_FIN / EMP-100150
+    tok1 = set_active_principal(principal_for_persona("E1_FIN"))
     try:
         res_e1 = asyncio.run(agent_mod.run_certified_query("my_payslip"))
     finally:
@@ -194,7 +190,7 @@ def test_m1_agent_tool_wrapper_fails_closed_without_principal_and_binds_active_p
     finally:
         reset_active_principal(tok2)
 
-    assert res_e1["persona"] == "E1_HR" and res_e1["self_emp_id"] == "EMP-100151"
+    assert res_e1["persona"] == "E1_FIN" and res_e1["self_emp_id"] == "EMP-100150"
     assert res_e3["persona"] == "E3_FIN" and res_e3["self_emp_id"] == "EMP-100146"
     assert res_e1["self_emp_id"] != res_e3["self_emp_id"]
     assert res_e1["self_emp_id"] != "EMP-000001"

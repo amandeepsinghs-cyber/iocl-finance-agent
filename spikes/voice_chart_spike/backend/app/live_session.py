@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 # Enforce project and location for Vertex AI ADK live connection
-os.environ["GOOGLE_CLOUD_PROJECT"] = "ongc-hr-finance-agent"
+os.environ["GOOGLE_CLOUD_PROJECT"] = "yukti-finance-iocl"
 os.environ["GOOGLE_CLOUD_LOCATION"] = "us-central1"
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "TRUE"
 
@@ -45,7 +45,7 @@ class LiveSessionManager:
         self.model_name = model_name
         self.voice = voice
         self.language = language
-        self.project_id = "ongc-hr-finance-agent"
+        self.project_id = "yukti-finance-iocl"
         self.location = "us-central1"
         self.session_service = InMemorySessionService()
         self.agent = create_ongc_agent(model_name=self.model_name)

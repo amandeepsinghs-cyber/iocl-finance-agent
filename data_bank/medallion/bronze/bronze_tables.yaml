@@ -1,14 +1,14 @@
 version: '1.0'
 generated_at: '2026-10-19T13:16:41.282722+00:00'
 batch_id: '20261019'
-project_id: ongc-hr-finance-agent
+project_id: yukti-finance-iocl
 dataset_id: hrfin_bronze
 total_tables: 46
 total_rows: 4363599
 tables:
   sap_cosp_coss:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/COSP_COSS.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/COSP_COSS.csv
     local_path: landing/sap/COSP_COSS.csv
     row_count: 318276
     column_count: 22
@@ -37,7 +37,7 @@ tables:
     - _batch_id
   sap_co_pa:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/CO_PA.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/CO_PA.csv
     local_path: landing/sap/CO_PA.csv
     row_count: 590
     column_count: 41
@@ -85,7 +85,7 @@ tables:
     - _batch_id
   sap_ekko_ekpo:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/EKKO_EKPO.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/EKKO_EKPO.csv
     local_path: landing/sap/EKKO_EKPO.csv
     row_count: 110000
     column_count: 29
@@ -121,7 +121,7 @@ tables:
     - _batch_id
   sap_essr_esll:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/ESSR_ESLL.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/ESSR_ESLL.csv
     local_path: landing/sap/ESSR_ESLL.csv
     row_count: 3036
     column_count: 25
@@ -153,7 +153,7 @@ tables:
     - _batch_id
   sap_fi_ar_invoices:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/FI_AR_INVOICES.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/FI_AR_INVOICES.csv
     local_path: landing/sap/FI_AR_INVOICES.csv
     row_count: 55000
     column_count: 25
@@ -185,7 +185,7 @@ tables:
     - _batch_id
   sap_pa0000_promotions:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/PA0000_promotions.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/PA0000_promotions.csv
     local_path: landing/sap/PA0000_promotions.csv
     row_count: 62761
     column_count: 18
@@ -210,7 +210,7 @@ tables:
     - _batch_id
   sap_pa0000_separations:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/PA0000_separations.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/PA0000_separations.csv
     local_path: landing/sap/PA0000_separations.csv
     row_count: 19373
     column_count: 15
@@ -232,7 +232,7 @@ tables:
     - _batch_id
   sap_pa0001:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/PA0001.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/PA0001.csv
     local_path: landing/sap/PA0001.csv
     row_count: 198880
     column_count: 24
@@ -263,7 +263,7 @@ tables:
     - _batch_id
   sap_pa0002_pa0001:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/PA0002_PA0001.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/PA0002_PA0001.csv
     local_path: landing/sap/PA0002_PA0001.csv
     row_count: 42171
     column_count: 29
@@ -299,7 +299,7 @@ tables:
     - _batch_id
   sap_pa2001_pa2006:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/PA2001_PA2006.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/PA2001_PA2006.csv
     local_path: landing/sap/PA2001_PA2006.csv
     row_count: 455922
     column_count: 15
@@ -321,7 +321,7 @@ tables:
     - _batch_id
   sap_ptrv_head_doc:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/PTRV_HEAD_DOC.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/PTRV_HEAD_DOC.csv
     local_path: landing/sap/PTRV_HEAD_DOC.csv
     row_count: 23758
     column_count: 24
@@ -352,7 +352,7 @@ tables:
     - _batch_id
   sap_py_cluster_exp:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/PY_CLUSTER_EXP.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/PY_CLUSTER_EXP.csv
     local_path: landing/sap/PY_CLUSTER_EXP.csv
     row_count: 1685637
     column_count: 26
@@ -385,7 +385,7 @@ tables:
     - _batch_id
   sap_eapar_ratings:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/eAPAR_ratings.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/eAPAR_ratings.csv
     local_path: landing/sap/eAPAR_ratings.csv
     row_count: 126490
     column_count: 17
@@ -409,7 +409,7 @@ tables:
     - _batch_id
   sap_headcount_monthly_snapshot:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/headcount_monthly_snapshot.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/headcount_monthly_snapshot.csv
     local_path: landing/sap/headcount_monthly_snapshot.csv
     row_count: 977104
     column_count: 17
@@ -433,7 +433,7 @@ tables:
     - _batch_id
   sap_project_milestones:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/project_milestones.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/project_milestones.csv
     local_path: landing/sap/project_milestones.csv
     row_count: 360
     column_count: 27
@@ -467,7 +467,7 @@ tables:
     - _batch_id
   sap_vigilance_cases_confidential:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261019/vigilance_cases_confidential.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261019/vigilance_cases_confidential.csv
     local_path: landing/sap/vigilance_cases_confidential.csv
     row_count: 95
     column_count: 16
@@ -490,7 +490,7 @@ tables:
     - _batch_id
   db_exports_access_audit_log:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261019/access_audit_log.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261019/access_audit_log.csv
     local_path: landing/db_exports/access_audit_log.csv
     row_count: 3503
     column_count: 18
@@ -515,7 +515,7 @@ tables:
     - _batch_id
   db_exports_hse_incident_log:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261019/hse_incident_log.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261019/hse_incident_log.csv
     local_path: landing/db_exports/hse_incident_log.csv
     row_count: 3036
     column_count: 22
@@ -544,7 +544,7 @@ tables:
     - _batch_id
   db_exports_lms_attendance:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261019/lms_attendance.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261019/lms_attendance.csv
     local_path: landing/db_exports/lms_attendance.csv
     row_count: 74144
     column_count: 17
@@ -568,7 +568,7 @@ tables:
     - _batch_id
   db_exports_medical_claims_export:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261019/medical_claims_export.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261019/medical_claims_export.csv
     local_path: landing/db_exports/medical_claims_export.csv
     row_count: 35134
     column_count: 19
@@ -594,7 +594,7 @@ tables:
     - _batch_id
   db_exports_production_monthly:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261019/production_monthly.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261019/production_monthly.csv
     local_path: landing/db_exports/production_monthly.csv
     row_count: 6678
     column_count: 23
@@ -624,7 +624,7 @@ tables:
     - _batch_id
   db_exports_rti_applications_export:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261019/rti_applications_export.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261019/rti_applications_export.csv
     local_path: landing/db_exports/rti_applications_export.csv
     row_count: 779
     column_count: 16
@@ -647,7 +647,7 @@ tables:
     - _batch_id
   db_exports_wells_drilled:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261019/wells_drilled.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261019/wells_drilled.csv
     local_path: landing/db_exports/wells_drilled.csv
     row_count: 4688
     column_count: 20
@@ -674,7 +674,7 @@ tables:
     - _batch_id
   governance_corporate_financial_summary:
     source_type: governance
-    source_file: gs://ongc-hr-finance-agent-landing/governance/20261019/corporate_financial_summary.csv
+    source_file: gs://yukti-finance-iocl-landing/governance/20261019/corporate_financial_summary.csv
     local_path: landing/governance/corporate_financial_summary.csv
     row_count: 10
     column_count: 25
@@ -706,7 +706,7 @@ tables:
     - _batch_id
   governance_parliament_questions_index:
     source_type: governance
-    source_file: gs://ongc-hr-finance-agent-landing/governance/20261019/parliament_questions_index.csv
+    source_file: gs://yukti-finance-iocl-landing/governance/20261019/parliament_questions_index.csv
     local_path: landing/governance/parliament_questions_index.csv
     row_count: 37
     column_count: 25
@@ -738,7 +738,7 @@ tables:
     - _batch_id
   governance_subsidiary_group_financials:
     source_type: governance
-    source_file: gs://ongc-hr-finance-agent-landing/governance/20261019/subsidiary_group_financials.csv
+    source_file: gs://yukti-finance-iocl-landing/governance/20261019/subsidiary_group_financials.csv
     local_path: landing/governance/subsidiary_group_financials.csv
     row_count: 25
     column_count: 18
@@ -763,7 +763,7 @@ tables:
     - _batch_id
   excel_dpc_tracker:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/DPC_tracker.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/DPC_tracker.xlsx
     local_path: landing/excel/DPC_tracker.xlsx
     row_count: 15183
     column_count: 21
@@ -791,7 +791,7 @@ tables:
     - _batch_id
   excel_actuarial_benefit_liabilities:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/actuarial_benefit_liabilities.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/actuarial_benefit_liabilities.xlsx
     local_path: landing/excel/actuarial_benefit_liabilities.xlsx
     row_count: 21
     column_count: 20
@@ -818,7 +818,7 @@ tables:
     - _batch_id
   excel_board_agenda_index:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/board_agenda_index.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/board_agenda_index.xlsx
     local_path: landing/excel/board_agenda_index.xlsx
     row_count: 66
     column_count: 17
@@ -842,7 +842,7 @@ tables:
     - _batch_id
   excel_cag_paras_register:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/cag_paras_register.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/cag_paras_register.xlsx
     local_path: landing/excel/cag_paras_register.xlsx
     row_count: 47
     column_count: 18
@@ -867,7 +867,7 @@ tables:
     - _batch_id
   excel_capex_be_re_actuals:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/capex_be_re_actuals.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/capex_be_re_actuals.xlsx
     local_path: landing/excel/capex_be_re_actuals.xlsx
     row_count: 7789
     column_count: 16
@@ -890,7 +890,7 @@ tables:
     - _batch_id
   excel_csr_projects_tracker:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/csr_projects_tracker.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/csr_projects_tracker.xlsx
     local_path: landing/excel/csr_projects_tracker.xlsx
     row_count: 311
     column_count: 20
@@ -917,7 +917,7 @@ tables:
     - _batch_id
   excel_dpe_mou_scorecard:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/dpe_mou_scorecard.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/dpe_mou_scorecard.xlsx
     local_path: landing/excel/dpe_mou_scorecard.xlsx
     row_count: 48
     column_count: 24
@@ -948,7 +948,7 @@ tables:
     - _batch_id
   excel_energy_transition_progress:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/energy_transition_progress.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/energy_transition_progress.xlsx
     local_path: landing/excel/energy_transition_progress.xlsx
     row_count: 36
     column_count: 19
@@ -974,7 +974,7 @@ tables:
     - _batch_id
   excel_icc_committees:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/icc_committees.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/icc_committees.xlsx
     local_path: landing/excel/icc_committees.xlsx
     row_count: 47
     column_count: 19
@@ -1000,7 +1000,7 @@ tables:
     - _batch_id
   excel_legal_cases_tracker:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/legal_cases_tracker.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/legal_cases_tracker.xlsx
     local_path: landing/excel/legal_cases_tracker.xlsx
     row_count: 427
     column_count: 21
@@ -1028,7 +1028,7 @@ tables:
     - _batch_id
   excel_manpower_plan:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/manpower_plan.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/manpower_plan.xlsx
     local_path: landing/excel/manpower_plan.xlsx
     row_count: 12908
     column_count: 25
@@ -1060,7 +1060,7 @@ tables:
     - _batch_id
   excel_price_fx:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/price_fx.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/price_fx.xlsx
     local_path: landing/excel/price_fx.xlsx
     row_count: 133
     column_count: 19
@@ -1086,7 +1086,7 @@ tables:
     - _batch_id
   excel_reserves_annual:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/reserves_annual.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/reserves_annual.xlsx
     local_path: landing/excel/reserves_annual.xlsx
     row_count: 550
     column_count: 23
@@ -1116,7 +1116,7 @@ tables:
     - _batch_id
   excel_succession_planning:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/succession_planning.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/succession_planning.xlsx
     local_path: landing/excel/succession_planning.xlsx
     row_count: 112
     column_count: 21
@@ -1144,7 +1144,7 @@ tables:
     - _batch_id
   excel_training_calendar:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/training_calendar.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/training_calendar.xlsx
     local_path: landing/excel/training_calendar.xlsx
     row_count: 217
     column_count: 27
@@ -1178,7 +1178,7 @@ tables:
     - _batch_id
   excel_treasury_forex_hedges:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261019/treasury_forex_hedges.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261019/treasury_forex_hedges.xlsx
     local_path: landing/excel/treasury_forex_hedges.xlsx
     row_count: 92
     column_count: 20
@@ -1205,7 +1205,7 @@ tables:
     - _batch_id
   db_exports_env_incident_log:
     source_type: db_exports
-    source_file: gs://ongc-hr-finance-agent-landing/db_exports/20261020/env_incident_log.csv
+    source_file: gs://yukti-finance-iocl-landing/db_exports/20261020/env_incident_log.csv
     local_path: landing/db_exports/env_incident_log.csv
     row_count: 482
     column_count: 17
@@ -1229,7 +1229,7 @@ tables:
     - _batch_id
   excel_posh_register:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261020/posh_register.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261020/posh_register.xlsx
     local_path: landing/excel/posh_register.xlsx
     row_count: 58
     column_count: 16
@@ -1252,7 +1252,7 @@ tables:
     - _batch_id
   sap_apprentice_ledger:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261020/apprentice_ledger.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261020/apprentice_ledger.csv
     local_path: landing/sap/apprentice_ledger.csv
     row_count: 7585
     column_count: 14
@@ -1273,7 +1273,7 @@ tables:
     - _batch_id
   sap_ekko_channel:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261020/EKKO_channel.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261020/EKKO_channel.csv
     local_path: landing/sap/EKKO_channel.csv
     row_count: 110000
     column_count: 7
@@ -1287,7 +1287,7 @@ tables:
     - _batch_id
   sap_employee_cost_pool:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261020/employee_cost_pool.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261020/employee_cost_pool.csv
     local_path: landing/sap/employee_cost_pool.csv
     row_count: 50
     column_count: 9
@@ -1303,7 +1303,7 @@ tables:
     - basis
   sap_co_pa_v3:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261020/CO_PA_v3.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261020/CO_PA_v3.csv
     local_path: landing/sap/CO_PA_v3.csv
     row_count: 279551
     column_count: 6
@@ -1316,7 +1316,7 @@ tables:
     - basis
   sap_field_alloc_audit:
     source_type: sap
-    source_file: gs://ongc-hr-finance-agent-landing/sap/20261020/field_alloc_audit.csv
+    source_file: gs://yukti-finance-iocl-landing/sap/20261020/field_alloc_audit.csv
     local_path: landing/sap/field_alloc_audit.csv
     row_count: 745
     column_count: 6
@@ -1329,7 +1329,7 @@ tables:
     - final
   dim_basin:
     source_type: excel
-    source_file: gs://ongc-hr-finance-agent-landing/excel/20261020/basins.xlsx
+    source_file: gs://yukti-finance-iocl-landing/excel/20261020/basins.xlsx
     local_path: landing/excel/basins.xlsx
     row_count: 100
     column_count: 4
@@ -1340,7 +1340,7 @@ tables:
     - field_count
   dim_field:
     source_type: yaml
-    source_file: gs://ongc-hr-finance-agent-landing/yaml/fields.yaml
+    source_file: gs://yukti-finance-iocl-landing/yaml/fields.yaml
     local_path: world_bible/reference/fields.yaml
     row_count: 53
     column_count: 8
@@ -1355,7 +1355,7 @@ tables:
     - hydrocarbon_type
   field_econ_targets_fy:
     source_type: csv
-    source_file: gs://ongc-hr-finance-agent-landing/csv/field_econ_targets_fy.csv
+    source_file: gs://yukti-finance-iocl-landing/csv/field_econ_targets_fy.csv
     local_path: world_bible/reference/real_targets/field_econ_targets_fy.csv
     row_count: 150
     column_count: 7

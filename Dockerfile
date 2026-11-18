@@ -37,16 +37,19 @@ COPY data_bank/landing/documents/rulebooks_clause_index.csv /app/data_bank/landi
 COPY data_bank/landing/documents/templates /app/data_bank/landing/documents/templates
 # P0.9 (BUG-13 part): runtime financial snapshot read by the backend (compiler local_snapshot fallback,
 # insight context, notes corpus). BigQuery stays primary; on an outage answers carry the "Local snapshot" badge.
-COPY financial_build/data/ongc_10yr_schedule_iii_lines.json \
-     financial_build/data/ongc_10yr_balance_sheet_lines.json \
-     financial_build/data/ongc_10yr_cash_flow_lines.json \
-     financial_build/data/ongc_10yr_ratios_lines.json \
-     financial_build/data/ongc_10yr_corporate_wide.json \
+COPY financial_build/data/iocl_10yr_schedule_iii_lines.json \
+     financial_build/data/iocl_10yr_balance_sheet_lines.json \
+     financial_build/data/iocl_10yr_cash_flow_lines.json \
+     financial_build/data/iocl_10yr_ratios_lines.json \
+     financial_build/data/iocl_10yr_corporate_wide.json \
+     financial_build/data/financial_notes_corpus.jsonl \
      financial_build/data/snapshot_manifest.json \
      /app/financial_build/data/
 COPY financial_ssot/out/fact_snapshot.parquet \
      financial_ssot/out/fact_wacc_annual.parquet \
      financial_ssot/out/fact_wacc_input.parquet \
+     financial_ssot/out/fact_retail_fuel_prices.parquet \
+     financial_ssot/out/fact_fuel_price_buildup.parquet \
      /app/financial_ssot/out/
 COPY financial_ssot/dim_financial_line.csv /app/financial_ssot/dim_financial_line.csv
 COPY knowledge/public_sources/market_data/manual/market_prices_seed.csv /app/knowledge/public_sources/market_data/manual/market_prices_seed.csv
@@ -61,6 +64,11 @@ RUN chmod +x /app/start_cloudrun.sh && \
     npm run build
 
 ENV NODE_ENV=production \
+    GOOGLE_CLOUD_PROJECT=yukti-finance-iocl \
+    TARGET_PROJECT=yukti-finance-iocl \
+    YUKTI_GCP_PROJECT=yukti-finance-iocl \
+    YUKTI_COMPANY_SHORT_NAME=IOCL \
+    YUKTI_CONTRACT_V3_FIELDS=all \
     YUKTI_PLANNER=1 \
     YUKTI_ENV=prod \
     YUKTI_AUTH_MODE=demo

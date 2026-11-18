@@ -8,7 +8,7 @@ SELECT
     clause_ref,
     heading,
     SUBSTR(text, 1, 300) AS quote_snippet
-FROM `ongc-hr-finance-agent.hrfin_docs.silver_chunks`
+FROM `yukti-finance-iocl.hrfin_docs.silver_chunks`
 WHERE (doc_id = 'PRBS' AND clause_ref = 'Clause 3.0')
 ORDER BY doc_id, clause_ref
 LIMIT 5;

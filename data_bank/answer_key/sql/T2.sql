@@ -14,7 +14,7 @@ SELECT
     v.retirement_date,
     DATE_DIFF(v.retirement_date, DATE '2026-10-19', DAY) <= 3 * 365.25 AS within_3yr_of_superannuation,
     NULLIF(p.exemption_tag, 'None') AS exemption_tag
-FROM `ongc-hr-finance-agent.hrfin_gold.v_continuous_stay` v
+FROM `yukti-finance-iocl.hrfin_gold.v_continuous_stay` v
 JOIN dim_discipline d ON d.discipline_id = v.discipline_id
 LEFT JOIN posting_history p ON p.emp_id = v.emp_id AND p.is_current_posting AND p.wc_id = 'WC-DEL'
 WHERE v.is_current_stay AND v.wc_id = 'WC-DEL' AND v.grade_id LIKE 'E%' AND v.continuous_stay_months >= 60

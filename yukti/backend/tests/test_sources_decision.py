@@ -12,12 +12,13 @@ import pytest
 # Add backend directory to sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from app.config import DEFAULT_TEXT_MODEL
 from app.turn_runner import AgentTurnRunner
 
 
 @pytest.mark.asyncio
 async def test_no_sources_or_clause_numbers_in_spoken_summary_normal_turn():
-    runner = AgentTurnRunner(model_name="gemini-2.5-flash")
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
 
     # Run C1 normal turn
     res = await runner.execute_turn_async(
@@ -37,7 +38,7 @@ async def test_no_sources_or_clause_numbers_in_spoken_summary_normal_turn():
 
 @pytest.mark.asyncio
 async def test_whats_the_source_followup():
-    runner = AgentTurnRunner(model_name="gemini-2.5-flash")
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
     session_id = "test-source-inquiry-session"
 
     # Turn 1: Ask an executive tenure question

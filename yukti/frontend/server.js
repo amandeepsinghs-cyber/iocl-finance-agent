@@ -2,15 +2,15 @@
  * Yukti AI — single-origin server.
  *
  * Wraps Next.js and proxies backend traffic through the UI origin so the browser
- * only ever talks to ONE port (forward only port 3200 from your laptop):
+ * only ever talks to ONE port (forward only port 3400 from your laptop):
  *   /api/turn, /api/export, /api/export/{id}, /api/auth/*, /api/market/*, /health  -> YUKTI_BACKEND_URL (HTTP or HTTPS, e.g. Cloud Run)
  *   /ws/live                                          -> YUKTI_BACKEND_URL (WebSocket upgrade)
  * Everything else (pages, assets, HMR websocket) is served by Next.
  *
  * Usage:  node server.js --dev     (npm run dev)
  *         node server.js           (npm run start, after npm run build)
- * Env:    PORT (default 3200), HOST (default 0.0.0.0),
- *         YUKTI_BACKEND_URL (default http://127.0.0.1:8095)
+ * Env:    PORT (default 3400), HOST (default 0.0.0.0),
+ *         YUKTI_BACKEND_URL (default http://127.0.0.1:8195)
  */
 const http = require('http');
 const https = require('https');
@@ -20,9 +20,9 @@ const { parse } = require('url');
 const next = require('next');
 
 const dev = process.argv.includes('--dev') || process.env.NODE_ENV === 'development';
-const port = parseInt(process.env.PORT || '3200', 10);
+const port = parseInt(process.env.PORT || '3400', 10);
 const host = process.env.HOST || '0.0.0.0';
-const backend = new URL(process.env.YUKTI_BACKEND_URL || 'http://127.0.0.1:8095');
+const backend = new URL(process.env.YUKTI_BACKEND_URL || 'http://127.0.0.1:8195');
 // H1.3a: https backends (Cloud Run) are proxied over TLS for both HTTP and the WebSocket upgrade
 const secure = backend.protocol === 'https:' || backend.protocol === 'wss:';
 const backendPort = parseInt(backend.port || (secure ? '443' : '80'), 10);
@@ -136,6 +136,6 @@ app.prepare().then(() => {
 
   server.listen(port, host, () => {
     log(`${dev ? 'dev' : 'production'} UI on http://${host}:${port}  ->  backend ${backend.origin}`);
-    log('Forward ONLY this port from your laptop (e.g. ssh -L 3200:localhost:3200 <cloudtop>).');
+    log('Forward ONLY this port from your laptop (e.g. ssh -L 3400:localhost:3400 <cloudtop>).');
   });
 });

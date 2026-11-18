@@ -173,28 +173,28 @@ def translate_to_hindi(text: str) -> str:
     out = text.strip()
     # Pattern rewrites for common headline structures
     out = re.sub(
-        r"^Between\s+(FY\d{2})\s+and\s+(FY\d{2}),\s*ONGC's\s+",
-        r"\1 और \2 के बीच, ONGC का ",
+        r"^Between\s+(FY\d{2})\s+and\s+(FY\d{2}),\s*IOCL's\s+",
+        r"\1 और \2 के बीच, IOCL का ",
         out,
     )
     out = re.sub(
-        r"^For\s+(FY\d{2}),\s*ONGC's\s+Schedule\s+III\s+",
-        r"\1 के लिए, ONGC की अनुसूची-III के अनुसार ",
+        r"^For\s+(FY\d{2}),\s*IOCL's\s+Schedule\s+III\s+",
+        r"\1 के लिए, IOCL की अनुसूची-III के अनुसार ",
         out,
     )
     out = re.sub(
-        r"^For\s+(FY\d{2}),\s*ONGC's\s+",
-        r"\1 के लिए, ONGC का ",
+        r"^For\s+(FY\d{2}),\s*IOCL's\s+",
+        r"\1 के लिए, IOCL का ",
         out,
     )
     out = re.sub(
-        r"^In\s+(FY\d{2}),\s*ONGC\s+generated\s+",
-        r"\1 में, ONGC ने उत्पन्न किया ",
+        r"^In\s+(FY\d{2}),\s*IOCL\s+generated\s+",
+        r"\1 में, IOCL ने उत्पन्न किया ",
         out,
     )
     out = re.sub(
-        r"^As of 31 March\s+(FY\d{2}),\s*ONGC's\s+Schedule\s+III\s+",
-        r"31 मार्च \1 की स्थिति के अनुसार, ONGC की अनुसूची-III ",
+        r"^As of 31 March\s+(FY\d{2}),\s*IOCL's\s+Schedule\s+III\s+",
+        r"31 मार्च \1 की स्थिति के अनुसार, IOCL की अनुसूची-III ",
         out,
     )
     out = re.sub(
@@ -220,7 +220,7 @@ def translate_to_hindi(text: str) -> str:
 
     # Ensure Devanagari presence even for compact KPI strings like "PAT (FY26): ₹32,894.02 crore."
     if not _DEVANAGARI_RE.search(out):
-        out = f"ओएनजीसी डेटा सारांश: {out} विस्तृत विवरण स्क्रीन पर है।"
+        out = f"इंडियनऑयल डेटा सारांश: {out} विस्तृत विवरण स्क्रीन पर है।"
     return out
 
 
@@ -259,8 +259,8 @@ def translate_to_hinglish(text: str) -> str:
         return text
     out = _DEVANAGARI_RE.sub("", text).strip()
     out = re.sub(
-        r"^For\s+(FY\d{2}),\s*ONGC's\s+",
-        r"\1 mein ONGC ka ",
+        r"^For\s+(FY\d{2}),\s*IOCL's\s+",
+        r"\1 mein IOCL ka ",
         out,
     )
     out = re.sub(

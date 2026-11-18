@@ -10,9 +10,9 @@ All numbers in this test suite are copied **verbatim** from official primary sou
 1. **Integrated Annual Reports (Standalone)**: FY17 through FY26 (`ONGC_AR_FYxxxx-xx.pdf`).
 2. **Ten-Year Excellence Summary**: AR FY2025-26 printed pages 21–22 (PDF pp. 23–24).
 3. **Verified SSOT Database Tables & Views**:
-   - `ongc-hr-finance-agent.hrfin_gold.fact_financial_statement_line`
-   - `ongc-hr-finance-agent.hrfin_gold.fact_wacc_annual`
-   - `ongc-hr-finance-agent.hrfin_gold.fact_wacc_shapley`
+   - `yukti-finance-iocl.hrfin_gold.fact_financial_statement_line`
+   - `yukti-finance-iocl.hrfin_gold.fact_wacc_annual`
+   - `yukti-finance-iocl.hrfin_gold.fact_wacc_shapley`
 
 > [!IMPORTANT]
 > **No Synthetic Guessing / Rounding**: Never compute, round, or extrapolate an expected value unless explicitly mandated by the specification (e.g. `derived_ar` ratios). If an official number is absent in the spec, mark `expect_value: TODO_SPEC_GAP`.
@@ -63,14 +63,14 @@ Run the standalone verification script located at `/tmp/verify_golden_diff.py` t
 
 ## 4. Evaluation Execution (FL Executor)
 
-To run the golden evaluation suite against a live backend instance (port 8095):
+To run the golden evaluation suite against a live backend instance (port 8195):
 
 ```bash
 cd "<app root>/yukti/backend"
 .venv/bin/python eval/golden_v3/run_golden.py \
   --cases eval/golden_v3/cases_finance.yaml \
   --chains eval/golden_v3/chains.yaml \
-  --base-url http://127.0.0.1:8095 \
+  --base-url http://127.0.0.1:8195 \
   --no-cache \
   --report eval/golden_v3/report_P1.md
 ```

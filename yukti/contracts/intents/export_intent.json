@@ -69,7 +69,7 @@
     "Designation": ["designations", "designation", "post", "title", "पद"],
     "Level": ["ranks", "rank", "levels", "level", "grades", "grade", "स्तर", "ग्रेड"],
     "Tenure in Delhi (yrs)": ["tenure in delhi", "delhi tenure", "years in delhi", "दिल्ली में कार्यकाल", "tenure"],
-    "ONGC service (yrs)": ["ongc tenure", "ongc service", "service"],
+    "IOCL service (yrs)": ["iocl tenure", "iocl service", "service"],
     "Years to retirement": ["years to retirement", "retirement"],
     "Exemption": ["exemptions", "exemption"]
   }

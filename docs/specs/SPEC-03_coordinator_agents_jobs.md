@@ -258,7 +258,7 @@ On success the executor builds a **v3 answer contract** (`turn_id = "job:<id>"`)
 Unit: intent router (40 labelled phrasings incl. hi-en), confirm/cancel regex table, registry schema validation, contract v3 fixtures. API: pytest + httpx for the jobs lifecycle, idempotency, 403/410/422 paths, SSE stream parse. E2E (Playwright, FL-run): BEH-05 scenarios. Voice: scripted WS session for confirm + announcement (SPEC-11 voice smoke).
 
 ## 12. Open questions
-1. Firestore availability in `ongc-hr-finance-agent` (needs an API enable + IAM). Fallback: a GCS JSON per job (slower polling).
+1. Firestore availability in `yukti-finance-iocl` (needs an API enable + IAM). Fallback: a GCS JSON per job (slower polling).
 2. Should `fin_diagnostics_agent` also ask permission when it would take more than 8 s, or auto-run as a job (recommended: auto-run, no permission, because it's read-only)?
 3. Cloud Run cost of `--min-instances=1 --no-cpu-throttling` is acceptable for demo periods only? Toggle in `start_cloudrun.sh`.
 

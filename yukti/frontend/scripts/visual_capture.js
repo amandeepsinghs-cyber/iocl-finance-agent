@@ -2,7 +2,7 @@
 // Usage: URL=http://localhost:3201 OUT=dir MODE=mock|live SIZES=1440x900,1920x1080 node visual_capture.js
 const { chromium } = require('playwright');
 const fs = require('fs');
-const URL = process.env.URL || 'http://localhost:3200';
+const URL = process.env.URL || 'http://localhost:3400';
 const OUT = process.env.OUT || './screenshots/after';
 const MODE = process.env.MODE || 'mock';
 const SIZES = (process.env.SIZES || '1440x900').split(',').map((s) => s.split('x').map(Number));
