@@ -75,6 +75,13 @@ async def route_turn(query: str, persona: str, session: Any = None) -> Dict[str,
         if pa and session is not None:
             if not hasattr(session, "pending_actions"):
                 session.pending_actions = {}
+            # Replace any older pending proposal for the same agent so duplicates never trigger disambiguation loops
+            stale_same_agent = [
+                aid for aid, existing in list(session.pending_actions.items())
+                if isinstance(existing, dict) and existing.get("agent") == pa.get("agent")
+            ]
+            for aid in stale_same_agent:
+                session.pending_actions.pop(aid, None)
             session.pending_actions[pa["id"]] = pa
         return prop
 

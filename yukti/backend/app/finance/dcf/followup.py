@@ -363,7 +363,7 @@ def _base_contract(
         "sources": sources or [{"kind": "data", "object": "DCF engine (this conversation's run)", "sql": "per-share value, WACC build, bridge, terminal value, sensitivity"}],
         "suggestions": suggestions,
         "access": {"status": "allowed"},
-        "export_options": ["xlsx", "pdf"],
+        "export_options": ["xlsx", "sheets", "pdf"],
         "status_events": [status],
         "caveat": "Illustrative valuation, not investment advice.",
         "latency_ms": round((time.perf_counter() - t0) * 1000, 2),

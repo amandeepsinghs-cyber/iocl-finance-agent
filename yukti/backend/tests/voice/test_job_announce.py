@@ -233,3 +233,109 @@ async def test_two_pending_proposals_disambiguation_and_queuing_while_user_speak
     assert queued_msg["type"] == "speak"
     assert queued_msg["speak_id"] == "job:job_queued_123:1"
     assert queued_msg["text"] == fake_job["result"]["spoken_summary"]
+
+
+@pytest.mark.asyncio
+async def test_dcf_disambiguation_never_loops_on_explicit_dcf_or_duplicate_proposals():
+    """Regression: duplicate dcf_agent proposals auto-dedupe; explicit 'Run the DCF' / 'No, just show the DCF first' never loops."""
+    ws = FakeWebSocket()
+    mgr = LiveSessionManager(websocket=ws, session_id="sess_dcf_no_loop", persona="CMD", language="en")
+
+    # 1. Duplicate dcf_agent proposals -> auto-deduplicated and confirmed cleanly
+    mgr.session_state.pending_actions["pa_dcf_1"] = {
+        "id": "pa_dcf_1",
+        "agent": "dcf_agent",
+        "summary": "Run DCF 1",
+        "requires_role": ["CMD", "DIR_FIN"],
+        "inputs": {},
+    }
+    mgr.session_state.pending_actions["pa_dcf_2"] = {
+        "id": "pa_dcf_2",
+        "agent": "dcf_agent",
+        "summary": "Run DCF 2",
+        "requires_role": ["CMD", "DIR_FIN"],
+        "inputs": {},
+    }
+    res_dup = await resolve_pending_proposal_async("Run the DCF valuation model for NSE:IOC.", mgr.session_state)
+    assert res_dup is not None
+    assert res_dup["action"] == "confirm"
+    assert res_dup["job"]["agent"] == "dcf_agent"
+
+    # 2. Two distinct agents pending -> explicit 'No, just show the DCF first.' resolves directly to dcf_agent
+    mgr2 = LiveSessionManager(websocket=ws, session_id="sess_dcf_explicit", persona="CMD", language="en")
+    mgr2.session_state.pending_actions["pa_dcf"] = {
+        "id": "pa_dcf",
+        "agent": "dcf_agent",
+        "summary": "Run DCF",
+        "requires_role": ["CMD", "DIR_FIN"],
+        "inputs": {},
+    }
+    mgr2.session_state.pending_actions["pa_email"] = {
+        "id": "pa_email",
+        "agent": "email_agent",
+        "summary": "Send email",
+        "requires_role": ["CMD", "DIR_FIN"],
+        "inputs": {},
+    }
+    res_explicit = await resolve_pending_proposal_async("No, just show the DCF first.", mgr2.session_state)
+    assert res_explicit is not None
+    assert res_explicit["action"] == "confirm"
+    assert res_explicit["action_id"] == "pa_dcf"
+    assert res_explicit["job"]["agent"] == "dcf_agent"
+
+
+def test_dcf_job_exports_8_sheet_formula_xlsx_and_sheets():
+    """Completed DCF job registers its turn contract and exports an 8-sheet live-formula .xlsx for both Excel and Sheets."""
+    import io
+    import time
+    import openpyxl
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    with TestClient(app, base_url="https://testserver") as client:
+        sr = client.post("/api/auth/session", json={"persona_id": "CMD"})
+        assert sr.status_code == 200
+        sm = get_session_manager()
+        sess = sm.get_or_create("sess_dcf_xlsx", persona="CMD")
+        sess.pending_actions["pa_xlsx"] = {
+            "id": "pa_xlsx",
+            "agent": "dcf_agent",
+            "requires_role": ["CMD", "DIR_FIN"],
+            "inputs": {},
+            "expires_at": "2099-01-01T00:00:00Z",
+        }
+        jr = client.post("/api/jobs", json={"proposed_action_id": "pa_xlsx", "session_id": "sess_dcf_xlsx"})
+        assert jr.status_code == 202
+        job_id = jr.json()["job"]["id"]
+
+        job_done = None
+        for _ in range(50):
+            jstate = client.get(f"/api/jobs/{job_id}", params={"session_id": "sess_dcf_xlsx"}).json()["job"]
+            if jstate["status"] in ("succeeded", "failed", "cancelled"):
+                job_done = jstate
+                break
+            time.sleep(0.05)
+        assert job_done and job_done["status"] == "succeeded"
+        assert "sheets" in (job_done["result"].get("export_options") or [])
+        assert "xlsx" in (job_done["result"].get("export_options") or [])
+
+        for fmt in ("xlsx", "sheets"):
+            er = client.post(
+                "/api/export",
+                json={"turn_id": f"job:{job_id}", "session_id": "sess_dcf_xlsx", "format": fmt},
+            )
+            assert er.status_code == 200, f"Export {fmt} failed: {er.status_code} {er.text}"
+            exp_id = er.json()["export_id"]
+            dl = client.get(f"/api/export/{exp_id}")
+            assert dl.status_code == 200
+            wb = openpyxl.load_workbook(io.BytesIO(dl.content), data_only=False)
+            assert set(["Cover", "Assumptions", "WACC", "Historical", "Forecast", "Valuation", "Sensitivity", "Tornado"]).issubset(set(wb.sheetnames))
+            # Verify live Excel formulas exist on Forecast sheet
+            fc_sheet = wb["Forecast"]
+            formulas = [
+                cell.value
+                for row in fc_sheet.iter_rows()
+                for cell in row
+                if isinstance(cell.value, str) and cell.value.startswith("=")
+            ]
+            assert len(formulas) >= 10, f"Expected live Excel formulas in Forecast tab, got {formulas}"

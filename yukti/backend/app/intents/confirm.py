@@ -58,11 +58,41 @@ def extract_voice_edits(text: str) -> Dict[str, float]:
     return edits
 
 
+DCF_SELECT_RE = re.compile(
+    r"\b(dcf|discounted\s+cash\s*flow|valuation(?:\s+model)?|intrinsic\s+value)\b",
+    re.IGNORECASE,
+)
+
+EMAIL_SELECT_RE = re.compile(
+    r"\b(email|e-mail|mail|send\s+(?:the\s+)?email|transfer)\b",
+    re.IGNORECASE,
+)
+
+
+def _match_explicit_agent(text: str, active: Dict[str, Dict[str, Any]]) -> Optional[str]:
+    """Return the action_id explicitly named by the user when disambiguating multiple pending proposals."""
+    want_dcf = bool(DCF_SELECT_RE.search(text or ""))
+    want_email = bool(EMAIL_SELECT_RE.search(text or ""))
+    if want_dcf and not want_email:
+        for aid, pa in reversed(list(active.items())):
+            if str(pa.get("agent") or "").lower() == "dcf_agent":
+                return aid
+    if want_email and not want_dcf:
+        for aid, pa in reversed(list(active.items())):
+            if str(pa.get("agent") or "").lower() != "dcf_agent":
+                return aid
+    return None
+
+
 def detect_confirm_intent(text: str) -> Optional[str]:
     """Classify an utterance against SPEC-03 §6.2 into 'confirm', 'cancel', 'edit', or None."""
     cleaned = (text or "").strip()
     if not cleaned:
         return None
+
+    # Disambiguation replies like "No, just show the DCF first." select DCF rather than cancelling
+    if DCF_SELECT_RE.search(cleaned) and re.search(r"\b(just|show|run|first|only|instead)\b", cleaned, re.IGNORECASE):
+        return "confirm"
 
     if CANCEL_RE.search(cleaned):
         return "cancel"
@@ -127,25 +157,41 @@ async def resolve_pending_proposal_async(
     lang = getattr(session_state, "language", "en") or "en"
     persona = getattr(session_state, "persona", "CMD") or "CMD"
 
-    # SPEC-03 §6.2: if two non-expired proposals exist, ask which one to run
-    if len(active) >= 2:
-        msg = "Run the DCF or the email send?"
-        return {
-            "action": "clarify_multiple",
-            "echo": echo_text,
-            "contract": {
-                "contract_version": 3,
-                "turn_id": f"turn-clarify-pa-{int(datetime.now(timezone.utc).timestamp() * 1000)}",
-                "language": lang,
-                "persona": persona,
-                "spoken_summary": msg,
-                "display_text": msg,
-                "visual": {"type": "none", "mode": "replace"},
-                "access": {"status": "allowed"},
-            },
-        }
+    # Deduplicate stale proposals belonging to the same agent (keep newest per agent)
+    latest_by_agent: Dict[str, str] = {}
+    for aid, pa_item in list(active.items()):
+        ag = str(pa_item.get("agent") or aid)
+        if ag in latest_by_agent:
+            old_id = latest_by_agent[ag]
+            active.pop(old_id, None)
+            session_state.pending_actions.pop(old_id, None)
+        latest_by_agent[ag] = aid
 
-    action_id, pa = next(iter(active.items()))
+    # SPEC-03 §6.2: if two distinct non-expired proposals exist, check if user disambiguated first
+    selected_id: Optional[str] = None
+    if len(active) >= 2:
+        selected_id = _match_explicit_agent(text, active)
+        if selected_id is None:
+            msg = "Run the DCF or the email send?"
+            return {
+                "action": "clarify_multiple",
+                "echo": echo_text,
+                "contract": {
+                    "contract_version": 3,
+                    "turn_id": f"turn-clarify-pa-{int(datetime.now(timezone.utc).timestamp() * 1000)}",
+                    "language": lang,
+                    "persona": persona,
+                    "spoken_summary": msg,
+                    "display_text": msg,
+                    "visual": {"type": "none", "mode": "replace"},
+                    "access": {"status": "allowed"},
+                },
+            }
+
+    if selected_id is not None:
+        action_id, pa = selected_id, active[selected_id]
+    else:
+        action_id, pa = next(iter(active.items()))
 
     if intent == "cancel":
         session_state.pending_actions.pop(action_id, None)

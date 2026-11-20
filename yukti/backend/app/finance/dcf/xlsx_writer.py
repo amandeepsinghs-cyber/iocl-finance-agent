@@ -94,7 +94,7 @@ def write_dcf_xlsx(result: Dict[str, Any], filename: str):
             ws_f[f"{col}1"] = period
             ws_f[f"{col}2"] = i + 1
             ws_f[f"{col}3"] = val
-        list_len = list_len
+        list_len = len(fcff_list)
     else:
         for i, r in enumerate(fcff_data):
             col = chr(ord('B') + i)
@@ -102,6 +102,14 @@ def write_dcf_xlsx(result: Dict[str, Any], filename: str):
             ws_f[f"{col}2"] = r.get("t", i+1)
             ws_f[f"{col}3"] = r.get("fcff", 0)
         list_len = len(fcff_data)
+
+    # Add live Excel discount-factor & PV(FCFF) formulas on Forecast sheet
+    ws_f["A4"] = "Discount Factor"
+    ws_f["A5"] = "PV of FCFF"
+    for i in range(list_len):
+        col = chr(ord('B') + i)
+        ws_f[f"{col}4"] = f"=1/(1+wacc_pct/100)^{col}2"
+        ws_f[f"{col}5"] = f"={col}3*{col}4"
 
     last_col = chr(ord('B') + list_len - 1) if list_len > 0 else 'B'
 
@@ -199,7 +207,11 @@ def write_dcf_xlsx(result: Dict[str, Any], filename: str):
     ws_t["C2"] = "High (INR)"
     
     t_row = 3
-    for tor in result.get("tornado", []):
+    raw_tor = result.get("tornado", [])
+    tor_list = raw_tor.get("bars", []) if isinstance(raw_tor, dict) else (raw_tor or [])
+    for tor in tor_list:
+        if not isinstance(tor, dict):
+            continue
         ws_t[f"A{t_row}"] = tor.get("driver")
         ws_t[f"B{t_row}"] = tor.get("low_inr")
         ws_t[f"C{t_row}"] = tor.get("high_inr")

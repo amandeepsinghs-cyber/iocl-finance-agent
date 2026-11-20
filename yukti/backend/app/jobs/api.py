@@ -54,14 +54,16 @@ def _assert_job_owner(job: Dict[str, Any], principal: Principal, session_id: Opt
     caller_emp = str(principal.emp_id or "")
 
     job_sid = job.get("session_id")
-    if session_id and job_sid and session_id != job_sid:
-        raise HTTPException(status_code=403, detail="Forbidden")
-
     owner_persona = str(job.get("owner_persona") or "").upper()
     owner_emp = str(job.get("owner_emp_id") or "")
     if owner_persona and caller_persona != owner_persona:
         raise HTTPException(status_code=403, detail="Forbidden")
     if owner_emp and caller_emp and caller_emp != owner_emp:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    # Voice WebSocket sessions (sess-cmd-...) and HTTP UI tabs (sess-...) belong to the same authenticated
+    # principal; allow cross-channel polling when owner_persona + owner_emp_id match cleanly.
+    if session_id and job_sid and session_id != job_sid and not (owner_persona and caller_persona == owner_persona):
         raise HTTPException(status_code=403, detail="Forbidden")
 
     sm = get_session_manager()

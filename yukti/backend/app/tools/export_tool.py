@@ -456,7 +456,31 @@ class DocumentExporter:
         wb.properties.subject = str(c.get("user_query") or doc_title)
         wb.properties.keywords = f"persona={persona}; masked={str(bool(masked)).lower()}"
 
-        # DCF multi-sheet workbook branch
+        # DCF multi-sheet live-formula workbook branch (base job + WACC/assumption override runs)
+        if vis.get("type") == "dcf_model":
+            from app.finance.dcf.xlsx_writer import write_dcf_xlsx
+
+            dcf_payload = dict(vis.get("dcf_model") or {})
+            for k in (
+                "assumptions",
+                "wacc_build",
+                "historical",
+                "forecast",
+                "terminal",
+                "bridge",
+                "per_share",
+                "sensitivity",
+                "tornado",
+                "as_of",
+                "disclaimer",
+                "run_id",
+            ):
+                if k not in dcf_payload and vis.get(k) is not None:
+                    dcf_payload[k] = vis[k]
+            write_dcf_xlsx(dcf_payload, str(out_path))
+            return out_path
+
+        # Legacy DCF multi-sheet workbook branch
         if c.get("dcf_workbook"):
             _build_dcf_sheets(wb, c, persona=persona, masked=masked)
             if c.get("definition_id") or c.get("definition_meta"):

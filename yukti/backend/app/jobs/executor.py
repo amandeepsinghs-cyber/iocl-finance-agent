@@ -248,6 +248,7 @@ class JobExecutor:
                             "disclaimer": dcf_res["disclaimer"],
                             "assumptions": dcf_res["assumptions"],
                             "wacc_build": dcf_res["wacc_build"],
+                            "historical": dcf_res.get("historical", []),
                             "forecast": dcf_model["forecast"],
                             "terminal": dcf_model["terminal"],
                             "bridge": dcf_res["bridge"],
@@ -270,7 +271,7 @@ class JobExecutor:
                                 "title": f"NSE IOC.NS Close ({px_meta.get('date', '2026-03-30')}: ₹{px:.2f})",
                             },
                         ],
-                        "export_options": ["xlsx", "pdf"],
+                        "export_options": ["xlsx", "sheets", "pdf"],
                         "caveat": disclaimer,
                         "provenance": {"label": "illustrative", "detail": disclaimer},
                     }
@@ -335,6 +336,24 @@ class JobExecutor:
             sess.jobs.append({"id": job_id, "agent": agent_id, "status": "succeeded", "turn_id": f"job:{job_id}"})
             sess.last_agent_result = {"agent": agent_id, "run_id": job_id, "turn_id": f"job:{job_id}", "inputs": proposed_action.get("inputs") or {}}
             sess.record_turn(result)
+
+        try:
+            from app.export_audit import register_turn_contract
+            from app.auth import PERSONA_DIRECTORY
+
+            owner_persona = str(proposed_action.get("owner_persona") or "CMD").upper()
+            owner_emp = str(proposed_action.get("owner_emp_id") or "")
+            if not owner_emp:
+                owner_emp = PERSONA_DIRECTORY.get(owner_persona, {}).get("emp_id", "")
+            register_turn_contract(
+                turn_id=f"job:{job_id}",
+                contract=result,
+                emp_id=owner_emp,
+                persona=owner_persona,
+                session_id=session_id,
+            )
+        except Exception as exc_reg:
+            logger.debug("job turn export registration skipped: %s", exc_reg)
 
         job_final = self.store.get_job(job_id)
         self.broker.publish(job_id, "job.completed", {"job": job_final, "result_ref": f"job:{job_id}"})
