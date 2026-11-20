@@ -902,6 +902,9 @@ export default function YuktiApp() {
       bc = new BroadcastChannel('yukti_voice_owner');
       bc.onmessage = (ev) => {
         if (ev.data?.type === 'claim_mic' && ev.data?.sessionId !== yuktiClient.getSessionId()) {
+          // Yield mic cleanly and pause hands-free auto-reopen so two visible tabs never ping-pong every 600 ms
+          handsFreeRef.current = false;
+          engagedRef.current = false;
           if (micActiveRef.current) void stopMicRef.current(false);
           yuktiClient.disconnect();
         }
