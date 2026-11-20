@@ -19,7 +19,7 @@ WORKDIR /app
 
 # 1. Install Python backend dependencies
 COPY yukti/backend/pyproject.toml yukti/backend/uv.lock /app/yukti/backend/
-RUN cd /app/yukti/backend && uv sync --frozen --no-dev --no-install-project && uv pip install pyarrow pandas
+RUN cd /app/yukti/backend && uv sync --frozen --no-dev --no-install-project
 
 # 2. Install Frontend dependencies from public npm registry (strip corp airlock package-lock.json)
 COPY yukti/frontend/package.json /app/yukti/frontend/package.json
