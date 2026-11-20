@@ -1,9 +1,11 @@
-# Yukti IOCL — Live Application & Architecture Links
+# Yukti IOCL — App Link
 
-_Last updated: 17-Nov-2026 (`yukti-iocl` v3 · revision `yukti-iocl-00003-nl4` — Indian Oil Corporation Limited Finance & Downstream Intelligence Agent)._
+**app link:** https://yukti-iocl-u7thdacpua-el.a.run.app
+
+_Last updated: 20-Nov-2026 (`yukti-iocl` v3 · revision `yukti-iocl-00003-nl4` — Indian Oil Corporation Limited Finance & Downstream Intelligence Agent)._
 
 ## 1. Cloud Run — Production (`yukti-finance-iocl` · `asia-south1`)
-- **Service URL:** https://yukti-iocl-u7thdacpua-el.a.run.app (alias: https://yukti-iocl-304306246468.asia-south1.run.app)
+- **App link:** https://yukti-iocl-u7thdacpua-el.a.run.app (alias: https://yukti-iocl-304306246468.asia-south1.run.app)
 - **Architecture Portal ("How Yukti works"):** https://yukti-iocl-u7thdacpua-el.a.run.app/architecture/portal.html (and `/architecture`)
 - **Active Revision:** `yukti-iocl-00003-nl4` (100% traffic)
 - **Container Image:** `asia-south1-docker.pkg.dev/yukti-finance-iocl/yukti-repo/yukti-iocl:v3`
