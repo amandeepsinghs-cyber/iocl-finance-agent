@@ -538,6 +538,19 @@ class AgentTurnRunner:
             session_state.record_turn(policy_contract, user_query=query)
             return policy_contract
 
+        # Conceptual / definitional finance questions (e.g. "difference between P&L and Income statement")
+        # answer directly instead of dumping a full FY26 financial statement table.
+        if not spec_patch:
+            from app.brain.smalltalk import (
+                build_conceptual_finance_contract,
+                detect_conceptual_finance_question,
+            )
+            if detect_conceptual_finance_question(query):
+                concept_c = await build_conceptual_finance_contract(query, norm_persona, turn_id, det_lang, t0)
+                self._validate_contract(concept_c)
+                session_state.record_turn(concept_c, user_query=query)
+                return concept_c
+
         # Transfer note drafting from active cohort/row action (SPEC-07)
         from app.brain.documents import is_transfer_note_request, transfer_note_contract
         if is_transfer_note_request(query):

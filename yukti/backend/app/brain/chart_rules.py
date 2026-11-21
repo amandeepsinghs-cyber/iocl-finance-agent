@@ -301,7 +301,8 @@ def is_pure_replot_request(query: str) -> Tuple[bool, Optional[str]]:
         "hazira", "uran", "bokaro", "agartala", "silchar", "nazira", "karaikal", "panvel", "goa",
         "age", "ages", "salary", "pay", "tenure", "stay", "lifting", "water cut", "production",
         "vacancy", "vacancies", "overtime", "apar", "grade", "discipline", "employee", "employees",
-        "executive", "executives", "field", "fields", "brent", "mou", "capex", "revenue", "pbt", "pat", "ebitda",
+        "executive", "executives", "field", "fields", "brent", "mou", "capex", "revenue", "total income", "pbt", "pat", "ebitda",
+        "free cash flow", "fcf", "excise", "grm", "diesel", "petrol", "net profit", "operating profit",
         "p&l", "pnl", "profit and loss", "income statement", "balance sheet", "cash flow",
     ]
     if any(w in q for w in domain_words) or re.search(r"\bfy\s*\d{2}\b|\b20\d{2}\s*[-–]\s*\d{2}\b", q):

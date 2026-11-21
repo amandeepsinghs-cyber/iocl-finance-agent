@@ -119,6 +119,10 @@ def handle_ui_control(
         )
 
         stmt_dict = last_vis.get("statement") if isinstance(last_vis.get("statement"), dict) else None
+        # Never blindly re-plot a multi-line financial statement (24+ rows) into a spaghetti line/bar chart;
+        # return None so the planner runs a clean single-metric trend query for whatever metric the user named.
+        if stmt_dict is not None and val not in ("waterfall", "table"):
+            return None
         stmt_periods = [str(p) for p in (stmt_dict.get("periods") or []) if p] if stmt_dict else []
         flat_stmt_rows = (
             [

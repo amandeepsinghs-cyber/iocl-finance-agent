@@ -247,3 +247,50 @@ async def test_step_r3_compiler_local_snapshot_subjects(monkeypatch: pytest.Monk
     )
     assert res_bu.source == "local_snapshot"
     assert len(res_bu.rows) == 2
+
+
+def test_conceptual_finance_and_conversational_ar_guards() -> None:
+    from app.brain.smalltalk import detect_conceptual_finance_question
+    from app.knowledge.ar_deep_qa import _is_garbled_ocr, _trim_to_sentence, should_fallback_to_ar
+
+    # Conceptual finance questions must NOT be hijacked into FY26 P&L dump
+    assert detect_conceptual_finance_question(
+        "what is the difference in P&L and Income stateemnt or they are the same thing?"
+    )
+    assert detect_conceptual_finance_question("What is the difference between EBITDA and EBIT?")
+    assert detect_conceptual_finance_question("Are standalone and consolidated financials the same thing?")
+    # Real IOCL data requests must NOT be intercepted as conceptual
+    assert not detect_conceptual_finance_question("Show IOCL's Schedule III Profit and Loss statement for FY26")
+    assert not detect_conceptual_finance_question("Can I see the income statement for the past 5 years?")
+
+    # Conversational filler must NOT trigger AR RAG vector search
+    assert not should_fallback_to_ar("All right, I'll do one now.")
+    assert not should_fallback_to_ar("Sounds good, let me try another one.")
+    # Substantive IOCL/AR questions still trigger AR RAG
+    assert should_fallback_to_ar("What were IOCL's contingent liabilities in the FY26 annual report?")
+
+    # Garbled FY19 custom-font OCR detection + clean sentence-boundary trimming
+    assert _is_garbled_ocr("418 Indian Oil TOKEEPYOURPASSWORDCONlDENTIAL 4HE #OMPANY OPERATES")
+    assert not _is_garbled_ocr("Contingent liabilities for IndianOil stood at ₹58,642 crore in FY26.")
+    assert _trim_to_sentence(
+        "IndianOil adopted Ind AS 116 from April 1, 2019 across refinery and depot leases. Furthermore, the Group planned to adopt without r"
+    ) == "IndianOil adopted Ind AS 116 from April 1, 2019 across refinery and depot leases."
+
+
+def test_pnl_deduplicates_excise_and_places_net_revenue_under_income() -> None:
+    from app.brain.statement_builder import build_statement_spec
+
+    rows = [
+        {"fiscal_year": "FY26", "line_code": "PL.REV_OPS", "line_name": "Revenue from Operations (Gross)", "value_inr_cr": 886224.41, "verified": True},
+        {"fiscal_year": "FY26", "line_code": "LEVY.TOTAL", "line_name": "Excise Duty on Sale of Goods", "value_inr_cr": 102066.54, "verified": True},
+        {"fiscal_year": "FY26", "line_code": "PL.EXCISE", "line_name": "Excise Duty", "value_inr_cr": 102066.54, "verified": True},
+        {"fiscal_year": "FY26", "line_code": "REV.NET_OF_EXCISE", "line_name": "Revenue from Operations (Net of Excise Duty)", "value_inr_cr": 784157.87, "verified": True},
+        {"fiscal_year": "FY26", "line_code": "PL.OTHER_INCOME", "line_name": "Other Income", "value_inr_cr": 4988.31, "verified": True},
+        {"fiscal_year": "FY26", "line_code": "PL.TOTAL_INCOME", "line_name": "Total Income", "value_inr_cr": 891212.72, "verified": True},
+    ]
+    spec = build_statement_spec("pnl", rows, periods=["FY26"], fy="FY26")
+    all_codes = [r["line_code"] for sec in spec["sections"] for r in sec["rows"]]
+    assert "LEVY.TOTAL" in all_codes
+    assert "PL.EXCISE" not in all_codes
+    income_sec = next(sec for sec in spec["sections"] if sec["id"] == "income")
+    assert any(r["line_code"] == "REV.NET_OF_EXCISE" for r in income_sec["rows"])

@@ -489,10 +489,21 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ contract, isDark = false
       const art = j.artifact || j;
       const href = art.url || (art.export_id ? `/api/export/${encodeURIComponent(art.export_id)}` : '');
       if (!href) throw new Error('No file was returned');
-      // Same-origin download only: never open an external (e.g. docs.google.com) URL from an export.
+      // Same-origin download only for file artifact href; live Google Sheet URL (if created by Drive API) opens separately.
       if (/^https?:\/\//i.test(href) && !href.startsWith(window.location.origin)) throw new Error('Unexpected export link');
+      const liveSheetUrl =
+        typeof j.sheet_url === 'string' && /^https:\/\/docs\.google\.com\/spreadsheets\//i.test(j.sheet_url)
+          ? j.sheet_url
+          : null;
+      if (liveSheetUrl) {
+        window.open(liveSheetUrl, '_blank', 'noopener,noreferrer');
+      }
       triggerDownload(href, art.filename || `yukti_export.${art.kind || format}`);
-      const honest = format === 'sheets' || format === 'docs' ? j.toast || honestWorkspaceCopy(format, lang) : j.toast;
+      const honest = liveSheetUrl
+        ? j.toast || 'Opened live Google Sheet in a new tab (and downloaded .xlsx copy).'
+        : format === 'sheets' || format === 'docs'
+          ? j.toast || honestWorkspaceCopy(format, lang)
+          : j.toast;
       showToast([opts?.defaulted ? defaultedCopy(format, lang) : '', honest || readyCopy(format, lang)].filter(Boolean).join(' '));
     } catch (e: any) {
       showToast(`${lang === 'hi' ? 'एक्सपोर्ट नहीं हो सका' : 'Export failed'}: ${e?.message || e}`);

@@ -18,7 +18,7 @@ function AskBar({ state, label }: { state: AuraState; label: string }) {
       <div data-aura={state} className="yk-aura-ring rounded-pill">
        <div className="yk-aura-surface rounded-pill flex items-center gap-3 pl-5 pr-2 py-2 bg-[var(--card)] border border-[var(--hairline)]">
         <span className="flex-1 text-body text-[var(--ink-3)]">
-          {state === 'listening' ? 'Listening…' : state === 'thinking' ? 'Yukti is thinking…' : 'Ask Yukti anything about HR, Finance or policy'}
+          {state === 'listening' ? 'Listening…' : state === 'thinking' ? 'Yukti is thinking…' : 'Ask Yukti anything about IOCL Finance, Refineries, DCF or policy'}
         </span>
         <span className="inline-grid place-items-center w-9 h-9 rounded-full text-[var(--ink-2)]">
           <Mic className="w-[1.1rem] h-[1.1rem]" />

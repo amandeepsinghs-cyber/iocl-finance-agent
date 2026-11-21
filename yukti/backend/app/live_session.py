@@ -716,6 +716,32 @@ class LiveSessionManager:
                 cols = list(rows[0].keys()) if rows else []
 
             target_kind = val.lower() or "table"
+            stmt_dict = vis.get("statement") if isinstance(vis.get("statement"), dict) else None
+            if stmt_dict is not None and target_kind not in ("table", "waterfall"):
+                # Never plot all 24 rows of a Schedule III financial statement as a spaghetti line chart:
+                # extract a clean chronological single-series headline trend from the statement's periods.
+                stmt_periods = list(reversed([str(p) for p in (stmt_dict.get("periods") or []) if p]))
+                flat_rows = [
+                    r for s in (stmt_dict.get("sections") or []) if isinstance(s, dict)
+                    for r in (s.get("rows") or []) if isinstance(r, dict)
+                ]
+                preferred_codes = ("PL.TOTAL_INCOME", "PL.REV_OPS", "BS.ASSETS.TOTAL", "CF.CFO")
+                picked_row = next(
+                    (r for code in preferred_codes for r in flat_rows if r.get("line_code") == code),
+                    flat_rows[0] if flat_rows else None,
+                )
+                if picked_row and stmt_periods:
+                    series_label = str(picked_row.get("label") or "Amount (₹ Cr)")
+                    vals_map = picked_row.get("values") or {}
+                    rows = [
+                        {"fiscal_year": p, series_label: vals_map[p]}
+                        for p in stmt_periods
+                        if isinstance(vals_map.get(p), (int, float))
+                    ]
+                    cols = ["fiscal_year", series_label]
+                    vis["title"] = f"{series_label} ({stmt_periods[0]}–{stmt_periods[-1]})"
+                    vis.pop("statement", None)
+                    vis["table"] = {"columns": cols, "rows": rows}
             if target_kind == "table" and rows:
                 vis["type"] = "table"
                 vis["mode"] = "refine"

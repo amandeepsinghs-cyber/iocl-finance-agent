@@ -142,12 +142,65 @@ def detect_ar_deep_qa(query: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+_CONVERSATIONAL_FILLER_RE = re.compile(
+    r"^\s*(?:"
+    r"all\s+right|alright|got\s+it|sounds\s+good|okay|ok|sure|fine|great|cool|nice|"
+    r"thank(?:s|\s+you)|yes|yeah|yep|no|nope|cancel|hi|hello|hey|bye|goodbye|"
+    r"i'?ll\s+do|let\s+me|one\s+(?:sec|second|moment)|hold\s+on|wait|never\s*mind|sorry|"
+    r"good\s+job|well\s+done|awesome|perfect"
+    r")\b",
+    re.I,
+)
+
+_SUBSTANTIVE_AR_DOMAIN_RE = re.compile(
+    r"\b(?:"
+    r"iocl|indianoil|indian\s+oil|cpcl|lanka\s+ioc|petronet|ongc|oil\s+india|"
+    r"annual\s+report|disclosure|footnote|note\s+\d+|schedule\s+(?:iii|3)|ind\s*as|"
+    r"contingent|liabilit\w*|commitment\w*|litigation|arbitration|claim\w*|guarantee\w*|"
+    r"auditor|c&ag|caro|governance|board|director|dividend|equity|reserve\w*|borrow\w*|debt|lease\w*|"
+    r"refiner\w*|panipat|paradip|koyali|mathura|haldia|barauni|guwahati|digboi|bongaigaon|"
+    r"pipeline\w*|petchem|petrochemical|lpg|indane|atf|lube|servo|ethanol|biofuel|hydrogen|solar|wind|ev\b|net[- ]?zero|esg|csr|r&d|research|"
+    r"subsidiar\w*|joint\s+venture|\bjv\b|associate\w*|capex|project\w*|expansion|capacity|throughput|grm|margin|inventory|impairment|tax|excise|vat|segment|revenue|profit|ebitda|cash\s+flow|balance\s+sheet"
+    r")\b",
+    re.I,
+)
+
+
 def should_fallback_to_ar(query: str) -> bool:
-    """Whether an unresolved turn should consult the 10-year AR corpus before smalltalk."""
+    """Only consult the 10-year AR corpus on unresolved turns that carry a real IOCL/finance/disclosure signal."""
     q = (query or "").strip()
-    if not q or len(q.split()) < 3 or _GREETING_ONLY_RE.match(q):
+    if not q or len(q.split()) < 3 or _GREETING_ONLY_RE.match(q) or _CONVERSATIONAL_FILLER_RE.match(q):
         return False
-    return not bool(re.search(r"^\s*(thank|ok|okay|yes|no|cancel|hi|hello|bye)\b", q, re.I))
+    return bool(_SUBSTANTIVE_AR_DOMAIN_RE.search(q))
+
+
+def _is_garbled_ocr(text: str) -> bool:
+    """Detect corrupted custom-font PDF extractions (e.g. FY19 '4HE #OMPANY', 'TOKEEPYOURPASSWORDCONlDENTIAL')."""
+    s = str(text or "")
+    if not s:
+        return True
+    sample = s[:500]
+    # Corrupted font shift: punctuation/digits embedded directly before uppercase runs like ')NDIAN', '4HE', '#OMPANY', '3HRI0ARINDU'
+    if len(re.findall(r"[0-9#()\"'/\\][A-Z]{2,}", sample)) >= 2:
+        return True
+    # Spaceless long uppercase runs (e.g. TOKEEPYOURPASSWORDCONlDENTIAL, ONSUCCESSFULLOGIN)
+    if len(re.findall(r"[A-Z]{18,}", sample)) >= 1:
+        return True
+    if len(_SPACED_OCR_RE.findall(sample)) >= 3:
+        return True
+    return False
+
+
+def _trim_to_sentence(text: str) -> str:
+    """Avoid mid-word truncation if a completion hits token limit."""
+    s = (text or "").strip()
+    if not s or s[-1] in ".!?\"'”)]":
+        return s
+    # Trim back to the last clean sentence boundary if present past 40% of the string
+    m = re.search(r"^(.*[.!?])(?:\s+[^.!?]*)$", s, re.S)
+    if m and len(m.group(1)) >= max(60, int(len(s) * 0.4)):
+        return m.group(1).strip()
+    return s.rstrip(",;:- ") + "."
 
 
 _LEXICAL_STOPWORDS = {
@@ -232,7 +285,8 @@ def retrieve_ar_chunks(
         chunks = _lexical_fallback_retrieve(query, fiscal_year, top_k=top_k)
         if not chunks and fiscal_year is not None:
             chunks = _lexical_fallback_retrieve(query, None, top_k=top_k)
-    return chunks
+    clean_chunks = [c for c in chunks if not _is_garbled_ocr(c.get("text") or "")]
+    return clean_chunks if clean_chunks else chunks
 
 
 def _synthesize_with_gemini(query: str, chunks: List[Dict[str, Any]], language: str) -> Optional[str]:
@@ -252,11 +306,11 @@ def _synthesize_with_gemini(query: str, chunks: List[Dict[str, Any]], language: 
             contents=prompt,
             config=types.GenerateContentConfig(
                 temperature=0.15,
-                max_output_tokens=360,
+                max_output_tokens=512,
                 thinking_config=types.ThinkingConfig(thinking_budget=0),
             ),
         )
-        txt = (resp.text or "").strip()
+        txt = _trim_to_sentence(resp.text or "")
         return txt or None
     except Exception as exc:
         logger.info(f"AR Deep-QA Gemini synthesis fallback ({type(exc).__name__}: {exc})")

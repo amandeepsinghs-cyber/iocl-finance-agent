@@ -769,6 +769,19 @@ def create_export(
             "format": kind,
             "artifact": artifact_dict,
         }
+        if fmt in ("sheets", "google_sheets", "gsheet") and kind == "xlsx":
+            from app.tools.gsheets_export import parse_iap_email, upload_xlsx_to_google_sheets
+
+            iap_email = parse_iap_email(request.headers.get("X-Goog-Authenticated-User-Email"))
+            gs_res = upload_xlsx_to_google_sheets(out_path, title=canonical_filename, share_email=iap_email)
+            if gs_res and gs_res.get("sheet_url"):
+                resp_payload["sheet_url"] = gs_res["sheet_url"]
+                resp_payload["sheet_id"] = gs_res.get("sheet_id")
+                toast_parts = [
+                    "Created live Google Sheet with formulas"
+                    + (f" (shared with {gs_res['shared_with']})" if gs_res.get("shared_with") else "")
+                    + " — opened in a new tab."
+                ]
         if toast_parts:
             resp_payload["toast"] = " ".join(toast_parts)
         return resp_payload

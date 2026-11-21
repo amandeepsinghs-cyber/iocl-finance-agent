@@ -149,7 +149,7 @@ STATEMENT_LINE_META: Dict[str, Tuple[StatementKind, str, str, int, RowKind, int,
     "REV.CRUDE": ("pnl", "income", "Income", 2, "line", 12, "Petroleum products revenue (Refining & Marketing)"),
     "REV.PETCHEM": ("pnl", "income", "Income", 2, "line", 14, "Petrochemicals & other operating revenue"),
     "LEVY.TOTAL": ("pnl", "expenses", "Expenses", 1, "line", 35, "Excise duty on sale of goods"),
-    "REV.NET_OF_EXCISE": ("pnl", "expenses", "Expenses", 0, "subtotal", 38, "Revenue from operations (net of excise duty)"),
+    "REV.NET_OF_EXCISE": ("pnl", "income", "Income", 1, "subtotal", 18, "Revenue from operations (net of excise duty)"),
     "PL.COST_MATERIALS": ("pnl", "expenses", "Expenses", 1, "line", 40, "Cost of materials consumed"),
     "PL.PURCHASES_TRADED": ("pnl", "expenses", "Expenses", 1, "line", 50, "Purchases of stock-in-trade"),
     "PL.INVENTORY_CHANGE": ("pnl", "expenses", "Expenses", 1, "line", 60, "Changes in inventories of finished goods & WIP"),
@@ -689,9 +689,13 @@ def build_statement_spec(
             omitted_periods.append(p)
 
     # 3. Group rows by line_code (or clean label) while preserving 100% of SSOT `line_order` (`order`)
+    present_codes = {str(r.get("line_code") or "").strip() for r in verified_rows}
     grouped: Dict[str, Dict[str, Any]] = {}
     for idx, r in enumerate(verified_rows):
         code = str(r.get("line_code") or "").strip() or None
+        # Deduplicate alias Excise Duty rows (`PL.EXCISE`, `PL.STAT_LEVIES`) when canonical `LEVY.TOTAL` is already present
+        if statement == "pnl" and code in ("PL.EXCISE", "PL.STAT_LEVIES") and "LEVY.TOTAL" in present_codes:
+            continue
         raw_lbl = str(
             r.get("line_name_as_reported")
             or r.get("display_name")
@@ -768,8 +772,16 @@ def build_statement_spec(
         if r.get("is_restated"):
             entry["is_restated"] = True
 
-    # 4. Sort rows strictly by (order, original_index) so SSOT `line_order` is preserved 100%
-    ordered_entries = sorted(grouped.values(), key=lambda x: (x["_order"], x["_idx"]))
+    # 4. Sort rows by canonical section order first (so sections never split across headers), then (order, original_index)
+    _sec_rank_map = {
+        "income": 0, "expenses": 1, "profit": 2,
+        "non_current_assets": 0, "current_assets": 1, "equity": 2, "non_current_liabilities": 3, "current_liabilities": 4,
+        "operating": 0, "investing": 1, "financing": 2, "cash_summary": 3,
+    }
+    ordered_entries = sorted(
+        grouped.values(),
+        key=lambda x: (_sec_rank_map.get(str(x.get("_sec_id") or ""), 99), x["_order"], x["_idx"]),
+    )
 
     # 5. Compute YoY % (for periods[0] vs periods[1]; omitted for subtotals/totals when base <= 0 per SPEC-09 §4.1)
     effective_show_yoy = (len(active_periods) >= 2) if show_yoy is None else bool(show_yoy)

@@ -387,13 +387,23 @@ def detect_ui_control_intent(query: str) -> Optional[Dict[str, str]]:
                         matched_with_pos.append((best_pos, canonical))
                 matched_with_pos.sort(key=lambda x: x[0])
                 matched_cols = [c for _, c in matched_with_pos]
-                fmt = "pdf" if re.search(r"\bpdf\b|पीडीएफ", q, re.I) else "xlsx"
+                if re.search(r"\b(?:google\s+sheets?|gsheets?|to\s+sheets?)\b", q, re.I):
+                    fmt = "sheets"
+                elif re.search(r"\bpdf\b|पीडीएफ", q, re.I):
+                    fmt = "pdf"
+                else:
+                    fmt = "xlsx"
                 return {"action": "export", "value": fmt, "columns": ",".join(matched_cols)}
     except Exception as e:
         import logging
         logging.warning(f"Failed to load export_intent.json: {e}")
-        
-    if any(p in q for p in ["export to excel", "export to sheets", "download excel", "export xlsx"]):
+
+    if re.search(r"\b(?:export|download|save)\b.*\b(?:google\s+sheets?|gsheets?)\b", q, re.I) or "export to sheets" in q:
+        return {"action": "export", "value": "sheets"}
+    if (
+        any(p in q for p in ["export to excel", "download excel", "export xlsx"])
+        or re.search(r"\b(?:export|download|save)\b.*\b(?:excel|xlsx|spreadsheet)\b", q, re.I)
+    ):
         return {"action": "export", "value": "xlsx"}
 
     # 5. Persona & Language

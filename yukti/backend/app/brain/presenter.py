@@ -641,12 +641,24 @@ def build_visual(spec: QuerySpec, compiled: CompiledQuery, columns: List[str], r
         by_code = _by_code_for_fy(rows, fy)
         ocf_r = _pick_code(by_code, "CF.CFO", "operating_cash_flow_inr_cr")
         icf_r = _pick_code(by_code, "CF.CFI", "investing_cash_flow_inr_cr")
-        fcf_r = _pick_code(by_code, "CF.FCF", "free_cash_flow_inr_cr", "CF.CFF", "financing_cash_flow_inr_cr")
+        capex_r = _pick_code(by_code, "CF.CAPEX", "CF.INV_PPE_PAYMENTS", "capex_cash_outflow_inr_cr")
+        fcf_r = _pick_code(by_code, "CF.FCF", "free_cash_flow_inr_cr")
         cls_r = _pick_code(by_code, "CF.CCE_CLOSE", "closing_cash_inr_cr")
+        ocf_val = ocf_r.get("amount_cr") if "amount_cr" in ocf_r else (ocf_r.get("values") or {}).get(fy)
+        capex_val = capex_r.get("amount_cr") if "amount_cr" in capex_r else (capex_r.get("values") or {}).get(fy)
+        fcf_val = fcf_r.get("amount_cr") if "amount_cr" in fcf_r else (fcf_r.get("values") or {}).get(fy)
+        if fcf_val is None and isinstance(ocf_val, (int, float)) and isinstance(capex_val, (int, float)):
+            # Capex outflow is negative in Ind-AS 7 Cash Flow Statement; FCF = OCF - |Capex|
+            fcf_val = round(float(ocf_val) - abs(float(capex_val)), 2)
+        fcf_pct_ocf = (
+            round((float(fcf_val) / float(ocf_val)) * 100.0, 1)
+            if isinstance(fcf_val, (int, float)) and isinstance(ocf_val, (int, float)) and float(ocf_val) != 0
+            else None
+        )
         kpis = [
             {
                 "label": f"Operating Cash Flow ({fy})",
-                "value": ocf_r.get("amount_cr") if "amount_cr" in ocf_r else (ocf_r.get("values") or {}).get(fy),
+                "value": ocf_val,
                 "unit": "₹ crore",
                 "delta": f"{ocf_r.get('yoy_change_pct'):+.1f}% vs prior FY" if isinstance(ocf_r.get("yoy_change_pct"), (int, float)) else "Ind-AS 7 OCF",
             },
@@ -658,9 +670,13 @@ def build_visual(spec: QuerySpec, compiled: CompiledQuery, columns: List[str], r
             },
             {
                 "label": f"Free Cash Flow ({fy})",
-                "value": fcf_r.get("amount_cr") if "amount_cr" in fcf_r else (fcf_r.get("values") or {}).get(fy),
+                "value": fcf_val,
                 "unit": "₹ crore",
-                "delta": f"{fcf_r.get('pct_of_ocf'):.1f}% of OCF" if isinstance(fcf_r.get("pct_of_ocf"), (int, float)) else "Ind-AS 7 CFF",
+                "delta": (
+                    f"{fcf_pct_ocf:.1f}% of OCF · OCF less Capex"
+                    if isinstance(fcf_pct_ocf, (int, float))
+                    else "OCF less Capex"
+                ),
             },
             {
                 "label": f"Closing Cash & Bank ({fy})",
@@ -917,7 +933,8 @@ def build_visual(spec: QuerySpec, compiled: CompiledQuery, columns: List[str], r
                 if abs(tot - round(tot)) < 1e-9:
                     tot = int(round(tot))
                 plural = DIM_PLURAL.get(dims[0], "groups")
-                kpis.append({"label": f"Total {compiled.metric_label}", "value": tot, "unit": unit_word, "delta": f"Across {len(num_rows)} {plural}"})
+                _tot_lbl = compiled.metric_label if str(compiled.metric_label).strip().lower().startswith("total ") else f"Total {compiled.metric_label}"
+                kpis.append({"label": _tot_lbl, "value": tot, "unit": unit_word, "delta": f"Across {len(num_rows)} {plural}"})
             kpis.append({"label": f"Highest · {top_r.get(dims[0])}", "value": top_r.get(val), "unit": unit_word})
             if len(num_rows) > 1:
                 kpis.append({"label": f"Lowest · {low_r.get(dims[0])}", "value": low_r.get(val), "unit": unit_word})

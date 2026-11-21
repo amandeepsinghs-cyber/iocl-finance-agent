@@ -442,7 +442,7 @@ export const FloatingConversationPanel: React.FC<Props> = ({
                 e.currentTarget.blur();
               }
             }}
-            placeholder={orbState === 'listening' ? (liveInterimText || 'Listening… speak naturally') : 'Tap the aurora to talk, or type your question about HR, Finance or policies…'}
+            placeholder={orbState === 'listening' ? (liveInterimText || 'Listening… speak naturally') : 'Tap the aurora to talk, or type your question about IOCL Finance, Refineries, DCF or policies…'}
             data-testid="chat-input"
             className={clsx(
               collapsed
