@@ -1013,6 +1013,55 @@ class AgentTurnRunner:
         """Validates a planner contract and stores the spec for follow-up patches (B2.5)."""
         contract = planned["contract"]
         meta = planned.get("meta") or {}
+        # X1: a single-metric trend ("plot the PAT for the past five years") must plot ONLY that metric. The compiled SQL
+        # also returns helper columns (consolidated PAT / revenue / EBITDA, value_inr_cr …) which the chart renderer
+        # would otherwise draw as extra series.
+        try:
+            vis_x = contract.get("visual") or {}
+            ch_x = vis_x.get("chart") if isinstance(vis_x.get("chart"), dict) else None
+            data_x = ch_x.get("data") if ch_x and isinstance(ch_x.get("data"), list) else []
+            xk = (ch_x or {}).get("x")
+            is_fy_trend = bool(data_x and xk and re.match(r"^FY\d{2}$", str(data_x[0].get(xk) or "")))
+            has_types = any(isinstance(r.get("type"), str) for r in data_x)
+            from_planner = bool(contract.get("query_spec") or contract.get("generated_sql"))
+            if from_planner and vis_x.get("type") == "chart" and ch_x and is_fy_trend and not has_types and str(ch_x.get("kind") or "") in (
+                "line", "bar", "area", "hbar", "column", "waterfall", "grouped_bar", "combo"
+            ):
+                q_x = (query or "").lower()
+                cons = "consolidated" in q_x and "standalone" not in q_x
+                wanted: List[str] = []
+
+                def _want(col: str) -> None:
+                    if col in data_x[0] and col not in wanted:
+                        wanted.append(col)
+
+                if re.search(r"\b(revenue|turnover|sales|top\s*line)\b", q_x):
+                    _want("consolidated_revenue_cr" if cons else "corporate_revenue_cr")
+                if re.search(r"\b(pat|profit\s+after\s+tax|net\s+profit|profit|bottom\s*line|earnings)\b", q_x):
+                    _want("consolidated_pat_cr" if cons else "pat_cr")
+                if re.search(r"\bebitda\b", q_x):
+                    _want("consolidated_ebitda_cr" if cons else "ebitda_cr")
+                yk = ch_x.get("y")
+                if not wanted and yk in data_x[0]:
+                    wanted = [yk]
+                if wanted:
+                    ch_x["data"] = [{xk: r.get(xk), **{c: r.get(c) for c in wanted}} for r in data_x]
+                    ch_x["y"] = ch_x["value"] = wanted[0]
+                    ch_x.pop("series", None)
+                    if len(wanted) == 1 and ch_x.get("kind") in ("waterfall", "grouped_bar", "combo"):
+                        ch_x["kind"] = "bar"
+                    elif len(wanted) > 1 and ch_x.get("kind") in ("waterfall", "bar", "column", "hbar"):
+                        ch_x["kind"] = "grouped_bar"  # a time series of several metrics is never a waterfall
+                    tbl_x = vis_x.get("table") if isinstance(vis_x.get("table"), dict) else None
+                    if tbl_x and isinstance(tbl_x.get("rows"), list):
+                        keep = [c for c in [xk, *wanted, "source_doc", "source_page_label"] if c in (tbl_x.get("columns") or [])]
+                        tbl_x["columns"] = keep
+                        tbl_x["rows"] = [{c: r.get(c) for c in keep} for r in tbl_x["rows"]]
+                    meta = dict(meta)
+                    if isinstance(meta.get("rows"), list):
+                        meta["rows"] = [{xk: r.get(xk), **{c: r.get(c) for c in wanted}} for r in meta["rows"]]
+        except Exception:  # noqa: BLE001
+            pass
         # W5 (plan_fix.md v13): never silently answer a "consolidated" request with standalone figures
         try:
             vis_c = contract.get("visual") or {}

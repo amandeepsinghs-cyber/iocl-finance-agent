@@ -73,13 +73,13 @@ _NEW_TOPIC = re.compile(
 
 # what-if inputs: name -> (regex for the subject, valid range)
 _WI_FIELDS: Dict[str, Tuple[str, Tuple[float, float]]] = {
-    "wacc_pct": (r"wacc|discount rate|cost of capital", (5.0, 20.0)),
-    "terminal_g_pct": (r"terminal (growth|g)|long[- ]term growth|perpetual growth|\bg\b|growth rate", (0.0, 6.0)),
-    "brent_usd": (r"brent|oil price|crude price|crude|oil", (30.0, 160.0)),
-    "capex_scale_pct": (r"capex|capital expenditure", (40.0, 160.0)),
-    "production_decline_pct": (r"production decline|decline rate|production", (-10.0, 25.0)),
-    "holdco_discount_pct": (r"holdco|holding[- ]company discount|conglomerate discount", (0.0, 60.0)),
-    "fx_inr_usd": (r"rupee|exchange rate|usd ?inr|inr|fx|dollar", (60.0, 130.0)),
+    "wacc_pct": (r"wacc|discount rate|cost of capital", (3.0, 30.0)),
+    "terminal_g_pct": (r"terminal (growth|g)|long[- ]term growth|perpetual growth|\bg\b|growth rate", (-2.0, 8.0)),
+    "brent_usd": (r"brent|oil price|crude price|crude|oil", (20.0, 200.0)),
+    "capex_scale_pct": (r"capex|capital expenditure", (20.0, 300.0)),
+    "production_decline_pct": (r"production decline|decline rate|production|throughput", (-15.0, 30.0)),
+    "holdco_discount_pct": (r"holdco|holding[- ]company discount|conglomerate discount", (0.0, 80.0)),
+    "fx_inr_usd": (r"rupee|exchange rate|usd ?inr|inr|fx|dollar", (50.0, 150.0)),
     "market_price_inr": (r"market price|share price|stock price|current (?:market )?(?:price|value)|cmp|ioc\.?ns|nse:ioc", (20.0, 1000.0)),
 }
 
@@ -194,6 +194,10 @@ def detect_dcf_followup(query: str, session_state: Any) -> Optional[Dict[str, An
         return None
     if dcf.get("is_latest"):
         q = normalize_asr_dcf_terms(q)
+    # Y1 (plan_fix.md v14): "Run the DCF revaluation with the WACC set to 10%" is a scenario re-run, not a fresh DCF
+    early_overrides = parse_whatif(q, dcf["visual"]) or value_matched_override(q, dcf["visual"])
+    if early_overrides and re.search(r"\b(wacc|discount|terminal|growth|brent|crude|oil|capex|share\s+price|market\s+price|holdco|rupee|fx|decline|throughput)\b", q, re.I):
+        return {"intent": "whatif", "overrides": early_overrides, "dcf": dcf}
     if re.search(r"\b(run|re-?run|build|create|do|start)\b.{0,20}\b(dcf|valuation)\b", q, re.I) and not _WHATIF.search(q):
         return None
     if _VERIFY_RUN_RE.search(q):

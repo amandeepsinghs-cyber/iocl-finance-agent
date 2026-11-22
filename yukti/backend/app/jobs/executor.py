@@ -352,8 +352,11 @@ class JobExecutor:
             from app.export_audit import register_turn_contract
             from app.auth import PERSONA_DIRECTORY
 
-            owner_persona = str(proposed_action.get("owner_persona") or "CMD").upper()
-            owner_emp = str(proposed_action.get("owner_emp_id") or "")
+            # Z1 (plan_fix.md v14): voice-confirmed jobs carry no owner stamp — fall back to the SESSION's principal,
+            # never to "CMD" (a DIR_FIN user's DCF was registered as CMD, so their Excel export returned 403).
+            _sess_o = sm.sessions.get(session_id) if session_id in sm.sessions else None
+            owner_persona = str(proposed_action.get("owner_persona") or getattr(_sess_o, "persona", "") or "CMD").upper()
+            owner_emp = str(proposed_action.get("owner_emp_id") or getattr(_sess_o, "principal_emp_id", "") or "")
             if not owner_emp:
                 owner_emp = PERSONA_DIRECTORY.get(owner_persona, {}).get("emp_id", "")
             register_turn_contract(

@@ -17,13 +17,15 @@ CANCEL_RE = re.compile(
     re.IGNORECASE,
 )
 
+_EDIT_LINK = r"(?:\s+(?:is|be|was|should\s+be|to\s+be|set|changed|change|equal|equals|at|as|of|to|=|from\s+\d+(?:\.\d+)?\s*%?\s+to)){0,3}\s*"
+
 WACC_EDIT_RE = re.compile(
-    r"\b(?:wacc|discount rate)\s*(?:of|=|to|is|at)?\s*(\d+(?:\.\d+)?)\s*%",
+    r"\b(?:wacc|discount rate|cost of capital)" + _EDIT_LINK + r"(\d+(?:\.\d+)?)\s*(?:%|percent|pct)?(?!\s*(?:years?|crore|cr|bbl))",
     re.IGNORECASE,
 )
 
 GROWTH_EDIT_RE = re.compile(
-    r"\b(?:terminal growth|growth|g)\s*(?:of|=|to|is|at)?\s*(\d+(?:\.\d+)?)\s*%",
+    r"\b(?:terminal growth|terminal g|perpetual growth|long[- ]term growth)" + _EDIT_LINK + r"(-?\d+(?:\.\d+)?)\s*(?:%|percent|pct)?",
     re.IGNORECASE,
 )
 
@@ -290,6 +292,11 @@ async def resolve_pending_proposal_async(
 
     executor = get_executor()
     session_state.pending_actions.pop(action_id, None)
+    # Z1: stamp the confirming principal so the job result (and its Excel export) belongs to them
+    pa = dict(pa)
+    pa.setdefault("owner_persona", str(getattr(session_state, "persona", "") or "CMD").upper())
+    if getattr(session_state, "principal_emp_id", None):
+        pa.setdefault("owner_emp_id", str(session_state.principal_emp_id))
     job = await executor.submit_job(pa, session_state.session_id)
     started_msg = f"Starting {pa.get('agent', 'dcf_agent')}. I will announce the result as soon as it finishes."
     return {

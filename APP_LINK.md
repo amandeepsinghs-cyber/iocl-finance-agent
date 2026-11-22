@@ -2,14 +2,14 @@
 
 **app link:** https://yukti-iocl-u7thdacpua-el.a.run.app
 
-_Last updated: 22-Nov-2026 (`yukti-iocl` v13 · revision `yukti-iocl-00014-m8s` — Indian Oil Corporation Limited Finance & Downstream Intelligence Agent)._
+_Last updated: 22-Nov-2026 (`yukti-iocl` v14 · revision `yukti-iocl-00015-q7z` — Indian Oil Corporation Limited Finance & Downstream Intelligence Agent)._
 
 ## 1. Cloud Run — Production (`yukti-finance-iocl` · `asia-south1`)
 - **App link:** https://yukti-iocl-u7thdacpua-el.a.run.app (alias: https://yukti-iocl-304306246468.asia-south1.run.app)
 - **Demo Practice Playbook:** https://yukti-iocl-u7thdacpua-el.a.run.app/demo
 - **Architecture Portal ("How Yukti works"):** https://yukti-iocl-u7thdacpua-el.a.run.app/architecture/portal.html (and `/architecture`)
-- **Active Revision:** `yukti-iocl-00014-m8s` (100% traffic)
-- **Container Image:** `asia-south1-docker.pkg.dev/yukti-finance-iocl/yukti-repo/yukti-iocl:v13`
+- **Active Revision:** `yukti-iocl-00015-q7z` (100% traffic)
+- **Container Image:** `asia-south1-docker.pkg.dev/yukti-finance-iocl/yukti-repo/yukti-iocl:v14`
 - **Runtime Service Account:** `yukti-iocl-sa@yukti-finance-iocl.iam.gserviceaccount.com`
 - **Secret Manager Binding:** `YUKTI_PERSONA_SIGNING_KEY=yukti-persona-signing-key:latest`
 - **Access:** Google Sign-In via **Identity-Aware Proxy (IAP)**. Approved account: `admin@amandeepsinghs.altostrat.com`.

@@ -144,3 +144,13 @@ Verification: `tests/test_v12_transcript_replay.py` (stock routing, no self-conf
 | W7 | P2 | "Same as FCF?" → generic definition | Conceptual answer ignored data | OCF − capex = FCF with FY26 figures |
 | W8 | P2 | DCF WACC tab: "Post-tax Kd 7.15" | 7.15% is pre-tax | Pre-tax 7.15% and post-tax 5.35% rows |
 | W9 | P2 | "Salary Component" filter label; weights 0.63 | HR leftover label; fractions | "Component"; weights in % |
+
+---
+
+# `v14` Fixes (22-Nov-2026 14:39–14:51 session + Cloud Run logs)
+
+| # | Severity | Symptom | Root cause | Fix |
+|---|---|---|---|---|
+| X1 | P1 | "Plot the profit after tax for the past five years" drew every column | Compiled SQL returns helper columns (consolidated PAT/revenue/EBITDA); renderer drew each as a series | Planner FY-trend charts keep only the metric(s) named in the question; multi-metric trends use grouped bars, never waterfall |
+| Y1 | **P0** | "WACC to be 10 / set to 10%" ignored; DCF re-ran at 9.25 four times | Live rewrote to "Run the DCF revaluation with the WACC set to 10%": "run … DCF" short-circuited to a new proposal; edit regex missed "set to / to be / from X to"; ranges capped at WACC 5–20% | Parameter+number after a DCF always re-runs the scenario; broad edit phrasing on the permission card and fresh proposals; ranges widened (WACC 3–30%, g −2–8%, Brent $20–200, capex 20–300%) |
+| Z1 | **P0** | Excel export 403 as Director (Finance) (14:51:54) | Voice-confirmed DCF jobs had no owner stamp → registered as CMD → ownership check refused DIR_FIN | Confirmation stamps the session principal; executor falls back to the session principal, never CMD |
