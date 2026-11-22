@@ -115,17 +115,18 @@ async def dcf_job_runner(
         else f"a market price of ₹{px:.2f} (NSE:IOC close {mkt_date})"
     )
 
-    summary = (
-        f"The DCF valuation is ready (illustrative valuation). Intrinsic value is ₹{iv:.2f} per share against "
+    spoken = (
+        f"The DCF valuation is ready. Intrinsic value is ₹{iv:.2f} per share against "
         f"{mkt_desc}, so the model suggests IndianOil is {verdict} "
-        f"by {abs(upside):.1f}%. Illustrative valuation, not investment advice."
+        f"by {abs(upside):.1f}%."
     )
+    summary = f"{spoken} Illustrative valuation, not investment advice."
 
     contract = {
         "contract_version": 3,
         "turn_id": f"job:{job_id}",
         "language": "en",
-        "spoken_summary": summary,
+        "spoken_summary": spoken,
         "display_text": summary,
         "visual": {
             "type": "dcf_model",

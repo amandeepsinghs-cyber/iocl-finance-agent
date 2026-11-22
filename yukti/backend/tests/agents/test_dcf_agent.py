@@ -93,7 +93,8 @@ async def test_dcf_job_runner():
     assert "dcf_model" in res["visual"]
     assert "years" in res["visual"]["dcf_model"]["forecast"]
     assert "sensitivity_grid" in res["visual"]["dcf_model"]
-    assert "illustrative valuation" in res["spoken_summary"]
+    assert "Illustrative valuation" in res["display_text"]
+    assert "investment advice" not in res["spoken_summary"]
 
 def test_dcf_proposal_what_if():
     sess = MockSession()

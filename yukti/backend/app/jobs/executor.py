@@ -241,14 +241,15 @@ class JobExecutor:
                             "It combines internal data, IOCL's verified FY26 cash flows, balance sheet and WACC, with external live market data from Yahoo Finance. "
                             if px_meta.get("live") else ""
                         )
-                        + f"{disclaimer}"
-                    )
+                    ).strip()
+                    # Voice no longer reads the disclaimer aloud; it stays in the on-screen text, card captions and Excel
+                    display = f"{spoken} {disclaimer}"
                     result = {
                         "contract_version": 3,
                         "turn_id": f"job:{job_id}",
                         "language": "en",
                         "spoken_summary": spoken,
-                        "display_text": spoken,
+                        "display_text": display,
                         "visual": {
                             "type": "dcf_model",
                             "mode": "replace",

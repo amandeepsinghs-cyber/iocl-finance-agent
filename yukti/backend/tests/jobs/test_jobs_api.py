@@ -180,7 +180,8 @@ def test_sse_events_and_rehydration():
         assert "bridge" in dcf_model and isinstance(dcf_model["bridge"], list)
         assert "sensitivity_grid" in dcf_model and "cells" in dcf_model["sensitivity_grid"]
         assert "tornado" in dcf_model and "bars" in dcf_model["tornado"]
-        assert "Illustrative valuation, not investment advice." in contract["spoken_summary"]
+        assert "Illustrative valuation, not investment advice." in contract["display_text"]
+        assert "investment advice" not in contract["spoken_summary"]  # not read aloud
 
 
 def test_cancel_action_and_cancel_job():
