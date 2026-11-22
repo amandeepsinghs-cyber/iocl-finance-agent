@@ -103,7 +103,15 @@ def detect_confirm_intent(text: str) -> Optional[str]:
         return None
 
     # Disambiguation replies like "No, just show the DCF first." select DCF rather than cancelling
-    if DCF_SELECT_RE.search(cleaned) and re.search(r"\b(just|show|run|first|only|instead)\b", cleaned, re.IGNORECASE):
+    # (V2: only as a short reply — a long "Run the 10-year DCF valuation agent against …" proposal echo is not consent)
+    _n_words = len(re.findall(r"[\w'’]+", cleaned))
+    _proposal_echo = bool(re.search(r"\b(agent|against|10[\s-]*year|share\s+price|live\s+nse|it\s+takes|seconds?)\b", cleaned, re.I))
+    if (
+        DCF_SELECT_RE.search(cleaned)
+        and re.search(r"\b(just|show|run|first|only|instead)\b", cleaned, re.IGNORECASE)
+        and _n_words <= 9
+        and not _proposal_echo
+    ):
         return "confirm"
 
     if CANCEL_RE.search(cleaned):
@@ -117,6 +125,15 @@ def detect_confirm_intent(text: str) -> Optional[str]:
         return "edit"
 
     if CONFIRM_RE.search(cleaned):
+        # V2 (plan_fix.md v12): a long "Run the 10-year DCF valuation agent against …" sentence (e.g. the voice model
+        # echoing the proposal) is a NEW request, not the user's consent. Affirmative openers always confirm;
+        # imperative "run/start/do it" confirms only as a short reply.
+        words = re.findall(r"[\w'’]+", cleaned)
+        affirmative_start = re.match(
+            r"^\s*(?:(?:please|kindly)\s+)?(?:yes|yeah|yep|sure|ok(?:ay)?|go\s+ahead|proceed|confirm|haan|ha|हाँ|हां)\b", cleaned, re.I
+        )
+        if not affirmative_start and len(words) > 5:
+            return None
         return "confirm"
 
     return None

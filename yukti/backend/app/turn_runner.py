@@ -543,6 +543,19 @@ class AgentTurnRunner:
         # R1/R2 (plan_fix.md): verified PAT variance explainer ("why was FY25 profit low?") + repair turns
         # ("which screen are you showing?"). Runs before DCF follow-ups / coordinator / planner.
         if not spec_patch:
+            # V1 (plan_fix.md v12): IndianOil share price in any word order → live Yahoo Finance IOC.NS chart (before AR / DCF follow-ups)
+            from app.market.oil_intent import build_oil_plot_contract as _bopc, detect_stock_price_plot
+
+            stock_req = detect_stock_price_plot(query)
+            if stock_req is not None:
+                try:
+                    stock_c = await asyncio.to_thread(_bopc, stock_req, norm_persona, turn_id, det_lang, t0)
+                    self._validate_contract(stock_c)
+                    session_state.record_turn(stock_c, user_query=query)
+                    return stock_c
+                except Exception as e_stock:  # noqa: BLE001
+                    logging.getLogger(__name__).warning(f"stock price chart failed: {e_stock}")
+
             from app.brain.explain_screen import is_repair_or_meta_question
             from app.brain.profit_explainer import answer_profit_variance, detect_profit_variance
 
@@ -579,7 +592,23 @@ class AgentTurnRunner:
                     return rep_contract
 
             # R4 (plan_fix.md): multi-year cash flow trend ("total cash flow for the past 10 years") from verified SSOT
-            from app.brain.cashflow_trend import build_cashflow_trend_contract, detect_cashflow_trend
+            from app.brain.cashflow_trend import (
+                build_cashflow_trend_contract,
+                build_cashflow_variance_contract,
+                detect_cashflow_trend,
+                detect_cashflow_variance,
+            )
+
+            # V4 (plan_fix.md v12): "why did net cash / operating cash flow reduce in FY24-25?" → OCF bridge
+            cfv_req = detect_cashflow_variance(query, session_state)
+            if cfv_req is not None:
+                try:
+                    cfv_contract = await asyncio.to_thread(build_cashflow_variance_contract, cfv_req, norm_persona, turn_id, det_lang, t0)
+                    self._validate_contract(cfv_contract)
+                    session_state.record_turn(cfv_contract, user_query=query)
+                    return cfv_contract
+                except Exception as e_cfv:  # noqa: BLE001
+                    logging.getLogger(__name__).warning(f"cash flow variance failed: {e_cfv}")
 
             cf_req = detect_cashflow_trend(query)
             if cf_req is not None:

@@ -109,3 +109,22 @@ When `asm.market_price_inr.source` contains "Yahoo Finance", put the Yahoo sourc
 
 ## 3. Suggested execution order
 R1 → R2 → R3 → R4 (P0, one batch) → R6, R7, R9, R11 (small UI/format fixes) → R8 → R10 → R5 (after log check) → tests → deploy.
+
+
+---
+
+# `v12` Fix Plan (from `current_refinements.md`, 22-Nov-2026 10:57–11:08 session + Cloud Run logs)
+
+> **Bottom line:** Yahoo Finance data *was* fetched every time (HTTP 200 on IOC.NS / BZ=F / INR=X, latest NSE close ₹150.50 on 20-Nov). Stock-price questions were mis-routed to Annual Report RAG, and the DCF voice was cut because the voice model self-confirmed the DCF and the job announcement was sent twice while Yukti was still speaking.
+
+| # | Severity | Symptom (transcript lines) | Root cause (verified in code / logs) | Fix |
+|---|---|---|---|---|
+| V1 | **P0** | "show me the current stock price", "historical stock market price of IndianOil for the past 5 years", "plot the stock market price" → AR BSE tables (L338–L537) | `oil_intent._OIL` only matches `(iocl|indianoil) (share|stock)`; Live rewrites to "stock price **of IndianOil**"; `_NOT` blocks any query containing "cash flow / DCF"; Live chose `ui_control overlay=iocl` once (L376–L407) | Word-order-free stock detector (`stock/share/market price`, `stock mrket`, `IOC`), early route before DCF follow-ups, AR exclusion, Live prompt: overlay only when explicitly asked, "latest NSE close" wording on weekends |
+| V2 | **P0** | DCF started without the user's "yes"; voice cut mid-sentence (L543–L585) | Live sent "Run the 10-year DCF valuation agent…" → `CONFIRM_RE` matched leading "run"; job finished in ~2 s; announcement `job:…:1` arrived twice (11:07:51.1 / 51.5) while Live was still speaking | Long sentences are not confirmations (affirmative-start or ≤5-word "run it"); dedupe speak ids; defer job announcement until Yukti finishes speaking; Live prompt: never confirm on the user's behalf |
+| V3 | P1 | "Why was there a reduction in net profit in FY24-25?" → FY23→FY24 "profit rose" bridge (L215–L245) | `FY24-25` parsed as FY24; "reduction" not a fall word | `FY24-25`/`2024-25` → FY25 only; add reduc*/declin*/lower; reuse previous turn's year |
+| V4 | P1 | "Why did net cash reduce in FY24-25?" → 10-year statement, no explanation (L130–L176) | No cash-flow variance skill; trend skill excludes "why" | OCF bridge FY24→FY25 (PBT, non-cash, working capital, tax paid) + waterfall |
+| V5 | P1 | Text cut mid-word "(₹1,454 c" (L227, L654) | `display_text` maxLength 600 (schema) truncates long explanations | Keep display ≤ 560 chars; detail in insights |
+| V6 | Needs owner action | Google Sheets export → Excel fallback (11:08:21 log: "Service Accounts do not have storage quota") | SA has no My Drive quota | Create a Shared Drive, add `yukti-iocl-sa@yukti-finance-iocl.iam.gserviceaccount.com` as Content Manager, set `YUKTI_GDRIVE_FOLDER_ID` on Cloud Run (code already passes `supportsAllDrives` + `parents`) |
+| V7 | P1 | Demo story "internal + external data" not explicit | — | DCF result sentence naming internal SSOT + external Yahoo Finance sources |
+
+Verification: `tests/test_v12_transcript_replay.py` (stock routing, no self-confirm, FY24-25 parsing, cash-flow explainer, display length), full suite, frontend gates, deploy `v12`.

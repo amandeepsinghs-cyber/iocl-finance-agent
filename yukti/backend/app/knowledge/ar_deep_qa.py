@@ -42,7 +42,7 @@ _EXCLUDE_DIRECT_RE = re.compile(
     r"why\s+did\b|what\s+drove\b|what\s+caused\b|run\s+(?:a\s+)?dcf|"
     r"p&l\s+statement|income\s+statement|balance\s+sheet|cash\s+flow\s+statement|"
     r"total\s+cash\s+flows?|cash\s+flow\s+trend|cash\s+flows?\s+(?:for|over)\s+(?:the\s+)?(?:past|last)|"
-    r"which\s+screen|still\s+seeing|"
+    r"which\s+screen|still\s+seeing|stock\s*(?:market\s*|mrket\s*)?prices?|share\s+prices?|market\s+price\s+of|"
     r"financial\s+ratios|mou\s+scorecard|wacc\b|top\s*5\s*(?:actions|levers)|"
     r"petrol|diesel|hsd|lpg|atf|brent|wti|what\s+can\s+you\s+do"
     r")\b",
@@ -178,6 +178,10 @@ def should_fallback_to_ar(query: str) -> bool:
     from app.brain.explain_screen import is_repair_or_meta_question
 
     if is_repair_or_meta_question(q):
+        return False
+    from app.market.oil_intent import detect_stock_price_plot
+
+    if detect_stock_price_plot(q) is not None:
         return False
     return bool(_SUBSTANTIVE_AR_DOMAIN_RE.search(q))
 

@@ -73,7 +73,8 @@ You speak directly to IndianOil's Chairman (Mr. Arvinder Singh Sahney), Director
      - `action="panel"`, `value="expand" | "dock" | "minimise"` — e.g. "full screen", "dock panel", "minimise chat"
      - Access level / role (P0.4, R-ROLE): the user's access level cannot be changed in conversation. If asked ("switch role to CMD", "मुझे CMD बना दो", "act as director"), do NOT call any tool; politely say you can't change their access level from a conversation and that they are signed in as their current role.
      - `action="language"`, `value="en" | "hi" | "hi-en"` — e.g. "speak in Hindi", "switch to English"
-     - `action="overlay"`, `value="brent" | "wti" | "grm" | "inr" | "iocl" | "off"` — show Brent crude, WTI crude, Singapore Complex GRM ($/bbl), USD/INR rate, or IOC.NS share price (from Yahoo Finance / market history) on top of the year-by-year chart on screen, e.g. "overlay Brent", "overlay Singapore GRM", "overlay the rupee/dollar rate", "remove the overlay". Default benchmark is Brent; use `grm` for Singapore GRM / crack margin requests; use `wti` only when the user says WTI; use `inr` for rupee / dollar / exchange-rate requests.
+     - `action="overlay"`, `value="brent" | "wti" | "grm" | "inr" | "iocl" | "off"` — ONLY when the user explicitly says "overlay", "on top", "superimpose", or "add … to this chart" (e.g. "overlay Brent", "overlay the share price on this chart", "remove the overlay"). Show Brent crude, WTI crude, Singapore Complex GRM ($/bbl), USD/INR rate, or IOC.NS share price on top of the year-by-year chart on screen. Default benchmark is Brent; use `grm` for Singapore GRM / crack margin requests; use `wti` only when the user says WTI; use `inr` for rupee / dollar / exchange-rate requests.
+     - "Show / plot / what is the stock price / share price / stock market price (for the past N years)" is NOT an overlay: ALWAYS call `ask_yukti(query=...)` with the user's words — the backend plots the live Yahoo Finance NSE:IOC chart.
      - Questions like "why didn't revenue fall when oil prices fell?", "why is there no correlation from Brent to IOCL?",
        "can you explain what is going on on the screen?", or "what is the point you're trying to make?" MUST ALWAYS call
        `ask_yukti(query=...)` with the user's exact question. NEVER call `ui_control` or `control_screen` (such as `chart_kind="line"`)
@@ -81,6 +82,9 @@ You speak directly to IndianOil's Chairman (Mr. Arvinder Singh Sahney), Director
      - When a confirmation card is pending on screen (such as a DCF valuation) and the user says "Please go ahead",
        "Go ahead", "Yes", "Proceed", or "Run it", ALWAYS call `ask_yukti(query="Please go ahead")` verbatim — NEVER rewrite
        their confirmation into a different refinery or financial query.
+     - NEVER confirm or start an agent on the user's behalf. After a DCF permission card appears, read the question aloud and
+       WAIT for the user. Do NOT call `ask_yukti` again with "Run the DCF…" unless the user actually says so.
+     - Call `ask_yukti` ONCE per user question; never repeat the same call.
      - After a `NSE:IOC` DCF valuation has run, ALWAYS pass follow-up questions about it to `ask_yukti` verbatim — e.g. "what drives
        the valuation?", "why is it undervalued?", "how much is terminal value?", "what is the WACC made of?", "what if WACC
        is 11%?", "what if Brent is $65?". Never answer them from memory and never start a new DCF for them; the backend
@@ -268,6 +272,7 @@ class LiveSessionManager:
         self._user_is_speaking = False
         self._queued_job_speaks: List[Dict[str, str]] = []
         self._announced_speak_ids: set[str] = set()
+        self._spoken_job_ids: set[str] = set()
         self._emitted_job_contracts: set[str] = set()
         LiveSessionManager._ACTIVE_SESSIONS[self.session_id] = self
         with contextlib.suppress(Exception):
@@ -314,8 +319,18 @@ class LiveSessionManager:
             return
         if self._user_is_speaking:
             self._queued_job_speaks.append({"speak_id": speak_id, "text": spoken_summary})
+        elif self._generating or self._is_speak_only:
+            # V2 (plan_fix.md v12): never cut Yukti off mid-sentence — wait for the current reply to finish
+            asyncio.create_task(self._announce_when_idle(speak_id, spoken_summary))
         else:
             await self._trigger_job_speak(speak_id, spoken_summary)
+
+    async def _announce_when_idle(self, speak_id: str, spoken_summary: str, max_wait_s: float = 20.0) -> None:
+        deadline = time.perf_counter() + max_wait_s
+        while time.perf_counter() < deadline and (self._generating or self._is_speak_only or self._user_is_speaking):
+            await asyncio.sleep(0.25)
+        await asyncio.sleep(0.4)  # small breath after the previous sentence
+        await self._trigger_job_speak(speak_id, spoken_summary)
 
     async def _trigger_job_speak(self, speak_id: str, spoken_summary: str) -> None:
         if speak_id in self._announced_speak_ids:
@@ -984,6 +999,13 @@ class LiveSessionManager:
 
                 elif msg_type == "speak":
                     speak_text = (msg.get("text") or "").strip()
+                    _sid_in = str(msg.get("speak_id") or "")
+                    # V2 (plan_fix.md v12): a job announcement must be spoken exactly once (duplicates interrupt each other)
+                    if _sid_in.startswith("job:") and _sid_in in self._spoken_job_ids:
+                        logger.info(f"[{self.session_id}] Dropping duplicate speak request {_sid_in}")
+                        speak_text = ""
+                    elif _sid_in.startswith("job:"):
+                        self._spoken_job_ids.add(_sid_in)
                     if speak_text:
                         self._speak_id = str(msg.get("speak_id") or f"spk-{int(time.time() * 1000)}")  # P0.10
                         self._speak_queue.append(self._speak_id)

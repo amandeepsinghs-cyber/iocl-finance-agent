@@ -59,6 +59,37 @@ _BUILDUP_RE = re.compile(
 _METRO_COMPARE_RE = re.compile(r"\b(metros?|4 cities|four cities|all cities|across cities|city[- ]wise)\b", re.I)
 _WORDNUM = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
 
+# V1 (plan_fix.md v12): IndianOil share-price questions in ANY word order ("stock price of IndianOil",
+# "plot the stock market price", "stock mrket price", "IOC.NS") → live Yahoo Finance IOC.NS chart.
+_STOCK_RE = re.compile(
+    r"\b(?:stock|share|equity)s?\s*(?:market\s*|mrket\s*|mkt\s*)?(?:prices?|movement|chart|trend|performance|quote|value|history)\b"
+    r"|\bstock\s*(?:market|mrket)\b"
+    r"|\bmarket\s+price\s+of\s+(?:the\s+)?(?:share|stock|iocl|indianoil|indian\s+oil|ioc)\b"
+    r"|\bioc\.?ns\b|\bnse\s*:?\s*ioc\b",
+    re.I,
+)
+_STOCK_SHOW_RE = re.compile(r"\b(show|plot|chart|graph|see|display|view|what\s+is|what's|current|today|latest|past|last|history|historical|movement|trend)\b", re.I)
+_STOCK_NOT_RE = re.compile(
+    r"\b(overlay|superimpose|on\s+top|remove|hide|what[\s-]+if|analysts?|target\s+price|consensus|brokerage|"
+    r"instead\s+of|change|set\s+the|use\s+(?:the\s+)?(?:live|current|real[- ]?time))\b",
+    re.I,
+)
+_DCF_WORD_RE = re.compile(r"\b(dcf|discounted\s+cash\s*flow|valuation|intrinsic|undervalued|overvalued)\b", re.I)
+
+
+def detect_stock_price_plot(query: str) -> Optional[Dict[str, Any]]:
+    """IndianOil (NSE:IOC) share price chart request → {'benchmark': 'iocl', 'months': N} or None."""
+    q = (query or "").strip()
+    if not q or not _STOCK_RE.search(q) or _STOCK_NOT_RE.search(q):
+        return None
+    if _DCF_WORD_RE.search(q):
+        # "Run the DCF on the current share price" is a DCF request; "run a DCF... first, show me the stock price" is a chart
+        if not re.search(r"\b(show|plot|chart|see|display)\b[^.?!]{0,40}\b(stock|share)\b", q, re.I):
+            return None
+    if not _STOCK_SHOW_RE.search(q) and not re.search(r"\bprice\b", q, re.I):
+        return None
+    return {"benchmark": "iocl", "months": _extract_months(q, default=60)}
+
 _FUEL_DISPLAY: Dict[str, Dict[str, str]] = {
     "MS_PETROL": {"short": "Petrol (MS)", "label": "Motor Spirit (Petrol)", "col": "petrol_rsp_inr_l", "unit": "₹/L"},
     "HSD_DIESEL": {"short": "Diesel (HSD)", "label": "High Speed Diesel (HSD)", "col": "diesel_rsp_inr_l", "unit": "₹/L"},
@@ -148,6 +179,9 @@ def detect_oil_plot(query: str) -> Optional[Dict[str, Any]]:
     retail = _extract_retail_request(q)
     if retail is not None:
         return retail
+    stock = detect_stock_price_plot(q)
+    if stock is not None:
+        return stock
     if not _OIL.search(q) or not _ASK.search(q) or _NOT.search(q):
         return None
     months = _extract_months(q, default=60)
@@ -446,9 +480,11 @@ def build_oil_plot_contract(req: Dict[str, Any], persona: str, turn_id: str, lan
     )
     live = d["live"]
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    as_of_day = str(live.get("as_of") or "")[:10]
+    market_closed = bool(as_of_day) and as_of_day < today  # weekend / holiday: last trading close, not "today"
     rows = [{"date": _day_label(k), key: v} for k, v in days]
     # today's live price as the last point (if the market has moved since the last daily close)
-    live_point = bool(live.get("price")) and not d.get("stale")
+    live_point = bool(live.get("price")) and not d.get("stale") and not market_closed
     if live_point:
         if days[-1][0] == today:
             rows[-1] = {"date": "Today (live)", key: live["price"]}
@@ -464,8 +500,13 @@ def build_oil_plot_contract(req: Dict[str, Any], persona: str, turn_id: str, lan
     stale = " (from saved history; the live feed is unavailable right now)" if d.get("stale") else ""
     hist_info = d.get("history") or {}
     subj = "The rupee" if d["benchmark"] == "inr" else ("IndianOil (NSE:IOC, live via Yahoo Finance API)" if d["benchmark"] == "iocl" else short)
+    when = (
+        f"closed at {cur}{live['price']:.2f} {per} on {_day_label(as_of_day)} (latest close; the market is shut today){stale}"
+        if market_closed and live.get("price")
+        else f"is at {cur}{live['price']:.2f} {per} today{stale}"
+    )
     spoken = (
-        f"{subj} is at {cur}{live['price']:.2f} {per} today{stale}"
+        f"{subj} {when}"
         + (f", {'up' if (live.get('change_pct') or 0) >= 0 else 'down'} {abs(live.get('change_pct') or 0):.1f}% on the day" if live.get("change_pct") is not None and not d.get("stale") else "")
         + f". Over the {period} it moved from {cur}{vals[0]:.2f} on {rows[0]['date']}, peaking at {cur}{vals[hi_i]:.2f} on {rows[hi_i]['date']} "
         f"and bottoming at {cur}{vals[lo_i]:.2f} on {rows[lo_i]['date']}."
@@ -515,7 +556,7 @@ def build_oil_plot_contract(req: Dict[str, Any], persona: str, turn_id: str, lan
                 "unit": d["unit"],
             },
             "kpis": [
-                {"label": f"{short} today (live)" if not d.get("stale") else f"{short} last close", "value": live["price"] if live.get("price") else vals[-1], "unit": d["unit"],
+                {"label": (f"{short} close · {_day_label(as_of_day)}" if market_closed else f"{short} today (live)") if not d.get("stale") else f"{short} last close", "value": live["price"] if live.get("price") else vals[-1], "unit": d["unit"],
                  "delta": (f"{'▲' if (live.get('change_pct') or 0) >= 0 else '▼'} {abs(live.get('change_pct') or 0):.1f}% today") if live.get("change_pct") is not None and not d.get("stale") else "saved history"},
                 {"label": f"Highest · {rows[hi_i]['date']}", "value": vals[hi_i], "unit": d["unit"]},
                 {"label": f"Lowest · {rows[lo_i]['date']}", "value": vals[lo_i], "unit": d["unit"]},

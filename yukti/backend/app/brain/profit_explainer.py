@@ -34,7 +34,7 @@ _WHY_RE = re.compile(
     r"\b(why|what\s+happened|what\s+caused|what\s+drove|reasons?|explain|how\s+come|justif\w*|what\s+went\s+wrong)\b", re.I
 )
 _LOW_RE = re.compile(
-    r"\b(low|lower|less|lesser|drop\w*|fell|fall\w*|declin\w*|decreas\w*|down|dip\w*|weak\w*|poor|exceptionally|different|crash\w*|collaps\w*)\b",
+    r"\b(low|lower|less|lesser|drop\w*|fell|fall\w*|declin\w*|decreas\w*|reduc\w*|down|dip\w*|weak\w*|poor|exceptionally|different|crash\w*|collaps\w*|slump\w*|shrank|shrink\w*|plung\w*)\b",
     re.I,
 )
 _HIGH_RE = re.compile(r"\b(high|higher|increas\w*|rose|rise|jump\w*|surg\w*|recover\w*|improv\w*|doubl\w*|tripl\w*|grew|growth)\b", re.I)
@@ -157,6 +157,8 @@ def _years_in(q: str) -> List[str]:
         if fy in _FYS and fy not in found:
             found.append(fy)
 
+    # "FY24-25" / "FY 2024-25" / "FY2024-2025" → FY25 only (the fiscal year ending in the second number)
+    q = re.sub(r"\bfy\s*'?(?:20)?(\d{2})\s*[-–/]\s*(?:20)?(\d{2})\b", lambda m: f"FY{m.group(2)}", q, flags=re.I)
     for m in re.finditer(r"\bfy\s*'?(\d{2})\b", q, re.I):
         add(int(m.group(1)))
     for m in re.finditer(r"\b20(\d{2})\s*[-–/]\s*(?:20)?(\d{2})\b", q):
@@ -195,6 +197,8 @@ def detect_profit_variance(query: str, session_state: Any = None) -> Optional[Di
     q = (query or "").strip()
     if not q or _EXCLUDE_RE.search(q):
         return None
+    if re.search(r"\bcash\b", q, re.I) and not _PROFIT_RE.search(q):
+        return None  # cash-flow questions belong to the cash-flow explainer
     try:
         pat_years = _years_from_pat_numbers(q)
     except Exception:  # noqa: BLE001
@@ -217,10 +221,14 @@ def detect_profit_variance(query: str, session_state: Any = None) -> Optional[Di
 
     if not ((has_profit and (has_why or (low and pat_years) or (high and pat_years))) or follow_up):
         return None
-    # "Show me the profit and loss statement" style requests are not why-questions
+    # "Not showing a statement" guard: "Show me the profit and loss statement" style requests are not why-questions
     if not has_why and not follow_up and not (low or high):
         return None
-    return {"kind": "profit_variance", "years": _years_in(q), "pat_years": pat_years, "low": low, "high": high,
+    # V3: reuse the year from the previous user question when this one names none ("…in 2024-25?" → "why did profit fall?")
+    ctx_years: List[str] = []
+    if not _years_in(q) and not pat_years and session_state is not None:
+        ctx_years = _years_in(str(getattr(session_state, "last_user_query", "") or ""))
+    return {"kind": "profit_variance", "years": _years_in(q) or ctx_years, "pat_years": pat_years, "low": low, "high": high,
             "prev_ctx": prev_ctx, "query": q}
 
 
@@ -389,6 +397,14 @@ def build_narrative(br: Dict[str, Any]) -> Tuple[str, str, List[str], str]:
         s3 = s3[0].upper() + s3[1:] + "."
 
     display = " ".join(x for x in (s1, s2, s3) if x)
+    # V5 (plan_fix.md v12): contract display_text maxLength is 600 — never let the screen cut mid-word
+    if len(display) > 560 and s3_parts:
+        short_s3 = s3_parts[-1] if fy_to != LATEST_FY else ""
+        display = " ".join(x for x in (s1, s2, (short_s3[0].upper() + short_s3[1:] + ".") if short_s3 else "") if x)
+    if len(display) > 560:
+        display = f"{s1} {s2}"
+    if len(display) > 590:
+        display = display[:587].rsplit(" ", 1)[0] + "…"
     # Voice: keep it to ~2 crisp sentences so Live never cuts off mid-answer
     spoken_s2 = (
         f"The gross margin {'shrank' if gm < 0 else 'widened'} by {fmt_inr_cr(abs(gm))} as "
@@ -444,7 +460,8 @@ def answer_profit_variance(
         spoken = f"On screen is the {fy_from} to {fy_to} profit bridge. {alt_spoken}"
     if prefix:
         spoken = f"{prefix} {spoken}"
-        display = f"{prefix} {display}"
+        if len(prefix) + 1 + len(display) <= 595:
+            display = f"{prefix} {display}"
 
     o_a, o_b = _ops(fy_from), _ops(fy_to)
     title = f"Why {fy_to} profit {'fell' if br['pat_to'] < br['pat_from'] else 'rose'}: PAT bridge {fy_from} → {fy_to} (₹ crore)"

@@ -237,7 +237,11 @@ class JobExecutor:
                     spoken = (
                         f"The DCF valuation is ready. Intrinsic value is ₹{iv:.2f} per share against {mkt_phrase}, "
                         f"so the model suggests IOCL is {verdict} by {abs(upside):.1f}%. "
-                        f"{disclaimer}"
+                        + (
+                            "It combines internal data, IOCL's verified FY26 cash flows, balance sheet and WACC, with external live market data from Yahoo Finance. "
+                            if px_meta.get("live") else ""
+                        )
+                        + f"{disclaimer}"
                     )
                     result = {
                         "contract_version": 3,
