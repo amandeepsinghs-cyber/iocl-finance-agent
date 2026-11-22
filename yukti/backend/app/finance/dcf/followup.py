@@ -499,9 +499,13 @@ def _topic_visual(f: Dict[str, Any], topic: str) -> Dict[str, Any]:
         names = {
             "rf_used_pct": "Risk-free rate (%)", "beta_adj": "Beta (adjusted)", "erp_total_pct": "Equity risk premium (%)",
             "ke_pct": "Cost of equity (%)", "kd_used_pct": "Cost of debt, pre-tax (%)", "kd_after_tax_pct": "Cost of debt, after tax (%)",
-            "tax_rate_pct": "Tax rate (%)", "weight_equity": "Weight of equity", "weight_debt": "Weight of debt", "wacc_pct": "WACC (%)",
+            "tax_rate_pct": "Tax rate (%)", "weight_equity": "Weight of equity (%)", "weight_debt": "Weight of debt (%)", "wacc_pct": "WACC (%)",
         }
-        rows = [{"component": names[k], "value": round(w[k], 4)} for k in names if k in w]
+        def _wv(k: str) -> float:
+            v = float(w[k])
+            return round(v * 100, 2) if k.startswith("weight_") and abs(v) <= 1 else round(v, 4)
+
+        rows = [{"component": names[k], "value": _wv(k)} for k in names if k in w]
         return {"type": "table", "mode": "replace", "title": "WACC build", "table": {"columns": ["component", "value"], "rows": rows, "total_rows": len(rows), "masking": {"level": "none"}}}
     if topic == "forecast" and f["forecast"].get("years") and f["forecast"].get("fcff_cr"):
         rows = [{"year": y, "fcff_cr": fc, "pv_fcff_cr": pv} for y, fc, pv in zip(f["forecast"]["years"], f["forecast"]["fcff_cr"], f["forecast"]["pv_fcff_cr"] or [])]

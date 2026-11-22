@@ -70,7 +70,7 @@ _STOCK_RE = re.compile(
 )
 _STOCK_SHOW_RE = re.compile(r"\b(show|plot|chart|graph|see|display|view|what\s+is|what's|current|today|latest|past|last|history|historical|movement|trend)\b", re.I)
 _STOCK_NOT_RE = re.compile(
-    r"\b(overlay|superimpose|on\s+top|remove|hide|what[\s-]+if|analysts?|target\s+price|consensus|brokerage|"
+    r"\b(overlay|superimpose|on\s+top|remove|hide|what[\s-]+if|analysts?|target\s+price|consensus|brokerage|why|how\s+come|reasons?|"
     r"instead\s+of|change|set\s+the|use\s+(?:the\s+)?(?:live|current|real[- ]?time))\b",
     re.I,
 )

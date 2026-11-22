@@ -54,6 +54,20 @@ export function humanToolLabel(name?: string): string {
 
 export class YuktiApiClient {
   private ws: WebSocket | null = null;
+  /** W1 (plan_fix.md v13): when the current socket opened (Cloud Run closes WebSockets at the request timeout). */
+  private openedAt = 0;
+
+  /**
+   * W1: proactively renew the socket while Yukti is silent (after a turn completes) once it is older than `maxAgeMs`,
+   * so the server-side request timeout never cuts a sentence in half. Same session id, so context is kept.
+   */
+  public refreshIfOld(maxAgeMs = 50 * 60 * 1000): boolean {
+    if (!this.ws || this.state !== 'open' || !this.openedAt || Date.now() - this.openedAt < maxAgeMs) return false;
+    const wasWanted = this.wantOpen;
+    this.disconnect();
+    if (wasWanted) void this.connect();
+    return true;
+  }
   private state: WsState = 'idle';
   private listeners: Map<keyof YuktiStreamingEvents, Set<Function>> = new Map();
   private sessionId: string;
@@ -153,6 +167,7 @@ export class YuktiApiClient {
       this.ws = ws;
       ws.onopen = () => {
         this.reconnectAttempts = 0;
+        this.openedAt = Date.now();
         this.setState('open');
         const q = this.pending;
         this.pending = [];

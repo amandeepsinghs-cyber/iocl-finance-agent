@@ -35,7 +35,8 @@ def detect_cashflow_trend(query: str) -> Optional[Dict[str, Any]]:
         years = int(n) if n.isdigit() else _WORDNUM.get(n, 10)
     elif re.search(r"\bdecade\b", q, re.I):
         years = 10
-    return {"kind": "cashflow_trend", "years": max(2, min(10, years))}
+    focus = "fcf" if re.search(r"\b(free\s+cash\s*flow|fcf)\b", q, re.I) and not re.search(r"\b(operating|ocf|total|investing|financing)\b", q, re.I) else "all"
+    return {"kind": "cashflow_trend", "years": max(2, min(10, years)), "focus": focus}
 
 
 @lru_cache(maxsize=1)
@@ -95,6 +96,23 @@ def build_cashflow_trend_contract(req: Dict[str, Any], persona: str, turn_id: st
         f"{last['fiscal_year']}: free cash flow {fmt_inr_cr(last['free_cash_flow_cr'])}; financing outflow {fmt_inr_cr(last['financing_cf_cr'])} (debt repayment, dividends, interest).",
     ]
     chart_rows = [{k: v for k, v in r.items() if k != "net_change_in_cash_cr"} for r in rows]
+    chart_kind, chart_y = "grouped_bar", "operating_cf_cr"
+    if req.get("focus") == "fcf":
+        # W6 (plan_fix.md v13): "free cash flow for the past N years" → FCF only
+        chart_rows = [{"fiscal_year": r["fiscal_year"], "free_cash_flow_cr": r["free_cash_flow_cr"]} for r in rows]
+        chart_kind, chart_y = "bar", "free_cash_flow_cr"
+        neg = [r["fiscal_year"] for r in rows if r["free_cash_flow_cr"] < 0]
+        fhi = max(rows, key=lambda r: r["free_cash_flow_cr"])
+        title = f"IOCL free cash flow (operating cash flow − capex) · {first['fiscal_year']}–{last['fiscal_year']} (₹ crore)"
+        spoken = (
+            f"IOCL's free cash flow went from {fmt_inr_cr(first['free_cash_flow_cr'])} in {first['fiscal_year']} to {fmt_inr_cr(last['free_cash_flow_cr'])} in {last['fiscal_year']}, "
+            f"{fmt_inr_cr(tot_fcf)} in total over {n} years, highest in {fhi['fiscal_year']}"
+            + (f" and negative in {' and '.join(neg)} when capex exceeded operating cash flow." if neg else ".")
+        )
+        insights = [
+            f"Free cash flow {first['fiscal_year']} {fmt_inr_cr(first['free_cash_flow_cr'])} → {last['fiscal_year']} {fmt_inr_cr(last['free_cash_flow_cr'])}; total {fmt_inr_cr(tot_fcf)}.",
+            f"{last['fiscal_year']}: operating cash flow {fmt_inr_cr(last['operating_cf_cr'])} less capex {fmt_inr_cr(last['operating_cf_cr'] - last['free_cash_flow_cr'])}.",
+        ] + ([f"Negative years: {', '.join(neg)}."] if neg else [])
     return {
         "contract_version": 3,
         "turn_id": turn_id,
@@ -108,8 +126,8 @@ def build_cashflow_trend_contract(req: Dict[str, Any], persona: str, turn_id: st
             "title": title,
             "subtitle": "Operating, Investing, Financing cash flow and Free Cash Flow (OCF − Capex) · verified Annual Report SSOT",
             "chart": {
-                "kind": "grouped_bar", "title": title, "data": chart_rows, "x": "fiscal_year", "y": "operating_cf_cr",
-                "category": "fiscal_year", "value": "operating_cf_cr", "unit": "₹ Cr",
+                "kind": chart_kind, "title": title, "data": chart_rows, "x": "fiscal_year", "y": chart_y,
+                "category": "fiscal_year", "value": chart_y, "unit": "₹ Cr",
             },
             "table": {"columns": list(rows[0].keys()), "rows": rows, "total_rows": len(rows), "masking": {"level": "none"}},
             "kpis": [
@@ -275,5 +293,42 @@ def build_cashflow_variance_contract(req: Dict[str, Any], persona: str, turn_id:
         "access": {"status": "allowed"},
         "export_options": ["xlsx", "sheets", "pdf"],
         "status_events": [f"Computed verified operating cash flow bridge {fy_from}→{fy_to}"],
+        "latency_ms": round((time.perf_counter() - t0) * 1000, 2),
+    }
+
+
+# ---------------------------------------------------------------------------------------------- W7: OCF vs FCF concept
+
+_FCF_CONCEPT_RE = re.compile(
+    r"\b(same\s+as|different\s+from|difference\s+between|differ|vs\.?|versus|equal\s+to)\b.{0,40}\b(free\s+cash\s*flow|fcf)\b"
+    r"|\b(free\s+cash\s*flow|fcf)\b.{0,40}\b(same\s+as|different\s+from|vs\.?|versus)\b.{0,30}\b(operating|ocf|cash\s*flow)\b",
+    re.I,
+)
+
+
+def detect_fcf_concept(query: str) -> bool:
+    q = (query or "").strip()
+    return bool(q and _FCF_CONCEPT_RE.search(q) and not re.search(r"\b(\d{1,2}|five|ten)\s*years?\b|\btrend\b|\bplot\b", q, re.I))
+
+
+def build_fcf_concept_contract(persona: str, turn_id: str, language: str, t0: float) -> Dict[str, Any]:
+    d = _cf_by_fy().get(_FYS[-1]) or {}
+    ocf, capex = d.get("CF.CFO", 0.0), abs(d.get("CAPEX.TOTAL", 0.0))
+    fcf = ocf - capex
+    fy = _FYS[-1]
+    spoken = (
+        f"No. Operating cash flow is the cash the business generates, {fmt_inr_cr(ocf)} in {fy}. "
+        f"Free cash flow is what is left after capital spending: {fmt_inr_cr(ocf)} minus {fmt_inr_cr(capex)} of capex, so {fmt_inr_cr(fcf)}, "
+        "which is the cash available for dividends and debt reduction."
+    )
+    return {
+        "contract_version": 3, "turn_id": turn_id, "language": language, "persona": persona,
+        "spoken_summary": spoken, "display_text": spoken,
+        "visual": {"type": "none", "mode": "replace"},
+        "insights": [f"{fy}: OCF {fmt_inr_cr(ocf)} − capex {fmt_inr_cr(capex)} = FCF {fmt_inr_cr(fcf)}."],
+        "sources": [{"kind": "data", "object": "fact_snapshot (Standalone Cash Flow, Ind AS 7)", "sql": "CF.CFO, CAPEX.TOTAL"}],
+        "suggestions": ["Show free cash flow for the past 5 years", "Show the cash flow trend for the past 10 years"],
+        "access": {"status": "allowed"}, "export_options": [],
+        "status_events": ["Explained OCF vs FCF with verified FY figures"],
         "latency_ms": round((time.perf_counter() - t0) * 1000, 2),
     }

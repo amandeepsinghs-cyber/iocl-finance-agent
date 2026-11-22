@@ -664,6 +664,8 @@ export default function YuktiApp() {
         });
       }
       engineRef.current?.acceptIncoming();
+      // W1 (plan_fix.md v13): renew an old voice socket between turns, never mid-sentence (Cloud Run timeout is 60 min)
+      window.setTimeout(() => yuktiClient.refreshIfOld(), 2500);
       // A voice turn with no contract: keep the spoken reply as a text card; drop pure screen commands.
       settleVoiceTurn('settle');
       liveUserMsgRef.current = null;

@@ -128,3 +128,19 @@ R1 → R2 → R3 → R4 (P0, one batch) → R6, R7, R9, R11 (small UI/format fix
 | V7 | P1 | Demo story "internal + external data" not explicit | — | DCF result sentence naming internal SSOT + external Yahoo Finance sources |
 
 Verification: `tests/test_v12_transcript_replay.py` (stock routing, no self-confirm, FY24-25 parsing, cash-flow explainer, display length), full suite, frontend gates, deploy `v12`.
+
+---
+
+# `v13` Fix Plan (from `current_refinements.md`, 22-Nov-2026 11:58–12:04 session + Cloud Run logs)
+
+| # | Severity | Symptom | Root cause | Fix (status) |
+|---|---|---|---|---|
+| W1 | **P0** | Voice cut at 11:58:39 / 12:03:41 ("Between FY22…") | Cloud Run request timeout 300 s closes WebSockets every 5 min (11:53:37.99 → 11:58:39.26) | `--timeout=3600` (applied) + client renews the socket between turns after 50 min (`refreshIfOld`) |
+| W2 | **P0** | "FCF doubled but stock didn't — why?" → stock chart repeated | Stock-chart route matched "stock price" in a why-question | Market-vs-fundamentals skill: FCF bars + IOC.NS FY-average line, premise check, negative years, P/FCF multiple |
+| W3 | P1 | "WACC for the past 10 years" → current WACC only | DCF follow-up grabbed "WACC" | FY17–FY26 WACC history from `fact_wacc_annual` |
+| W4 | P1 | "Overlay FCF on this" (stock chart) → fake combo | Daily stock vs FY metric | Same combo as W2 (overlay mode) |
+| W5 | P1 | "Consolidated cash flow" → standalone shown silently | Only 6 consolidated line codes in SSOT | Explicit "consolidated not in verified data; showing standalone" note |
+| W6 | P1 | "Free cash flow for 5 years" narrated OCF | Trend skill not metric-aware | FCF-only chart + narrative |
+| W7 | P2 | "Same as FCF?" → generic definition | Conceptual answer ignored data | OCF − capex = FCF with FY26 figures |
+| W8 | P2 | DCF WACC tab: "Post-tax Kd 7.15" | 7.15% is pre-tax | Pre-tax 7.15% and post-tax 5.35% rows |
+| W9 | P2 | "Salary Component" filter label; weights 0.63 | HR leftover label; fractions | "Component"; weights in % |

@@ -79,11 +79,10 @@ export function buildWaccStatement(spec: DcfModelSpec): StatementSpec {
     { line_code: 'WACC.BETA', label: 'Adjusted beta (Blume)', level: 1, kind: 'line', values: { [p]: w.beta_adj } },
     { line_code: 'WACC.ERP', label: 'Total equity risk premium (India %)', level: 1, kind: 'line', values: { [p]: w.erp_total_pct } },
     { line_code: 'WACC.KE', label: 'Cost of equity (Ke %)', level: 0, kind: 'subtotal', values: { [p]: w.ke_pct } },
-    ...(typeof w.kd_pretax_pct === 'number'
-      ? [{ line_code: 'WACC.KD_PRE', label: 'Pre-tax cost of debt (%)', level: 1, kind: 'line' as const, values: { [p]: w.kd_pretax_pct } }]
-      : []),
+    // W8 (plan_fix.md v13): kd_used_pct is the PRE-tax rate; show pre-tax and the computed post-tax rate explicitly
+    { line_code: 'WACC.KD_PRE', label: 'Pre-tax cost of debt (Kd %)', level: 1, kind: 'line' as const, values: { [p]: typeof w.kd_pretax_pct === 'number' ? w.kd_pretax_pct : w.kd_used_pct } },
     { line_code: 'WACC.TAX', label: 'Effective tax rate (%)', level: 1, kind: 'line', values: { [p]: w.tax_rate_pct } },
-    { line_code: 'WACC.KD', label: 'Post-tax cost of debt (Kd %)', level: 0, kind: 'subtotal', values: { [p]: w.kd_used_pct } },
+    { line_code: 'WACC.KD', label: 'Post-tax cost of debt (%)', level: 0, kind: 'subtotal', values: { [p]: Number((w.kd_used_pct * (1 - w.tax_rate_pct / 100)).toFixed(2)) } },
     { line_code: 'WACC.WE', label: 'Equity weight (%)', level: 1, kind: 'line', values: { [p]: weightEquity } },
     { line_code: 'WACC.WD', label: 'Debt weight (%)', level: 1, kind: 'line', values: { [p]: weightDebt } },
     { line_code: 'WACC.TOTAL', label: 'Weighted average cost of capital (WACC %)', level: 0, kind: 'total', values: { [p]: w.wacc_pct } },

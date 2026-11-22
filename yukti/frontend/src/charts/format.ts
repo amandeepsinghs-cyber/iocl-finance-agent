@@ -58,7 +58,7 @@ const KEY_LABELS: Record<string, string> = {
   customer: 'Customer',
   fiscal_year: 'Fiscal year',
   fy: 'Fiscal year',
-  component: 'Salary Component',
+  component: 'Component',
   annual_lakh: 'Annual / Officer (₹ Lakh)',
   monthly_inr: 'Monthly / Officer (₹)',
   share_pct: 'Share of Gross (%)',

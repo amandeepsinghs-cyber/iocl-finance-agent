@@ -543,6 +543,31 @@ class AgentTurnRunner:
         # R1/R2 (plan_fix.md): verified PAT variance explainer ("why was FY25 profit low?") + repair turns
         # ("which screen are you showing?"). Runs before DCF follow-ups / coordinator / planner.
         if not spec_patch:
+            # W2/W4/W3 (plan_fix.md v13): market vs fundamentals ("FCF doubled but the stock didn't — why?", "overlay FCF
+            # on this"), and 10-year WACC history — before the stock chart and DCF follow-ups that would otherwise grab them
+            from app.brain.market_fundamentals import (
+                build_market_vs_fundamental_contract,
+                build_wacc_trend_contract,
+                detect_market_vs_fundamental,
+                detect_wacc_trend,
+            )
+
+            for _det, _build in (
+                (lambda: detect_market_vs_fundamental(query, session_state), build_market_vs_fundamental_contract),
+                (lambda: detect_wacc_trend(query), build_wacc_trend_contract),
+            ):
+                _req = _det()
+                if _req is None:
+                    continue
+                try:
+                    _c = await asyncio.to_thread(_build, _req, norm_persona, turn_id, det_lang, t0)
+                    self._validate_contract(_c)
+                    session_state.record_turn(_c, user_query=query)
+                    return _c
+                except Exception as e_mf:  # noqa: BLE001
+                    logging.getLogger(__name__).warning(f"{_req.get('kind')} failed: {e_mf}")
+                    break
+
             # V1 (plan_fix.md v12): IndianOil share price in any word order → live Yahoo Finance IOC.NS chart (before AR / DCF follow-ups)
             from app.market.oil_intent import build_oil_plot_contract as _bopc, detect_stock_price_plot
 
@@ -595,9 +620,18 @@ class AgentTurnRunner:
             from app.brain.cashflow_trend import (
                 build_cashflow_trend_contract,
                 build_cashflow_variance_contract,
+                build_fcf_concept_contract,
                 detect_cashflow_trend,
                 detect_cashflow_variance,
+                detect_fcf_concept,
             )
+
+            # W7 (plan_fix.md v13): "Is this the same as free cash flow?" → answer with the verified FY26 numbers
+            if detect_fcf_concept(query):
+                fc_c = build_fcf_concept_contract(norm_persona, turn_id, det_lang, t0)
+                self._validate_contract(fc_c)
+                session_state.record_turn(fc_c, user_query=query)
+                return fc_c
 
             # V4 (plan_fix.md v12): "why did net cash / operating cash flow reduce in FY24-25?" → OCF bridge
             cfv_req = detect_cashflow_variance(query, session_state)
@@ -979,6 +1013,19 @@ class AgentTurnRunner:
         """Validates a planner contract and stores the spec for follow-up patches (B2.5)."""
         contract = planned["contract"]
         meta = planned.get("meta") or {}
+        # W5 (plan_fix.md v13): never silently answer a "consolidated" request with standalone figures
+        try:
+            vis_c = contract.get("visual") or {}
+            stmt_c = vis_c.get("statement") if isinstance(vis_c.get("statement"), dict) else {}
+            scope_c = str(stmt_c.get("scope") or "standalone").lower()
+            if re.search(r"\bconsolidated\b", query or "", re.I) and scope_c != "consolidated" and (stmt_c or "standalone" in str(vis_c.get("title") or "").lower()):
+                note = "Consolidated figures for this statement aren't in the verified data, so this is IOCL standalone."
+                if note not in str(contract.get("spoken_summary") or ""):
+                    contract["spoken_summary"] = f"{note} {contract.get('spoken_summary') or ''}".strip()
+                    disp = f"{note} {contract.get('display_text') or ''}".strip()
+                    contract["display_text"] = disp if len(disp) <= 595 else note
+        except Exception:  # noqa: BLE001
+            pass
         contract["latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
         self._validate_contract(contract)
         rows = meta.get("rows")
