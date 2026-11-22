@@ -368,6 +368,28 @@ async def run_planner_turn(
         }
 
     if plan.intent == "what_if":
+        # R3 (plan_fix.md): never hijack a DCF follow-up into the refinery GRM simulator. If the latest card is a DCF
+        # and the question names no refinery / GRM / throughput driver, ask a one-line clarifier instead.
+        _last_t = (list(getattr(session_state, "turns", None) or [])[-1:] or [{}])[0]
+        _last_vis = (_last_t.get("visual") or {}) if isinstance(_last_t, dict) else {}
+        if _last_vis.get("type") == "dcf_model" and not re.search(
+            r"\b(refiner\w*|grm|crack|throughput|panipat|paradip|koyali|mathura|haldia|barauni|digboi|guwahati|bongaigaon|brent|crude)\b",
+            query or "", re.I,
+        ):
+            _num = re.search(r"(\d+(?:\.\d+)?)", query or "")
+            _clar = (
+                f"Just to confirm, sir — do you want me to re-run the DCF with WACC at {_num.group(1)}%? Say \"yes, WACC {_num.group(1)}\" and I'll recompute all six tabs."
+                if _num else "Which DCF assumption would you like me to change — WACC, terminal growth, Brent, or the share price?"
+            )
+            return {"contract": {
+                "turn_id": turn_id, "language": language, "persona": persona,
+                "spoken_summary": _clar, "display_text": _clar,
+                "visual": {"type": "none", "mode": "replace"},
+                "insights": [], "sources": [],
+                "suggestions": [f"Change WACC to {_num.group(1)}% and run again" if _num else "Change WACC to 10% and run again", "What drives the valuation?"],
+                "access": {"status": "allowed"}, "export_options": [], "status_events": ["Clarified DCF what-if (refinery simulator not applicable)"],
+            }, "meta": None}
+
         # M-B4 / SPEC-11: what_if runs after RBAC (Leadership/Directors and Finance personas) using ssot_refinery_economics_360
         from app.brain.rbac import persona_class, persona_function
         from app.answer_composer import build_refusal_contract

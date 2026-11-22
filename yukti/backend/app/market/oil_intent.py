@@ -463,7 +463,7 @@ def build_oil_plot_contract(req: Dict[str, Any], persona: str, turn_id: str, lan
     chg = (vals[-1] - vals[0]) / vals[0] * 100 if vals[0] else 0
     stale = " (from saved history; the live feed is unavailable right now)" if d.get("stale") else ""
     hist_info = d.get("history") or {}
-    subj = "The rupee" if d["benchmark"] == "inr" else ("IndianOil (IOC.NS)" if d["benchmark"] == "iocl" else short)
+    subj = "The rupee" if d["benchmark"] == "inr" else ("IndianOil (NSE:IOC, live via Yahoo Finance API)" if d["benchmark"] == "iocl" else short)
     spoken = (
         f"{subj} is at {cur}{live['price']:.2f} {per} today{stale}"
         + (f", {'up' if (live.get('change_pct') or 0) >= 0 else 'down'} {abs(live.get('change_pct') or 0):.1f}% on the day" if live.get("change_pct") is not None and not d.get("stale") else "")
@@ -473,9 +473,19 @@ def build_oil_plot_contract(req: Dict[str, Any], persona: str, turn_id: str, lan
     insights = [
         f"Change over the period: {'+' if chg >= 0 else ''}{chg:.0f}% ({rows[0]['date']} to today).",
         f"Range: {cur}{vals[lo_i]:.2f} ({rows[lo_i]['date']}) to {cur}{vals[hi_i]:.2f} ({rows[hi_i]['date']}).",
-        ("Tip: ask about USD/INR sensitivity to see currency impact on IndianOil's crude import bill." if d["benchmark"] == "inr"
-         else ("Tip: ask to compare IndianOil's realised refinery GRMs vs Singapore Complex GRM." if d["benchmark"] == "grm"
-               else "Tip: ask for IndianOil revenue or PAT by year and say \"overlay Brent\" or \"overlay GRM\" to compare.")),
+        (
+            "Connected live to Yahoo Finance (IOC.NS): ask \"Run the DCF valuation model for IOCL\" to value IndianOil directly against this live market price."
+            if d["benchmark"] == "iocl"
+            else (
+                "Tip: ask about USD/INR sensitivity to see currency impact on IndianOil's crude import bill."
+                if d["benchmark"] == "inr"
+                else (
+                    "Tip: ask to compare IndianOil's realised refinery GRMs vs Singapore Complex GRM."
+                    if d["benchmark"] == "grm"
+                    else "Tip: ask for IndianOil revenue or PAT by year and say \"overlay Brent\" or \"overlay GRM\" to compare."
+                )
+            )
+        ),
     ]
     status = (
         f"Live {d['label']} prices: {hist_info.get('saved_days', 0):,} days from saved history + "
@@ -524,8 +534,12 @@ def build_oil_plot_contract(req: Dict[str, Any], persona: str, turn_id: str, lan
             {"label": f"Daily · {d['unit']}", "kind": "filter"},
             {"label": f"Yahoo Finance {d['symbol']}", "kind": "source"},
         ],
-        "sources": [{"kind": "data", "object": f"Yahoo Finance {d['symbol']} ({d['label']}, front-month futures)", "sql": d["source"]}],
-        "suggestions": ["Show IndianOil revenue for the last 10 years", ("Plot Brent for the same period" if d["benchmark"] != "brent" else "Plot Singapore GRM for the same period")],
+        "sources": [{"kind": "data", "object": f"Yahoo Finance {d['symbol']} ({d['label']}{', front-month futures' if d['benchmark'] in ('brent', 'wti') else ''})", "sql": d["source"]}],
+        "suggestions": (
+            ["Run the DCF valuation model for IOCL", "And what are the analysts saying online?", "Show IndianOil Cash Flow statement for the past 5 years"]
+            if d["benchmark"] == "iocl"
+            else ["Show IndianOil revenue for the last 10 years", ("Plot Brent for the same period" if d["benchmark"] != "brent" else "Plot Singapore GRM for the same period")]
+        ),
         "access": {"status": "allowed"},
         "export_options": ["xlsx", "pdf", "sheets"],
         "status_events": [status],

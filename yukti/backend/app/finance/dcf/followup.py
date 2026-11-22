@@ -80,6 +80,7 @@ _WI_FIELDS: Dict[str, Tuple[str, Tuple[float, float]]] = {
     "production_decline_pct": (r"production decline|decline rate|production", (-10.0, 25.0)),
     "holdco_discount_pct": (r"holdco|holding[- ]company discount|conglomerate discount", (0.0, 60.0)),
     "fx_inr_usd": (r"rupee|exchange rate|usd ?inr|inr|fx|dollar", (60.0, 130.0)),
+    "market_price_inr": (r"market price|share price|stock price|current (?:market )?(?:price|value)|cmp|ioc\.?ns|nse:ioc", (20.0, 1000.0)),
 }
 
 
@@ -144,6 +145,46 @@ def detect_extend_to_forecast(query: str, session_state: Any = None) -> Optional
     return {"intent": "extend_to_forecast", "dcf": dcf}
 
 
+_ASR_WACC_ALIAS_RE = re.compile(r"\b(vat|wack|whack|wac|vac|vacc|bac|wak|vak)\b(?=[^.?!]{0,20}\d)", re.I)
+_INSTEAD_RE = re.compile(
+    r"(?P<new>\d+(?:\.\d+)?)\s*(?:%|percent|pct)?\s+(?:instead\s+of|rather\s+than|in\s+place\s+of)\s+(?:the\s+)?(?P<old>\d+(?:\.\d+)?)"
+    r"|from\s+(?P<old2>\d+(?:\.\d+)?)\s*(?:%|percent)?\s+to\s+(?P<new2>\d+(?:\.\d+)?)",
+    re.I,
+)
+_VALUE_MATCH_FIELDS = ("wacc_pct", "terminal_g_pct", "brent_usd", "capex_scale_pct", "holdco_discount_pct", "market_price_inr")
+
+
+def normalize_asr_dcf_terms(q: str) -> str:
+    """Map common speech-recognition slips for WACC ('VAT', 'wack', 'whack') when a DCF is the active card."""
+    return _ASR_WACC_ALIAS_RE.sub("WACC", q or "")
+
+
+def value_matched_override(q: str, vis: Dict[str, Any]) -> Dict[str, float]:
+    """'X instead of Y' / 'from Y to X' where Y equals a current DCF assumption → override that assumption."""
+    m = _INSTEAD_RE.search(q or "")
+    if not m:
+        return {}
+    new_s = m.group("new") or m.group("new2")
+    old_s = m.group("old") or m.group("old2")
+    try:
+        new_v, old_v = float(new_s), float(old_s)
+    except (TypeError, ValueError):
+        return {}
+    best: Optional[Tuple[float, str]] = None
+    for field in _VALUE_MATCH_FIELDS:
+        base = _base_value(vis, field)
+        if base is None:
+            continue
+        diff = abs(base - old_v)
+        if diff <= max(0.06, abs(base) * 0.005) and (best is None or diff < best[0]):
+            best = (diff, field)
+    if not best:
+        return {}
+    field = best[1]
+    lo, hi = _WI_FIELDS[field][1]
+    return {field: round(new_v, 4)} if lo <= new_v <= hi else {}
+
+
 def detect_dcf_followup(query: str, session_state: Any) -> Optional[Dict[str, Any]]:
     q = (query or "").strip()
     if not q:
@@ -151,6 +192,8 @@ def detect_dcf_followup(query: str, session_state: Any) -> Optional[Dict[str, An
     dcf = find_last_dcf(session_state)
     if not dcf:
         return None
+    if dcf.get("is_latest"):
+        q = normalize_asr_dcf_terms(q)
     if re.search(r"\b(run|re-?run|build|create|do|start)\b.{0,20}\b(dcf|valuation)\b", q, re.I) and not _WHATIF.search(q):
         return None
     if _VERIFY_RUN_RE.search(q):
@@ -162,7 +205,15 @@ def detect_dcf_followup(query: str, session_state: Any) -> Optional[Dict[str, An
     if _GROWTH_AUDIT_RE.search(q) and not re.search(r"\b(what\s+if|change|set)\b", q, re.I):
         return {"intent": "growth_audit", "dcf": dcf}
     overrides = parse_whatif(q, dcf["visual"])
-    if overrides and (_WHATIF.search(q) or re.search(r"\b(at|to|of|is|by)\s*[$₹]?\s*\d", q) or re.search(r"\b(up|down|higher|lower)\b", q, re.I)):
+    if not overrides and dcf.get("is_latest"):
+        overrides = value_matched_override(q, dcf["visual"])
+    if overrides and (
+        "market_price_inr" in overrides
+        or re.search(r"\b(live|spot|real[- ]?time|current)\b", q, re.I)
+        or _WHATIF.search(q)
+        or re.search(r"\b(at|to|of|is|by)\s*[$₹]?\s*\d", q)
+        or re.search(r"\b(up|down|higher|lower)\b", q, re.I)
+    ):
         return {"intent": "whatif", "overrides": overrides, "dcf": dcf}
     on_topic = bool(_DCF_WORDS.search(q))
     if not on_topic:
@@ -227,6 +278,28 @@ def parse_whatif(q: str, vis: Dict[str, Any]) -> Dict[str, float]:
             out[field] = round(val, 4)
     if "terminal_g_pct" in out and "wacc_pct" in out and out["terminal_g_pct"] >= out["wacc_pct"] - 1:
         out.pop("terminal_g_pct")
+    if "market_price_inr" not in out and re.search(
+        r"\b(real[- ]?time|live|current|latest|today'?s|yahoo)\b.{0,30}\b(market|share|stock)\s+price\b"
+        r"|\b(market|share|stock)\s+price\b.{0,30}\b(real[- ]?time|live|yahoo)\b",
+        ql,
+    ):
+        try:
+            from app.finance.dcf.inputs import load_market_price_for_dcf
+
+            live_px, _, _ = load_market_price_for_dcf(prefer_live=True)
+            if 20.0 <= live_px <= 1000.0:
+                out["market_price_inr"] = round(float(live_px), 2)
+        except Exception:
+            pass
+    if "brent_usd" not in out and re.search(r"\b(use|take|apply|with)\b.{0,15}\b(live|current|spot|today'?s|real[- ]?time)\s+brent\b", ql):
+        try:
+            from app.market.oil_prices import get_oil_prices
+
+            live_b = float((get_oil_prices("brent").get("live") or {}).get("price") or 0)
+            if 30.0 <= live_b <= 160.0:
+                out["brent_usd"] = round(live_b, 2)
+        except Exception:
+            pass
     return out
 
 
@@ -306,7 +379,7 @@ def facts_from_visual(vis: Dict[str, Any]) -> Dict[str, Any]:
             for k in (
                 "wacc_pct", "terminal_g_pct", "brent_usd", "fx_inr_usd", "gas_price_usd_mmbtu",
                 "capex_scale_pct", "production_decline_pct", "opex_per_boe", "effective_levy_rate",
-                "tax_rate_pct", "holdco_discount_pct", "vol_crude_mmt", "vol_gas_bcm", "shares_outstanding",
+                "tax_rate_pct", "holdco_discount_pct", "vol_crude_mmt", "vol_gas_bcm", "shares_outstanding", "market_price_inr",
             )
             if k in a
         },
@@ -703,6 +776,7 @@ _FIELD_NAMES = {
     "production_decline_pct": ("Throughput decline", "%/yr"),
     "holdco_discount_pct": ("Holdco discount", "%"),
     "fx_inr_usd": ("Rupee per dollar", "₹/$"),
+    "market_price_inr": ("NSE:IOC market price", "₹/share"),
 }
 
 
@@ -759,14 +833,15 @@ def answer_whatif(
     scenario_facts = facts_from_visual(new_spec)
 
     new_iv = float(new_spec.get("per_share", {}).get("intrinsic_inr", res["per_share"]["intrinsic_inr"]))
-    base_iv, mkt = base["intrinsic_inr"], base["market_inr"]
+    base_iv, old_mkt = base["intrinsic_inr"], base["market_inr"]
+    mkt = float(new_spec.get("per_share", {}).get("market_inr", overrides.get("market_price_inr", old_mkt)))
     chg = (new_iv - base_iv) / base_iv * 100 if base_iv else 0.0
     up = (new_iv - mkt) / mkt * 100 if mkt else 0.0
 
     changes = []
     for k, v in overrides.items():
         name, unit = _FIELD_NAMES.get(k, (k, ""))
-        bv = base["assumptions"].get(k) or _base_value(prior_vis, k)
+        bv = (old_mkt if k == "market_price_inr" else None) or base["assumptions"].get(k) or _base_value(prior_vis, k)
 
         def fmt(x: float) -> str:
             return f"{x:.2f}".rstrip("0").rstrip(".")
@@ -775,8 +850,8 @@ def answer_whatif(
             changes.append(f"{name} {fmt(_f(bv))}% → {fmt(v)}{unit}")
         elif unit == "$/bbl":
             changes.append(f"{name} ${fmt(_f(bv))} → ${fmt(v)}/bbl")
-        elif unit == "₹/$":
-            changes.append(f"{name} ₹{fmt(_f(bv))} → ₹{fmt(v)}")
+        elif unit in ("₹/$", "₹/share"):
+            changes.append(f"{name} ₹{fmt(_f(bv))} → ₹{fmt(v)}{'/share' if unit == '₹/share' else ''}")
         else:
             changes.append(f"{name} {fmt(_f(bv))} → {fmt(v)} {unit}")
 
@@ -784,12 +859,20 @@ def answer_whatif(
     dfs = ((new_spec.get("forecast") or {}).get("lines") or {}).get("discount_factor") or []
     df_txt = f"FY27 discount factor {dfs[0]:.4f}x → FY36 {dfs[-1]:.4f}x, " if len(dfs) >= 2 else ""
 
-    spoken = (
-        f"I have re-run the full 10-year DCF model with {', '.join(changes)}. "
-        f"Intrinsic value moves from ₹{base_iv:.0f} to ₹{new_iv:.0f} per share ({chg:+.1f}%), "
-        f"{'above' if new_iv > mkt else 'below'} the market price of ₹{mkt:.0f} ({up:+.1f}%). "
-        f"The updated model ({df_txt}WACC {new_wacc:.2f}%, EV {_cr(scenario_facts['ev_cr'])}) is shown in all six tabs on screen."
-    )
+    if list(overrides.keys()) == ["market_price_inr"] and abs(new_iv - base_iv) < 0.05:
+        verdict_lbl = str(new_spec.get("per_share", {}).get("verdict") or ("undervalued" if up > 10 else "overvalued" if up < -10 else "fairly valued"))
+        spoken = (
+            f"I have updated the DCF benchmark with {', '.join(changes)}. "
+            f"Intrinsic value is ₹{new_iv:.2f} per share against the ₹{mkt:.2f} market price, meaning IOCL is "
+            f"{verdict_lbl} by {abs(up):.1f}% ({up:+.1f}%). All six tabs on screen now reflect this share price."
+        )
+    else:
+        spoken = (
+            f"I have re-run the full 10-year DCF model with {', '.join(changes)}. "
+            f"Intrinsic value moves from ₹{base_iv:.0f} to ₹{new_iv:.0f} per share ({chg:+.1f}%), "
+            f"{'above' if new_iv > mkt else 'below'} the market price of ₹{mkt:.0f} ({up:+.1f}%). "
+            f"The updated model ({df_txt}WACC {new_wacc:.2f}%, EV {_cr(scenario_facts['ev_cr'])}) is shown in all six tabs on screen."
+        )
 
     artifacts: List[Dict[str, Any]] = []
     scenario_id = f"dcf-scen-{int(time.time())}"

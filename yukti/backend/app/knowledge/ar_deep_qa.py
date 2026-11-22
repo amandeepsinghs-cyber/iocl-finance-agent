@@ -41,6 +41,8 @@ _EXCLUDE_DIRECT_RE = re.compile(
     r"\b("
     r"why\s+did\b|what\s+drove\b|what\s+caused\b|run\s+(?:a\s+)?dcf|"
     r"p&l\s+statement|income\s+statement|balance\s+sheet|cash\s+flow\s+statement|"
+    r"total\s+cash\s+flows?|cash\s+flow\s+trend|cash\s+flows?\s+(?:for|over)\s+(?:the\s+)?(?:past|last)|"
+    r"which\s+screen|still\s+seeing|"
     r"financial\s+ratios|mou\s+scorecard|wacc\b|top\s*5\s*(?:actions|levers)|"
     r"petrol|diesel|hsd|lpg|atf|brent|wti|what\s+can\s+you\s+do"
     r")\b",
@@ -58,6 +60,8 @@ Rules:
 - Cite inline using the exact [AR FYxx p.NN] tags attached to the excerpts you rely on.
 - Use ₹ and Indian digit grouping where quoting amounts from the excerpts; NEVER invent numbers or facts not present in the excerpts.
 - Never refer to "JSON", "payload", "chunks", or "provided context". Speak directly about IOCL's Annual Report disclosures.
+- Never claim that data is "not available", "not a continuous series", or "only for select periods": Yukti holds a verified
+  FY17–FY26 financial SSOT. If the excerpts don't contain a figure, simply answer with what they do contain.
 - If the question is in Hindi (`language=hi`), respond in Devanagari Hindi; otherwise Indian English. Plain text only."""
 
 
@@ -170,6 +174,10 @@ def should_fallback_to_ar(query: str) -> bool:
     """Only consult the 10-year AR corpus on unresolved turns that carry a real IOCL/finance/disclosure signal."""
     q = (query or "").strip()
     if not q or len(q.split()) < 3 or _GREETING_ONLY_RE.match(q) or _CONVERSATIONAL_FILLER_RE.match(q):
+        return False
+    from app.brain.explain_screen import is_repair_or_meta_question
+
+    if is_repair_or_meta_question(q):
         return False
     return bool(_SUBSTANTIVE_AR_DOMAIN_RE.search(q))
 
@@ -339,6 +347,22 @@ def _deterministic_summary(chunks: List[Dict[str, Any]]) -> str:
     return " ".join(parts)
 
 
+def make_spoken(text: str, max_sentences: int = 2, max_words: int = 55) -> str:
+    """R5 (plan_fix.md): voice-friendly version — strip [AR FYxx p.NN] tags, keep ≤2 sentences / ~55 words."""
+    s = re.sub(r"\s*\[(?:AR\s+)?FY\d{2}[^\]]*\]", "", text or "")
+    s = re.sub(r"\s{2,}", " ", s).strip()
+    sents = [x.strip() for x in re.split(r"(?<=[.!?।])\s+", s) if x.strip()]
+    out: List[str] = []
+    words = 0
+    for x in sents[:max_sentences]:
+        n = len(x.split())
+        if out and words + n > max_words:
+            break
+        out.append(x)
+        words += n
+    return " ".join(out) if out else s
+
+
 def answer_ar_deep_qa(
     query: str,
     persona: str,
@@ -393,7 +417,7 @@ def answer_ar_deep_qa(
         "turn_id": turn_id,
         "language": language,
         "persona": persona,
-        "spoken_summary": answer,
+        "spoken_summary": make_spoken(answer),
         "display_text": answer,
         "visual": {
             "type": "table",

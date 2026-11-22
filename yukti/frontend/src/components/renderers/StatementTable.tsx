@@ -50,7 +50,7 @@ export function StatementTable({ statement, onWhy }: StatementTableProps) {
           <thead>
             <tr>
               <th scope="col" className="yk-statement__label-cell yk-statement__head text-left">
-                {STATEMENT_LABEL[statement.statement] || 'Line item'}
+                {(statement as any).row_header || STATEMENT_LABEL[statement.statement] || 'Line item'}
                 {statement.scope ? <span className="yk-statement__scope"> · {statement.scope === 'consolidated' ? 'Consolidated' : 'Standalone'}</span> : null}
               </th>
               {periods.map((p) => (

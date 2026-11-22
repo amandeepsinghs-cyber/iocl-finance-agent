@@ -589,7 +589,9 @@ export const AnswerCard: React.FC<AnswerCardProps> = ({ contract, isDark = false
             ? 'Yahoo Finance · live'
             : /^DCF engine/i.test(String(firstSource.object || '')) // 27-Oct: DCF follow-ups
               ? 'DCF model'
-              : 'SSOT'
+              : sources.some((s) => /yahoo/i.test(String(s.object || ''))) // R11: SSOT + live market data (DCF)
+                ? 'SSOT + Yahoo Finance live'
+                : 'SSOT'
       : undefined;
 
   // Follow-up chips (U2.3 / U5.4): drill-downs first, else the agent's suggestions; latest card only.

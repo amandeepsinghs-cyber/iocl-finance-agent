@@ -7,8 +7,8 @@ from app.finance.dcf.run import build_dcf_model_spec, run_dcf
 from app.finance.dcf.assumptions import DCFAssumptions, AssumptionField, defaults_from_ssot
 from app.finance.dcf.inputs import (
     DCFInputMissingError,
-    load_fy26_market_price_default,
     load_fy26_wacc_default,
+    load_market_price_for_dcf,
     load_ssot_snapshot_rows,
     load_wacc_annual_rows,
 )
@@ -18,17 +18,19 @@ from app.finance.dcf.xlsx_writer import write_dcf_xlsx
 def build_dcf_assumptions_from_inputs(job_id: str, inputs: Dict[str, Any]) -> DCFAssumptions:
     inputs = inputs or {}
     default_wacc_pct, wacc_src, _ = load_fy26_wacc_default()
-    default_mkt_px, mkt_src, mkt_meta = load_fy26_market_price_default()
-    as_of = str(mkt_meta.get("date") or "2026-03-30")
+    default_mkt_px, mkt_src, mkt_meta = load_market_price_for_dcf()
+    as_of = str(inputs.get("as_of") or mkt_meta.get("date") or "2026-03-30")
 
     base = defaults_from_ssot(load_ssot_snapshot_rows(), load_wacc_annual_rows(), as_of=as_of)
+    chosen_mkt = float(inputs.get("market_price_inr", default_mkt_px))
+    mkt_overridden = "market_price_inr" in inputs and abs(chosen_mkt - default_mkt_px) >= 0.01
     updates: Dict[str, Any] = {
         "run_id": job_id,
         "as_of": as_of,
         "market_price_inr": AssumptionField(
-            value=float(inputs.get("market_price_inr", default_mkt_px)),
-            source=mkt_src,
-            edited_by_user="market_price_inr" in inputs,
+            value=chosen_mkt,
+            source=f"user override (base: {mkt_src})" if mkt_overridden else mkt_src,
+            edited_by_user=mkt_overridden,
         ),
         "wacc_pct": AssumptionField(
             value=float(inputs.get("wacc_pct", default_wacc_pct)),
@@ -106,10 +108,16 @@ async def dcf_job_runner(
     mkt_date = str(res.get("per_share", {}).get("market_date", asm.as_of))
     upside = (iv / px - 1) * 100 if px else 0.0
     verdict = "undervalued" if upside > 10 else ("overvalued" if upside < -10 else "fairly valued")
+    is_live_yahoo = "yahoo finance" in str(asm.market_price_inr.source).lower()
+    mkt_desc = (
+        f"the live NSE:IOC market price of ₹{px:.2f} via Yahoo Finance ({mkt_date})"
+        if is_live_yahoo
+        else f"a market price of ₹{px:.2f} (NSE:IOC close {mkt_date})"
+    )
 
     summary = (
         f"The DCF valuation is ready (illustrative valuation). Intrinsic value is ₹{iv:.2f} per share against "
-        f"a market price of ₹{px:.2f} (NSE:IOC close {mkt_date}), so the model suggests IndianOil is {verdict} "
+        f"{mkt_desc}, so the model suggests IndianOil is {verdict} "
         f"by {abs(upside):.1f}%. Illustrative valuation, not investment advice."
     )
 
@@ -128,7 +136,11 @@ async def dcf_job_runner(
         "access": {"status": "allowed"},
         "sources": [
             {"kind": "data", "object": "hrfin_gold.fact_wacc_annual", "title": "IOCL WACC SSOT FY26"},
-            {"kind": "data", "object": "market_prices_seed.csv", "title": f"NSE Bhavcopy IOC.NS ({mkt_date})"},
+            (
+                {"kind": "data", "object": "Yahoo Finance API (IOC.NS)", "title": f"Live NSE:IOC Market Price ({mkt_date}: ₹{px:.2f})"}
+                if is_live_yahoo
+                else {"kind": "data", "object": "market_prices_seed.csv", "title": f"NSE Bhavcopy IOC.NS ({mkt_date})"}
+            ),
         ],
         "provenance": {
             "label": "illustrative",

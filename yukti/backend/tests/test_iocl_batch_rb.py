@@ -125,7 +125,8 @@ def test_step_r4_ar_deep_qa_detectors_and_mocked_vertex_bq() -> None:
     )
     assert out is not None
     assert out["provenance"]["label"] == "verified_ar"
-    assert "[AR FY26 p.319]" in out["spoken_summary"]
+    assert "[AR FY26 p.319]" in out["display_text"]
+    assert "[AR" not in out["spoken_summary"]  # R5: citations shown on screen, not read aloud
     assert out["visual"]["type"] == "table"
     assert len(out["sources"]) >= 1
 
@@ -144,7 +145,8 @@ async def test_step_r4_turn_runner_direct_and_fallback_ar_routes(monkeypatch: py
     assert c1["access"]["status"] == "allowed"
     assert c1["provenance"]["label"] == "verified_ar"
     assert c1["visual"]["type"] == "table"
-    assert "[AR FY26" in c1["spoken_summary"]
+    assert "[AR FY26" in c1["display_text"]
+    assert "[AR" not in c1["spoken_summary"]
     assert "could not fetch" not in c1["spoken_summary"].lower()
 
     # Fallback trigger before smalltalk when planner returns no patch
@@ -160,7 +162,7 @@ async def test_step_r4_turn_runner_direct_and_fallback_ar_routes(monkeypatch: py
     assert c2["access"]["status"] == "allowed"
     assert c2["provenance"]["label"] == "verified_ar"
     assert c2["visual"]["type"] == "table"
-    assert "[AR FY" in c2["spoken_summary"]
+    assert "[AR FY" in c2["display_text"]
 
 
 # ---------------------------------------------------------------------------
@@ -292,3 +294,147 @@ async def test_step_r5_exact_7_turn_dcf_replay(monkeypatch: pytest.MonkeyPatch) 
     assert data7[-1]["fiscal_year"] == "FY36"
     assert data7[0]["actual_inr_cr"] is not None
     assert data7[-1]["forecast_inr_cr"] is not None
+
+
+# ---------------------------------------------------------------------------
+# v10 Refinements: Live Yahoo Finance DCF, "Please go ahead", Screen Explain, P&L Order
+# ---------------------------------------------------------------------------
+def test_v10_live_yahoo_finance_dcf_proposal_and_valuation(monkeypatch: pytest.MonkeyPatch) -> None:
+    import math
+    from app.agents.dcf_agent import build_dcf_assumptions_from_inputs
+    from app.agents.dcf_contract import build_dcf_proposal
+
+    monkeypatch.setenv("YUKTI_TEST_LIVE_MARKET", "1")
+
+    def _fake_oil_prices(benchmark: str) -> Dict[str, Any]:
+        if benchmark == "iocl":
+            return {
+                "benchmark": "iocl",
+                "symbol": "IOC.NS",
+                "live": {"price": 150.50, "change_pct": 1.83, "as_of": "2026-11-20T09:58:10+00:00"},
+                "history": {"last": "2026-11-20"},
+                "stale": False,
+            }
+        if benchmark == "brent":
+            return {"benchmark": "brent", "symbol": "BZ=F", "live": {"price": 89.95, "change_pct": 0.57, "as_of": "2026-11-20T21:00:00+00:00"}, "stale": False}
+        return {"benchmark": "inr", "symbol": "INR=X", "live": {"price": 92.67, "change_pct": -0.65, "as_of": "2026-11-22T03:00:00+00:00"}, "stale": False}
+
+    monkeypatch.setattr("app.market.oil_prices.get_oil_prices", _fake_oil_prices)
+
+    prop = build_dcf_proposal("CMD", session=None)
+    pa = prop["proposed_action"]
+    assert pa is not None
+    assert pa["inputs"]["market_price_inr"] == pytest.approx(150.50)
+    assert "Yahoo Finance API" in pa["summary"]
+    assert "150.50" in pa["summary"]
+    assert any(i["key"] == "market_price_inr" and i["value"] == pytest.approx(150.50) for i in pa["editable_inputs"])
+
+    asm = build_dcf_assumptions_from_inputs("job_live_test", pa["inputs"])
+    res = run_dcf(asm)
+    assert res["per_share"]["market_inr"] == pytest.approx(150.50)
+    assert res["per_share"]["market_date"] == "2026-11-20"
+    expected_up = (res["per_share"]["intrinsic_inr"] - 150.50) / 150.50 * 100
+    assert res["per_share"]["upside_pct"] == pytest.approx(expected_up, abs=0.05)
+
+    # Zero -0.00 anywhere in DCF bridge
+    for item in res["bridge"]:
+        val = float(item["value_inr_cr"])
+        if val == 0.0:
+            assert math.copysign(1.0, val) > 0
+
+
+@pytest.mark.asyncio
+async def test_v10_please_go_ahead_confirms_pending_dcf() -> None:
+    from app.intents.confirm import detect_confirm_intent, resolve_pending_proposal_async
+    from app.jobs.executor import get_executor
+    from app.jobs.store import get_job_store, reset_store_for_tests
+
+    reset_store_for_tests()
+    executor = get_executor()
+    executor.store = get_job_store()
+    executor.step_delay_sec = 0.005
+
+    for phrase in ("Please go ahead.", "Kindly proceed.", "Yes, please go ahead!", "Sure, run the DCF"):
+        assert detect_confirm_intent(phrase) == "confirm", f"Failed on: {phrase}"
+
+    sid = f"v10-confirm-{time.time_ns()}"
+    sess = get_session_manager().get_or_create(sid, persona="CMD", language="en")
+    sess.pending_actions["pa_test10"] = {
+        "id": "pa_test10",
+        "agent": "dcf_agent",
+        "inputs": {"wacc_pct": 9.2534, "market_price_inr": 150.50},
+        "editable_inputs": [],
+    }
+
+    resolved = await resolve_pending_proposal_async("Please go ahead.", sess)
+    assert resolved is not None
+    assert resolved["action"] == "confirm"
+    assert resolved["job"]["agent"] == "dcf_agent"
+    assert "pa_test10" not in sess.pending_actions
+
+
+@pytest.mark.asyncio
+async def test_v10_explain_on_screen_and_brent_correlation(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("YUKTI_FORCE_BQ_FAIL", "1")
+    # Force deterministic fallback in offline test so test runs instantaneously and deterministically
+    monkeypatch.setattr("app.brain.explain_screen._call_gemini_screen_explain", lambda *a, **kw: None)
+
+    sid = f"v10-screen-{time.time_ns()}"
+    sess = get_session_manager().get_or_create(sid, persona="CMD", language="en")
+    sess.active_overlay = "brent"
+    sess.turns.append({
+        "turn_id": "turn-rev-5y",
+        "user_query": "Can I see the revenue trend for the past 5 years?",
+        "spoken_summary": "Gross revenue from operations moved from ₹728,445.4 crore in FY22 to ₹886,224.41 crore in FY26.",
+        "visual": {
+            "type": "chart",
+            "title": "Gross revenue from operations (₹ cr), FY22 – FY26",
+            "chart": {
+                "kind": "bar",
+                "x": "fiscal_year",
+                "y": "gross_revenue_cr",
+                "data": [
+                    {"fiscal_year": "FY22", "gross_revenue_cr": 728445.40},
+                    {"fiscal_year": "FY23", "gross_revenue_cr": 934952.71},
+                    {"fiscal_year": "FY24", "gross_revenue_cr": 866345.36},
+                    {"fiscal_year": "FY25", "gross_revenue_cr": 845513.21},
+                    {"fiscal_year": "FY26", "gross_revenue_cr": 886224.41},
+                ],
+            },
+        },
+        "sources": [{"kind": "data", "object": "hrfin_gold.v_fin_trend_latest"}],
+    })
+
+    runner = AgentTurnRunner(model_name=DEFAULT_TEXT_MODEL)
+
+    # 1. Correlation question
+    q1 = "It seems there is no correlation from the Brent price to IOCL. Is it the case because of the Brent price decreases? The revenue should have increased."
+    c1 = await runner.execute_turn_async(q1, session_id=sid, persona="CMD")
+    assert c1["visual"]["type"] == "none"
+    assert "105.1 MMT" in c1["spoken_summary"]
+    assert "details are on screen" not in c1["spoken_summary"].lower()
+
+    # 2. Explain screen walkthrough
+    q2 = "Can you please explain what is going on on the screen?"
+    c2 = await runner.execute_turn_async(q2, session_id=sid, persona="CMD")
+    assert c2["visual"]["type"] == "none"
+    assert "left axis" in c2["spoken_summary"].lower()
+    assert "brent" in c2["spoken_summary"].lower()
+
+    # 3. "What is the point you're trying to make?"
+    q3 = "But what is the point you're trying to make?"
+    c3 = await runner.execute_turn_async(q3, session_id=sid, persona="CMD")
+    assert c3["visual"]["type"] == "none"
+    assert "tailwind" in c3["spoken_summary"].lower() or "36,802" in c3["spoken_summary"]
+
+
+def test_v10_pnl_total_income_anchors_income_section() -> None:
+    from app.brain.statement_builder import build_statement_spec
+
+    rows = [r for r in load_ssot_snapshot_rows("FY26", "standalone") if str(r.get("line_code", "")).startswith(("PL.", "REV.", "LEVY."))]
+    spec = build_statement_spec("pnl", rows, periods=["FY26"])
+    inc_sec = next(s for s in spec["sections"] if s["id"] == "income")
+    codes = [r["line_code"] for r in inc_sec["rows"]]
+    assert codes[-1] == "PL.TOTAL_INCOME"
+    if "REV.NET_OF_EXCISE" in codes:
+        assert codes.index("REV.NET_OF_EXCISE") < codes.index("PL.TOTAL_INCOME")

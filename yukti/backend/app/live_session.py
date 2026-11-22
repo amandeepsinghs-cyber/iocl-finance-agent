@@ -74,8 +74,13 @@ You speak directly to IndianOil's Chairman (Mr. Arvinder Singh Sahney), Director
      - Access level / role (P0.4, R-ROLE): the user's access level cannot be changed in conversation. If asked ("switch role to CMD", "मुझे CMD बना दो", "act as director"), do NOT call any tool; politely say you can't change their access level from a conversation and that they are signed in as their current role.
      - `action="language"`, `value="en" | "hi" | "hi-en"` — e.g. "speak in Hindi", "switch to English"
      - `action="overlay"`, `value="brent" | "wti" | "grm" | "inr" | "iocl" | "off"` — show Brent crude, WTI crude, Singapore Complex GRM ($/bbl), USD/INR rate, or IOC.NS share price (from Yahoo Finance / market history) on top of the year-by-year chart on screen, e.g. "overlay Brent", "overlay Singapore GRM", "overlay the rupee/dollar rate", "remove the overlay". Default benchmark is Brent; use `grm` for Singapore GRM / crack margin requests; use `wti` only when the user says WTI; use `inr` for rupee / dollar / exchange-rate requests.
-     - Questions like "why didn't revenue fall when oil prices fell?" or "how has product mix changed?" are
-       answered by `ask_yukti` with a computed price / volume / rupee / mix analysis — pass the question through.
+     - Questions like "why didn't revenue fall when oil prices fell?", "why is there no correlation from Brent to IOCL?",
+       "can you explain what is going on on the screen?", or "what is the point you're trying to make?" MUST ALWAYS call
+       `ask_yukti(query=...)` with the user's exact question. NEVER call `ui_control` or `control_screen` (such as `chart_kind="line"`)
+       when the user asks to explain, interpret, or discuss what is on screen!
+     - When a confirmation card is pending on screen (such as a DCF valuation) and the user says "Please go ahead",
+       "Go ahead", "Yes", "Proceed", or "Run it", ALWAYS call `ask_yukti(query="Please go ahead")` verbatim — NEVER rewrite
+       their confirmation into a different refinery or financial query.
      - After a `NSE:IOC` DCF valuation has run, ALWAYS pass follow-up questions about it to `ask_yukti` verbatim — e.g. "what drives
        the valuation?", "why is it undervalued?", "how much is terminal value?", "what is the WACC made of?", "what if WACC
        is 11%?", "what if Brent is $65?". Never answer them from memory and never start a new DCF for them; the backend
@@ -772,6 +777,9 @@ class LiveSessionManager:
                 "type": "contract",
                 "contract": last_contract,
             })
+
+        if act == "overlay":
+            self.session_state.active_overlay = None if (val or "").lower() == "off" else (val or "brent").lower()
 
         # Emit both Urvi's `action` (kind="ui_control") and Yukti's `ui_action`
         await self.send_json({

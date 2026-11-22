@@ -7,7 +7,7 @@ import { ChartSpec } from '@/contracts/answerContract';
 import { ChartTokens, px } from './theme';
 import { legendName } from './options';
 
-export type OilBenchmark = 'brent' | 'wti' | 'grm' | 'inr';
+export type OilBenchmark = 'brent' | 'wti' | 'grm' | 'inr' | 'iocl';
 
 export interface OilPricePayload {
   benchmark: OilBenchmark;
@@ -79,14 +79,14 @@ export function withOilOverlay(option: any, oil: OilPricePayload, t: ChartTokens
 
   // dashed ink line: clearly distinct from the categorical revenue series
   const color = t.text;
-  const isFx = oil.benchmark === 'inr';
-  const money = (v: number, dp = 0) => (isFx ? `₹${v.toFixed(1)}` : `$${dp ? v.toFixed(dp) : Math.round(v)}`);
+  const isRupee = oil.benchmark === 'inr' || oil.benchmark === 'iocl';
+  const money = (v: number, dp = 0) => (isRupee ? `₹${v.toFixed(1)}` : `$${dp ? v.toFixed(dp) : Math.round(v)}`);
   const name = `${oil.short} (${oil.unit}, FY avg)`;
   const yAxes = Array.isArray(option.yAxis) ? [...option.yAxis] : [option.yAxis];
   const rightUsed = yAxes.some((a: any) => a && a.position === 'right');
   yAxes.push({
     type: 'value',
-    name: isFx ? '₹ per $' : `${oil.short} $/bbl`,
+    name: oil.benchmark === 'inr' ? '₹ per $' : oil.benchmark === 'iocl' ? 'IOC.NS ₹/sh' : `${oil.short} $/bbl`,
     position: 'right',
     offset: rightUsed ? px(t, 64) : 0,
     scale: true,
@@ -156,7 +156,12 @@ export function withOilOverlay(option: any, oil: OilPricePayload, t: ChartTokens
       const head = typeof origFmt === 'function' && rest.length ? origFmt(rest) : rest.map((p: any) => `${p.seriesName}: ${p.value}`).join('<br/>');
       if (!oilP || oilP.value == null) return head;
       const live = oilP.data?.provisional ? ' (FY to date, live)' : ' (FY average)';
-      const val = isFx ? `₹${Number(oilP.value).toFixed(2)} per $` : `$${Number(oilP.value).toFixed(2)}/bbl`;
+      const val =
+        oil.benchmark === 'inr'
+          ? `₹${Number(oilP.value).toFixed(2)} per $`
+          : oil.benchmark === 'iocl'
+            ? `₹${Number(oilP.value).toFixed(2)}/share`
+            : `$${Number(oilP.value).toFixed(2)}/bbl`;
       return `${head}<div style="margin-top:6px;font-size:12px;color:${color};font-weight:600">● ${oil.short}: ${val}${live}</div>`;
     },
   };

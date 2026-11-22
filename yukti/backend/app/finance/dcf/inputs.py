@@ -8,12 +8,16 @@ fallback to `financial_ssot/out/fact_wacc_input.parquet`) with full provenance l
 from __future__ import annotations
 
 import csv
+import logging
 import math
+import os
 from pathlib import Path
 import re
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
+
+logger = logging.getLogger("yukti.dcf.inputs")
 
 
 class DCFInputMissingError(ValueError):
@@ -193,3 +197,72 @@ def load_fy26_market_price_default() -> Tuple[float, str, Dict[str, Any]]:
                 )
 
     raise DCFInputMissingError("market_prices_seed.csv / fact_wacc_input")
+
+
+def should_use_live_market(prefer_live: Optional[bool] = None) -> bool:
+    """Return True when live Yahoo Finance market quotes should be used instead of offline FY26 seed."""
+    if prefer_live is not None:
+        return bool(prefer_live)
+    if os.getenv("YUKTI_OFFLINE_SSOT") == "1":
+        return False
+    if os.getenv("PYTEST_CURRENT_TEST") and os.getenv("YUKTI_TEST_LIVE_MARKET") != "1":
+        return False
+    return True
+
+
+def load_market_price_for_dcf(
+    prefer_live: Optional[bool] = None,
+) -> Tuple[float, str, Dict[str, Any]]:
+    """Return (share_price_inr, source_label, metadata) preferring live Yahoo Finance IOC.NS in production.
+
+    In offline test mode (`PYTEST_CURRENT_TEST` without `YUKTI_TEST_LIVE_MARKET=1`, or `YUKTI_OFFLINE_SSOT=1`),
+    delegates directly to `load_fy26_market_price_default()` so deterministic SSOT unit tests remain invariant.
+    """
+    if should_use_live_market(prefer_live):
+        try:
+            from app.market.oil_prices import get_oil_prices
+
+            iocl_data = get_oil_prices("iocl")
+            live_obj = iocl_data.get("live") or {}
+            hist_obj = iocl_data.get("history") or {}
+            px_opt = _opt_float(live_obj.get("price"))
+            if px_opt is not None and px_opt > 0:
+                px = round(px_opt, 2)
+                stale = bool(iocl_data.get("stale"))
+                as_of_raw = str(live_obj.get("as_of") or "")
+                dt = as_of_raw[:10] if len(as_of_raw) >= 10 else str(hist_obj.get("last") or "live")
+
+                brent_live: Optional[float] = None
+                fx_live: Optional[float] = None
+                try:
+                    brent_live = _opt_float((get_oil_prices("brent").get("live") or {}).get("price"))
+                except Exception:
+                    pass
+                try:
+                    fx_live = _opt_float((get_oil_prices("inr").get("live") or {}).get("price"))
+                except Exception:
+                    pass
+
+                feed_mode = "saved history" if stale else "live API"
+                src_label = f"Yahoo Finance {feed_mode} (NSE:IOC {dt}: ₹{px:.2f})"
+                return (
+                    px,
+                    src_label,
+                    {
+                        "ticker": "IOC.NS",
+                        "date": dt,
+                        "close_inr": px,
+                        "live_inr": px,
+                        "change_pct": _opt_float(live_obj.get("change_pct")),
+                        "source_doc": "Yahoo Finance API (IOC.NS)",
+                        "source_url": "https://finance.yahoo.com/quote/IOC.NS",
+                        "live": not stale,
+                        "stale": stale,
+                        "brent_live_usd": round(brent_live, 2) if brent_live else None,
+                        "fx_live_inr": round(fx_live, 2) if fx_live else None,
+                    },
+                )
+        except Exception as exc:
+            logger.warning(f"Live Yahoo Finance IOC.NS fetch unavailable for DCF, falling back to SSOT seed: {exc}")
+
+    return load_fy26_market_price_default()

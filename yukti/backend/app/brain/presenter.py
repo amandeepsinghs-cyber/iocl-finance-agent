@@ -233,14 +233,19 @@ def fmt_num(v: Any, unit: str = "") -> str:
         return f"${x:,.2f}"
     if unit == "inr_per_boe":
         return f"₹{x:,.0f}/BOE"
+    if unit in ("inr_cr", "inr_lakh"):
+        # R7 (plan_fix.md): Indian lakh-crore grouping for rupee amounts (₹7,28,445 crore, not ₹728,445.4 crore)
+        from app.brain.inr_format import group_indian
+
+        if abs(x) >= 1000:
+            s = group_indian(int(round(x)))
+        else:
+            s = f"{x:.2f}".rstrip("0").rstrip(".")
+        return f"₹{s} {'crore' if unit == 'inr_cr' else 'lakh'}"
     if abs(x - round(x)) < 1e-9 and abs(x) >= 1:
         s = f"{int(round(x)):,}"
     else:
         s = f"{x:,.2f}".rstrip("0").rstrip(".")
-    if unit == "inr_cr":
-        return f"₹{s} crore"
-    if unit == "inr_lakh":
-        return f"₹{s} lakh"
     return s
 
 
@@ -1085,21 +1090,23 @@ def narrate(spec: QuerySpec, compiled: CompiledQuery, columns: List[str], rows: 
                         return v
                 return None
 
+            from app.brain.inr_format import fmt_inr_cr as _fi
+
             if compiled.metric == "pnl_statement":
                 rev_hi, rev_lo = _get_val("PL.REV_OPS", hi), _get_val("PL.REV_OPS", lo)
                 pat_hi, pat_lo = _get_val("PL.PAT", hi), _get_val("PL.PAT", lo)
                 if all(v is not None for v in (rev_lo, rev_hi, pat_lo, pat_hi)):
-                    return f"Between {lo} and {hi}, IOCL's Gross Revenue from Operations moved from ₹{rev_lo:,.1f} cr to ₹{rev_hi:,.1f} cr, and Standalone PAT from ₹{pat_lo:,.1f} cr to ₹{pat_hi:,.1f} cr. The complete Schedule III P&L trend is on screen."
+                    return f"Between {lo} and {hi}, IOCL's Gross Revenue from Operations moved from {_fi(rev_lo)} to {_fi(rev_hi)}, and Standalone PAT from {_fi(pat_lo)} to {_fi(pat_hi)}. The complete Schedule III P&L trend is on screen."
                 return f"The {lo}–{hi} Schedule III Statement of Profit & Loss is on screen."
             elif compiled.metric == "balance_sheet":
                 ta_hi, ta_lo = _get_val("BS.TOTAL_ASSETS", hi), _get_val("BS.TOTAL_ASSETS", lo)
                 if ta_lo is not None and ta_hi is not None:
-                    return f"Between {lo} and {hi}, IOCL's Total Assets moved from ₹{ta_lo:,.1f} cr to ₹{ta_hi:,.1f} cr. The complete Balance Sheet trend is on screen."
+                    return f"Between {lo} and {hi}, IOCL's Total Assets moved from {_fi(ta_lo)} to {_fi(ta_hi)}. The complete Balance Sheet trend is on screen."
                 return f"The {lo}–{hi} Schedule III Balance Sheet is on screen."
             elif compiled.metric == "cash_flow_statement":
                 cfo_hi, cfo_lo = _get_val("CF.CFO", hi), _get_val("CF.CFO", lo)
                 if cfo_lo is not None and cfo_hi is not None:
-                    return f"Between {lo} and {hi}, IOCL's Operating Cash Flow moved from ₹{cfo_lo:,.1f} cr to ₹{cfo_hi:,.1f} cr. The complete Cash Flow trend is on screen."
+                    return f"Between {lo} and {hi}, IOCL's Operating Cash Flow moved from {_fi(cfo_lo)} to {_fi(cfo_hi)}. The complete Cash Flow trend is on screen."
                 return f"The {lo}–{hi} Ind-AS 7 Cash Flow Statement is on screen."
             elif compiled.metric == "financial_ratios":
                 eb_hi, eb_lo = _get_val("RATIO.PBIDT_MARGIN_PCT", hi), _get_val("RATIO.PBIDT_MARGIN_PCT", lo)

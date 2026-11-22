@@ -54,6 +54,7 @@ export function buildFcffStatement(spec: DcfModelSpec): StatementSpec {
   return {
     statement: 'cash_flow',
     title: 'Explicit forecast FCFF & present value schedule',
+    row_header: 'Forecast line',
     unit: '₹ crore',
     periods: years,
     show_yoy: false,
@@ -70,7 +71,9 @@ export function buildWaccStatement(spec: DcfModelSpec): StatementSpec {
   if (spec.wacc_statement) return spec.wacc_statement;
   const w = spec.wacc_build;
   const p = spec.as_of || 'Current';
-  const weightDebt = typeof w.weight_debt === 'number' ? w.weight_debt : Number((100 - w.weight_equity).toFixed(2));
+  const pctW = (x: number | undefined) => (typeof x === 'number' && Math.abs(x) <= 1 ? Number((x * 100).toFixed(2)) : x);
+  const weightEquity = pctW(w.weight_equity) as number;
+  const weightDebt = typeof w.weight_debt === 'number' ? (pctW(w.weight_debt) as number) : Number((100 - weightEquity).toFixed(2));
   const rows: StatementRow[] = [
     { line_code: 'WACC.RF', label: 'Risk-free rate (Rf, 10Y G-Sec %)', level: 1, kind: 'line', values: { [p]: w.rf_used_pct } },
     { line_code: 'WACC.BETA', label: 'Adjusted beta (Blume)', level: 1, kind: 'line', values: { [p]: w.beta_adj } },
@@ -81,13 +84,14 @@ export function buildWaccStatement(spec: DcfModelSpec): StatementSpec {
       : []),
     { line_code: 'WACC.TAX', label: 'Effective tax rate (%)', level: 1, kind: 'line', values: { [p]: w.tax_rate_pct } },
     { line_code: 'WACC.KD', label: 'Post-tax cost of debt (Kd %)', level: 0, kind: 'subtotal', values: { [p]: w.kd_used_pct } },
-    { line_code: 'WACC.WE', label: 'Equity weight (%)', level: 1, kind: 'line', values: { [p]: w.weight_equity } },
+    { line_code: 'WACC.WE', label: 'Equity weight (%)', level: 1, kind: 'line', values: { [p]: weightEquity } },
     { line_code: 'WACC.WD', label: 'Debt weight (%)', level: 1, kind: 'line', values: { [p]: weightDebt } },
     { line_code: 'WACC.TOTAL', label: 'Weighted average cost of capital (WACC %)', level: 0, kind: 'total', values: { [p]: w.wacc_pct } },
   ];
   return {
     statement: 'pnl',
     title: 'WACC build-up',
+    row_header: 'Cost of capital component',
     unit: '% / ratio',
     periods: [p],
     show_yoy: false,

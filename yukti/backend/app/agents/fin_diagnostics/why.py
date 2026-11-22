@@ -132,11 +132,25 @@ async def run_why_turn(
     # If we need an LLM, let's call one, or just compose deterministically.
     # The packet says: "Templated text; numbers inserted from rows." for the Lead.
     
+    from app.brain.inr_format import fmt_inr_cr
+
+    _LBL = {
+        "PL.REV_OPS": "Revenue from operations", "PL.OTHER_INCOME": "Other income", "LEVY.TOTAL": "Excise duty",
+        "PL.COST_MATERIALS": "Crude & raw material cost", "PL.PURCHASES_TRADED": "Purchases of stock-in-trade",
+        "PL.INVENTORY_CHANGE": "Inventory change", "PL.EMP_BENEFIT": "Employee cost",
+        "PL.IMPAIRMENT_FIN_ASSETS": "Impairment", "PL.OTHER_EXP": "Other expenses", "PL.DDA": "Depreciation",
+        "PL.FIN_COST": "Finance cost", "REV.PETCHEM": "Petrochemicals revenue", "PL.PBT": "Profit before tax",
+        "PL.PAT": "Profit after tax",
+    }
+
+    def _lbl(code: str) -> str:
+        return _LBL.get(code, code.split(".")[-1].replace("_", " ").title())
+
     lead = []
     if bridge:
-        lead.append(f"PBT changed by {bridge.delta:.1f} crore ({bridge.start:.1f} to {bridge.end:.1f}).")
+        lead.append(f"Profit before tax moved by {fmt_inr_cr(bridge.delta, signed=True)} ({fmt_inr_cr(bridge.start)} to {fmt_inr_cr(bridge.end)}).")
     for d in top_drivers:
-        lead.append(f"{d.line_code} had an impact of {d.impact_on_pbt_inr_cr:.1f} crore.")
+        lead.append(f"{_lbl(d.line_code)} contributed {fmt_inr_cr(d.impact_on_pbt_inr_cr, signed=True)}.")
         
     for c in chunks:
         lead.append(f'"{c["text"]}" {c["citation"]}')
@@ -162,21 +176,23 @@ async def run_why_turn(
         
     # Visual
     if bridge:
-        # M-BRIDGE -> waterfall
+        # M-BRIDGE -> renderer-compatible typed waterfall (R1, plan_fix.md)
+        wf = [{"step": f"{fy_from} PBT", "amount_cr": round(bridge.start, 2), "value": round(bridge.start, 2), "type": "total"}]
+        wf += [{"step": _lbl(r.line_code), "amount_cr": round(r.impact_on_pbt_inr_cr, 2), "value": round(r.impact_on_pbt_inr_cr, 2), "type": "delta"} for r in rows]
+        wf += [{"step": f"{fy_to} PBT", "amount_cr": round(bridge.end, 2), "value": round(bridge.end, 2), "type": "total"}]
         visual = {
-            "type": "chart", 
+            "type": "chart",
+            "mode": "replace",
+            "title": f"PBT bridge {fy_from} → {fy_to} (₹ crore)",
             "chart": {
-                "kind": "waterfall",
-                "x_key": "line_code",
-                "y_keys": ["impact"],
-                "data": [{"line_code": "Start", "impact": bridge.start}] + 
-                        [{"line_code": r.line_code, "impact": r.impact_on_pbt_inr_cr} for r in rows] +
-                        [{"line_code": "End", "impact": bridge.end}]
-            }
+                "kind": "waterfall", "x": "step", "y": "amount_cr", "category": "step", "value": "amount_cr",
+                "unit": "₹ Cr", "sort": "none", "title": f"PBT bridge {fy_from} → {fy_to} (₹ crore)", "data": wf,
+            },
         }
     else:
         visual = {
             "type": "table",
+            "mode": "replace",
             "table": {
                 "columns": ["Component", "Impact"],
                 "rows": [{"Component": r.component, "Impact": r.impact_inr_cr} for r in rows]

@@ -99,7 +99,7 @@ export const OilOverlayBar: React.FC<Props> = ({ active, data, loading, error, c
           <X className="w-3.5 h-3.5" /> Remove
         </button>
         <span className="flex-1" />
-        {loading && <span className="text-caption text-[var(--ink-3)]">Fetching live {active === 'wti' ? 'WTI' : active === 'grm' ? 'Singapore GRM' : active === 'inr' ? 'rupee' : 'Brent'} series…</span>}
+        {loading && <span className="text-caption text-[var(--ink-3)]">Fetching live {active === 'wti' ? 'WTI' : active === 'grm' ? 'Singapore GRM' : active === 'inr' ? 'rupee' : active === 'iocl' ? 'IOC.NS' : 'Brent'} series…</span>}
         {error && !loading && <span className="text-caption text-[var(--maroon)]">{error}</span>}
         {live && !loading && (
           <span className="inline-flex items-center gap-2.5 rounded-pill border border-[var(--hairline)] bg-[var(--surface)] px-3 py-1" data-testid="oil-live-badge">
@@ -108,7 +108,12 @@ export const OilOverlayBar: React.FC<Props> = ({ active, data, loading, error, c
               {data?.stale ? 'SAVED COPY' : 'LIVE'}
             </span>
             <span className="text-label font-semibold text-[var(--ink)]">
-              {data?.short} {data?.benchmark === 'inr' ? `₹${live.price.toFixed(2)}` : `$${live.price.toFixed(2)}`}
+              {data?.short}{' '}
+              {data?.benchmark === 'inr'
+                ? `₹${live.price.toFixed(2)}`
+                : data?.benchmark === 'iocl'
+                  ? `₹${live.price.toFixed(2)}/sh`
+                  : `$${live.price.toFixed(2)}`}
             </span>
             {live.change_pct !== null && (
               <span className={`text-caption font-semibold ${up ? 'text-[var(--positive)]' : 'text-[var(--maroon)]'}`}>

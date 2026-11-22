@@ -27,6 +27,20 @@ const AGENT_NAMES: Record<string, { name: string; version: string }> = {
   doc_export_agent: { name: 'Document Export Agent', version: 'v1.0' },
 };
 
+/** R8 (plan_fix.md): show assumption values with units (9.25%, ₹150.50/sh, $69.04/bbl) instead of raw numbers. */
+function formatInputValue(val: unknown, inp: EditableInputSpec): string {
+  if (val === null || val === undefined || val === '') return '—';
+  const n = typeof val === 'number' ? val : Number(val);
+  if (!Number.isFinite(n)) return String(val);
+  const trim = (x: number, dp = 2) => x.toFixed(dp).replace(/\.?0+$/, '');
+  const unit = String((inp as any).unit || '');
+  const kind = String((inp as any).type || '');
+  if (kind === 'percent' || unit === '%' || inp.key.endsWith('_pct')) return `${trim(n)}%`;
+  if (unit.includes('₹')) return `₹${n.toFixed(2)}${unit.replace('₹', '')}`;
+  if (/usd\/bbl|\$\/bbl/i.test(unit)) return `$${n.toFixed(2)}/bbl`;
+  return unit ? `${trim(n)} ${unit}` : trim(n);
+}
+
 const DEFAULT_EDITABLE_INPUTS: EditableInputSpec[] = [
   {
     key: 'wacc_pct',
@@ -228,8 +242,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
                   >
                     <td className="py-2 px-3 font-medium text-[var(--ink)]">{inp.label}</td>
                     <td className="py-2 px-3 font-mono tabular-nums text-[var(--ink)]">
-                      {String(val ?? '—')}
-                      {inp.unit ? ` ${inp.unit}` : ''}
+                      {formatInputValue(val, inp)}
                       {hasOverride && (
                         <span className="ml-2">
                           <Badge tone="warning">edited by you</Badge>

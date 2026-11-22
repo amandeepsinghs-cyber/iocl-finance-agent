@@ -310,6 +310,14 @@ def handle_ui_control(
             spoken_sc = replot_success_copy(val, lang=det_lang)
     elif cmd == "export":
         spoken_sc = f"Exporting the current view to {str(val or '').upper()}."
+    elif cmd == "overlay":
+        ov_val = str(val or "brent").lower()
+        session_state.active_overlay = None if ov_val == "off" else ov_val
+        spoken_sc = (
+            "Removed the overlay from the chart."
+            if ov_val == "off"
+            else f"Added the live {ov_val.upper()} benchmark overlay on top of the chart."
+        )
     elif cmd == "navigate_history":
         restored = session_state.restore_cohort(query)
         if restored and isinstance(restored.get("visual"), dict):

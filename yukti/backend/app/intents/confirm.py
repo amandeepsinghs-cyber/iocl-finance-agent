@@ -6,7 +6,9 @@ from typing import Any, Dict, Optional
 
 # SPEC-03 §6.2 Voice and text confirmation (deterministic, no LLM)
 CONFIRM_RE = re.compile(
-    r"^\s*(yes|yeah|yep|sure|ok(ay)?|go ahead|do it|run( it)?|please run|haan ji|haan|ha|chalao|kar do|chala do|हाँ|चलाओ|proceed)(?=$|[\s,.!?;:])",
+    r"^\s*(?:(?:please|kindly|yes,?\s*please|ok(?:ay)?,?\s*please|sure,?\s*please)\s+)?"
+    r"(yes|yeah|yep|sure|ok(ay)?|go\s+ahead|do\s+it|run(\s+(?:it|the\s+dcf|the\s+model))?|start(\s+it)?|please\s+run|haan\s+ji|haan|ha|chalao|kar\s+do|chala\s+do|हाँ|चलाओ|proceed|confirm)"
+    r"(?=$|[\s,.!?;:])",
     re.IGNORECASE,
 )
 
@@ -27,6 +29,11 @@ GROWTH_EDIT_RE = re.compile(
 
 BRENT_EDIT_RE = re.compile(
     r"\bbrent\s*(?:at|=|to|of|is)?\s*\$?\s*(\d+(?:\.\d+)?)\b",
+    re.IGNORECASE,
+)
+
+SHARE_PRICE_EDIT_RE = re.compile(
+    r"\b(?:market|share|stock)\s+price\s*(?:of|=|to|is|at)?\s*(?:₹|rs\.?|inr)?\s*(\d+(?:\.\d+)?)\b",
     re.IGNORECASE,
 )
 
@@ -55,6 +62,11 @@ def extract_voice_edits(text: str) -> Dict[str, float]:
     m_brent = BRENT_EDIT_RE.search(text)
     if m_brent:
         edits["brent_usd"] = float(m_brent.group(1))
+    m_px = SHARE_PRICE_EDIT_RE.search(text)
+    if m_px:
+        val_px = float(m_px.group(1))
+        if 20.0 <= val_px <= 1000.0:
+            edits["market_price_inr"] = val_px
     return edits
 
 
@@ -223,8 +235,14 @@ async def resolve_pending_proposal_async(
                 if item.get("key") == k:
                     item["value"] = v
                     item["edited_by_user"] = True
-            label = "WACC" if k == "wacc_pct" else ("terminal g" if k == "terminal_g_pct" else "Brent")
-            unit = "%" if "pct" in k else " USD/bbl"
+            if k == "wacc_pct":
+                label, unit = "WACC", "%"
+            elif k == "terminal_g_pct":
+                label, unit = "terminal g", "%"
+            elif k == "market_price_inr":
+                label, unit = "NSE:IOC share price", " ₹/sh"
+            else:
+                label, unit = "Brent", " USD/bbl"
             changed_parts.append(f"{label} = {v}{unit}")
         updated_pa["inputs"] = inputs
         updated_pa["editable_inputs"] = editable

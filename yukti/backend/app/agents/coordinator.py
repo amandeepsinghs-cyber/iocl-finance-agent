@@ -70,7 +70,7 @@ async def route_turn(query: str, persona: str, session: Any = None) -> Dict[str,
 
     if agent_id == "dcf_agent":
         from app.agents.dcf_contract import build_dcf_proposal
-        prop = build_dcf_proposal(persona, session)
+        prop = build_dcf_proposal(persona, session, overrides=edits)
         pa = prop.get("proposed_action")
         if pa and session is not None:
             if not hasattr(session, "pending_actions"):

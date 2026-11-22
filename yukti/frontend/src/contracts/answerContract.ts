@@ -244,6 +244,8 @@ export interface StatementSpec {
   statement: StatementKind;
   scope?: 'standalone' | 'consolidated';
   title?: string;
+  /** Optional first-column header override (e.g. DCF "Cost of capital component" instead of "Statement of Profit and Loss") */
+  row_header?: string;
   unit?: string;
   period?: string;
   prior_period?: string | null;

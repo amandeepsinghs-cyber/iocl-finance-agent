@@ -387,6 +387,7 @@ class AgentTurnRunner:
             detect_growth_audit as _dga_early,
         )
         from app.knowledge.ar_deep_qa import detect_ar_deep_qa as _dar_early
+        from app.brain.explain_screen import detect_screen_explanation_or_correlation as _dsec_early
 
         if _sc_probe and _sc_probe.get("command") in ("set_chart_kind", "open_screen") and (
             _detect_oil_plot_early(query)
@@ -397,6 +398,7 @@ class AgentTurnRunner:
             or _def_early(query, session_state)
             or _dac_early(query)
             or _dar_early(query)
+            or _dsec_early(query, session_state)
         ):
             _sc_probe = None
         if is_role_switch_request(query) or (_sc_probe and _sc_probe.get("command") == "set_persona"):
@@ -538,6 +540,57 @@ class AgentTurnRunner:
             session_state.record_turn(policy_contract, user_query=query)
             return policy_contract
 
+        # R1/R2 (plan_fix.md): verified PAT variance explainer ("why was FY25 profit low?") + repair turns
+        # ("which screen are you showing?"). Runs before DCF follow-ups / coordinator / planner.
+        if not spec_patch:
+            from app.brain.explain_screen import is_repair_or_meta_question
+            from app.brain.profit_explainer import answer_profit_variance, detect_profit_variance
+
+            pv_match = detect_profit_variance(query, session_state)
+            repair_q = is_repair_or_meta_question(query)
+            if pv_match is None and repair_q and getattr(session_state, "last_profit_variance", None):
+                prev_pv = session_state.last_profit_variance
+                last_vis_title = str(((session_state.turns[-1] if session_state.turns else {}).get("visual") or {}).get("title") or "")
+                if "PAT bridge" not in last_vis_title:
+                    pv_match = {"kind": "profit_variance", "years": [prev_pv.get("fy_to")], "pat_years": [], "low": False,
+                                "high": False, "prev_ctx": prev_pv, "query": prev_pv.get("query") or query}
+            if pv_match is not None:
+                try:
+                    pv_contract = await asyncio.to_thread(
+                        answer_profit_variance, pv_match, session_state, norm_persona, turn_id, det_lang, t0,
+                        "You're right, sir — here is the profit bridge you asked for." if repair_q else "",
+                    )
+                    self._validate_contract(pv_contract)
+                    session_state.record_turn(pv_contract, user_query=query)
+                    return pv_contract
+                except Exception as e_pv:  # noqa: BLE001
+                    logging.getLogger(__name__).warning(f"profit variance explainer failed: {e_pv}")
+            elif repair_q:
+                from app.brain.explain_screen import answer_screen_explanation_async, find_active_visual_turn
+
+                active_t = find_active_visual_turn(session_state)
+                if active_t is not None:
+                    rep_contract = await answer_screen_explanation_async(
+                        {"kind": "repair", "active_turn": active_t, "overlay": getattr(session_state, "active_overlay", None)},
+                        query, session_state, norm_persona, turn_id, det_lang, t0,
+                    )
+                    self._validate_contract(rep_contract)
+                    session_state.record_turn(rep_contract, user_query=query)
+                    return rep_contract
+
+            # R4 (plan_fix.md): multi-year cash flow trend ("total cash flow for the past 10 years") from verified SSOT
+            from app.brain.cashflow_trend import build_cashflow_trend_contract, detect_cashflow_trend
+
+            cf_req = detect_cashflow_trend(query)
+            if cf_req is not None:
+                try:
+                    cf_contract = await asyncio.to_thread(build_cashflow_trend_contract, cf_req, norm_persona, turn_id, det_lang, t0)
+                    self._validate_contract(cf_contract)
+                    session_state.record_turn(cf_contract, user_query=query)
+                    return cf_contract
+                except Exception as e_cf:  # noqa: BLE001
+                    logging.getLogger(__name__).warning(f"cash flow trend failed: {e_cf}")
+
         # Conceptual / definitional finance questions (e.g. "difference between P&L and Income statement")
         # answer directly instead of dumping a full FY26 financial statement table.
         if not spec_patch:
@@ -577,11 +630,12 @@ class AgentTurnRunner:
         )
 
         # (runs before the coordinator, which would otherwise propose a NEW DCF run for any 'valuation' question;
-        #  explicit pending confirmations such as 'yes, proceed' or 'cancel' are resolved first)
+        #  explicit pending confirmations such as 'yes, proceed', 'please go ahead', or 'cancel' are resolved first)
         _is_pending_reply = bool(
             getattr(session_state, "pending_actions", None)
             and re.match(
-                r"^\s*(?:yes|yeah|yep|sure|ok|okay|proceed|confirm|go\s+ahead|run(?:\s+it)?|cancel|no|abort|stop|हाँ|हां|चलाओ|रद्द)\s*[.!?]*\s*$",
+                r"^\s*(?:(?:please|kindly|yes,?\s*please|ok(?:ay)?,?\s*please|sure,?\s*please)\s+)?"
+                r"(?:yes|yeah|yep|sure|ok|okay|proceed|confirm|go\s+ahead|do\s+it|run(?:\s+(?:it|the\s+dcf|the\s+model))?|start(?:\s+it)?|cancel|no|abort|stop|हाँ|हां|चलाओ|रद्द)\s*[.!?]*\s*$",
                 query or "",
                 re.I,
             )
@@ -607,6 +661,24 @@ class AgentTurnRunner:
                     err_c = await _bsc(query, norm_persona, turn_id, det_lang, t0)
                     err_c.update({"spoken_summary": msg, "display_text": msg, "suggestions": ["What drives the valuation?", "What if WACC is 12%?"]})
                     return self._finalize_planner_contract({"contract": err_c, "meta": None}, session_state, query, t0)
+
+        # Contextual explanation / correlation / "what is the point?" over active on-screen visual (preserves active chart & overlay)
+        if not spec_patch and not _is_pending_reply:
+            from app.brain.explain_screen import (
+                answer_screen_explanation_async,
+                detect_screen_explanation_or_correlation,
+            )
+            exp_match = detect_screen_explanation_or_correlation(query, session_state)
+            if exp_match is not None:
+                try:
+                    exp_contract = await answer_screen_explanation_async(
+                        exp_match, query, session_state, norm_persona, turn_id, det_lang, t0
+                    )
+                    self._validate_contract(exp_contract)
+                    session_state.record_turn(exp_contract, user_query=query)
+                    return exp_contract
+                except Exception as e_exp:
+                    logging.getLogger(__name__).warning(f"screen explanation handler failed: {e_exp}")
 
         from app.agents.coordinator import route_turn
         coord_res = await route_turn(query, norm_persona, session_state)
@@ -715,7 +787,6 @@ class AgentTurnRunner:
                 if planned is not None:
                     return self._finalize_planner_contract(planned, session_state, query, t0)
             except Exception as e_plan:
-                import logging
                 logging.getLogger(__name__).exception(f"Planner pipeline failed: {e_plan}")
 
         # IOCL-R04: Post-planner Deep-QA fallback over 10-year AR corpus before generic smalltalk refusal

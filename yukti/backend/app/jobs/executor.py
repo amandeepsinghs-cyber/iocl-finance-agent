@@ -190,8 +190,8 @@ class JobExecutor:
                 from app.agents.dcf_agent import build_dcf_assumptions_from_inputs
                 from app.finance.dcf.inputs import (
                     DCFInputMissingError,
-                    load_fy26_market_price_default,
                     load_fy26_wacc_default,
+                    load_market_price_for_dcf,
                 )
                 from app.finance.dcf.run import build_dcf_model_spec, run_dcf
 
@@ -200,7 +200,7 @@ class JobExecutor:
                     asm = build_dcf_assumptions_from_inputs(job_id, inputs)
                     dcf_res = run_dcf(asm)
                     _, _, wacc_meta = load_fy26_wacc_default()
-                    _, _, px_meta = load_fy26_market_price_default()
+                    _, _, px_meta = load_market_price_for_dcf()
                 except DCFInputMissingError as exc:
                     refusal_msg = (
                         f"Cannot run the DCF valuation because required input `{exc.missing_input}` is missing or "
@@ -225,11 +225,18 @@ class JobExecutor:
                     dcf_model = build_dcf_model_spec(dcf_res, asm)
                     iv = dcf_res["per_share"]["intrinsic_inr"]
                     px = dcf_res["per_share"]["market_inr"]
+                    mkt_dt = dcf_res["per_share"].get("market_date") or px_meta.get("date", "2026-03-30")
                     upside = dcf_res["per_share"]["upside_pct"]
                     verdict = dcf_res["per_share"]["verdict"]
+                    if px_meta.get("live"):
+                        mkt_phrase = f"the live NSE:IOC market price of ₹{px:.2f} via Yahoo Finance (as of {mkt_dt})"
+                        mkt_title = f"Live NSE:IOC Market Price via Yahoo Finance ({mkt_dt}: ₹{px:.2f})"
+                    else:
+                        mkt_phrase = f"a market price of ₹{px:.2f} (as of {mkt_dt})"
+                        mkt_title = f"NSE IOC.NS Close ({mkt_dt}: ₹{px:.2f})"
                     spoken = (
-                        f"The DCF valuation is ready. Intrinsic value is ₹{iv:.2f} per share against a market price of ₹{px:.2f} "
-                        f"(as of {px_meta.get('date', '2026-03-30')}), so the model suggests IOCL is {verdict} by {abs(upside):.1f}%. "
+                        f"The DCF valuation is ready. Intrinsic value is ₹{iv:.2f} per share against {mkt_phrase}, "
+                        f"so the model suggests IOCL is {verdict} by {abs(upside):.1f}%. "
                         f"{disclaimer}"
                     )
                     result = {
@@ -268,7 +275,7 @@ class JobExecutor:
                             {
                                 "kind": "data",
                                 "object": px_meta.get("source_doc", "market_prices_seed.csv"),
-                                "title": f"NSE IOC.NS Close ({px_meta.get('date', '2026-03-30')}: ₹{px:.2f})",
+                                "title": mkt_title,
                             },
                         ],
                         "export_options": ["xlsx", "sheets", "pdf"],

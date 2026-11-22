@@ -433,7 +433,8 @@ export default function YuktiApp() {
           return c?.visual?.type === 'chart' && isOilOverlayEligible(c.visual.chart);
         });
         const v = String(val || 'brent').toLowerCase();
-        const detail: OilOverlayEventDetail = { value: v === 'off' ? 'off' : v === 'wti' ? 'wti' : v === 'inr' ? 'inr' : 'brent', targetTurnId: target?.contract?.turn_id };
+        const normOv = v === 'off' ? 'off' : v === 'wti' ? 'wti' : v === 'inr' ? 'inr' : v === 'grm' ? 'grm' : v === 'iocl' ? 'iocl' : 'brent';
+        const detail: OilOverlayEventDetail = { value: normOv, targetTurnId: target?.contract?.turn_id };
         window.dispatchEvent(new CustomEvent<OilOverlayEventDetail>(OIL_OVERLAY_EVENT, { detail }));
         if (!detail.handled && detail.value !== 'off')
           pushMessage({
@@ -546,6 +547,9 @@ export default function YuktiApp() {
 
     const onUserTranscript = ({ text, is_final }: { text: string; is_final: boolean }) => {
       if (!text) return;
+      // R10 (plan_fix.md): the server's confirmation echo ("You said: …") must not be glued onto the spoken bubble
+      // or open a duplicate bubble; the user's own words are already on screen.
+      if (/^\s*You said:/i.test(text) && (liveUserMsgRef.current || voiceTurnRef.current)) return;
       speakTrackerRef.current.userTurn(); // P0.10: a new user turn re-opens agent transcripts
       wsAudioGotFirstChunkRef.current = true;
       engineRef.current?.acceptIncoming(); // a new user turn: its reply audio must play (U3.4)

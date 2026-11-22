@@ -29,18 +29,21 @@ def compute_valuation(assumptions, fcff_res):
         
     per_share_val = equity / shares
     
+    def _nz(v: float) -> float:
+        return 0.0 if abs(v) < 1e-9 else v
+
     bridge = [
-        {"label": "PV of FCFF", "value_inr_cr": sum_pv, "source": "Engine"},
-        {"label": "PV of TV", "value_inr_cr": pv_tv, "source": "Engine"},
-        {"label": "Enterprise Value (EV)", "value_inr_cr": ev, "source": "Engine"},
-        {"label": "Less: Borrowings", "value_inr_cr": -assumptions.borrowings_inr_cr.value, "source": assumptions.borrowings_inr_cr.source},
-        {"label": "Less: Lease Liab", "value_inr_cr": -assumptions.lease_liab_inr_cr.value, "source": assumptions.lease_liab_inr_cr.source},
-        {"label": "Less: Decom Prov", "value_inr_cr": -assumptions.decom_provision_inr_cr.value, "source": assumptions.decom_provision_inr_cr.source},
-        {"label": "Add: Cash & CCE", "value_inr_cr": assumptions.cash_and_equivalents_inr_cr.value, "source": assumptions.cash_and_equivalents_inr_cr.source},
-        {"label": "Add: SRF Deposits", "value_inr_cr": assumptions.srf_deposits_inr_cr.value, "source": assumptions.srf_deposits_inr_cr.source},
-        {"label": "Add: Listed Inv", "value_inr_cr": listed_inv, "source": assumptions.listed_investments_inr_cr.source},
-        {"label": "Add: Unlisted Inv", "value_inr_cr": unlisted_inv, "source": assumptions.unlisted_investments_inr_cr.source},
-        {"label": "Equity Value", "value_inr_cr": equity, "source": "Engine"}
+        {"label": "PV of FCFF", "value_inr_cr": _nz(sum_pv), "source": "Engine"},
+        {"label": "PV of TV", "value_inr_cr": _nz(pv_tv), "source": "Engine"},
+        {"label": "Enterprise Value (EV)", "value_inr_cr": _nz(ev), "source": "Engine"},
+        {"label": "Less: Borrowings", "value_inr_cr": _nz(-assumptions.borrowings_inr_cr.value), "source": assumptions.borrowings_inr_cr.source},
+        {"label": "Less: Lease Liab", "value_inr_cr": _nz(-assumptions.lease_liab_inr_cr.value), "source": assumptions.lease_liab_inr_cr.source},
+        {"label": "Less: Decom Prov", "value_inr_cr": _nz(-assumptions.decom_provision_inr_cr.value), "source": assumptions.decom_provision_inr_cr.source},
+        {"label": "Add: Cash & CCE", "value_inr_cr": _nz(assumptions.cash_and_equivalents_inr_cr.value), "source": assumptions.cash_and_equivalents_inr_cr.source},
+        {"label": "Add: SRF Deposits", "value_inr_cr": _nz(assumptions.srf_deposits_inr_cr.value), "source": assumptions.srf_deposits_inr_cr.source},
+        {"label": "Add: Listed Inv", "value_inr_cr": _nz(listed_inv), "source": assumptions.listed_investments_inr_cr.source},
+        {"label": "Add: Unlisted Inv", "value_inr_cr": _nz(unlisted_inv), "source": assumptions.unlisted_investments_inr_cr.source},
+        {"label": "Equity Value", "value_inr_cr": _nz(equity), "source": "Engine"}
     ]
     
     ebitda_last = f_list[-1].get("ebit", 0) + f_list[-1].get("dda", 0)

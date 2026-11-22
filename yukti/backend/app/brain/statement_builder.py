@@ -425,9 +425,13 @@ def _infer_meta(
     else:
         meta = STATEMENT_LINE_META.get(line_code or "")
 
-    # Order: explicit row order (`line_order` or `order`) ALWAYS wins so SSOT order is preserved 100%
+    # Order: explicit row order (`line_order` or `order`) wins, EXCEPT `REV.NET_OF_EXCISE` (whose raw snapshot
+    # `line_order=38` would otherwise place Net Revenue below `PL.TOTAL_INCOME=30` inside the Income section).
     raw_order = raw_row.get("line_order") if raw_row.get("line_order") is not None else raw_row.get("order")
-    order = int(raw_order) if isinstance(raw_order, (int, float)) else (meta[5] if meta else fallback_order)
+    if line_code in ("REV.NET_OF_EXCISE", "net_revenue_inr_cr") and meta:
+        order = meta[5]
+    else:
+        order = int(raw_order) if isinstance(raw_order, (int, float)) else (meta[5] if meta else fallback_order)
 
     # Kind: explicit `kind` or `line_kind` on row, else meta, else label regex
     rk_raw = str(raw_row.get("kind") or raw_row.get("line_kind") or "").strip().lower()
